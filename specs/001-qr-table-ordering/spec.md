@@ -1,9 +1,10 @@
-# Feature Specification: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến Cho Nhà Hàng
+# Feature Specification: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt
 
 **Feature Branch**: `001-qr-table-ordering`  
 **Created**: 2026-10-13  
 **Status**: Draft  
-**Input**: User description: "Hệ thống quản lý đặt bàn và gọi món trực tuyến cho nhà hàng / quán cà phê theo mô hình 3 nhóm người dùng (Anonymous, Logged-in User, Admin/Staff), quản lý thực đơn, sơ đồ bàn kèm mã QR, đặt bàn theo khung giờ, gọi món, cập nhật trạng thái món (Đang nấu -> Đã phục vụ), tích hợp thanh toán trực tuyến, gửi email xác nhận đặt bàn, tải ảnh món ăn, xuất hóa đơn PDF và thống kê doanh thu."
+**Concept & Style**: Nhà hàng Ẩm thực Việt Nam truyền thống & đương đại (**Nhà Hàng Ẩm Thực Bếp Việt** - Phục vụ cơm niêu, lẩu riêu cua bắp bò, các món kho, xào, đồ uống truyền thống và chè cung đình).  
+**Input**: User description: "Hệ thống quản lý đặt bàn và gọi món trực tuyến cho Nhà Hàng Ẩm Thực Bếp Việt theo mô hình 3 nhóm người dùng (Anonymous, Logged-in User, Admin/Staff), quản lý thực đơn ẩm thực Việt Nam, sơ đồ bàn theo khu vực kèm mã QR, đặt bàn theo khung giờ, gọi món, cập nhật trạng thái món (Đang nấu -> Đã phục vụ), tích hợp thanh toán trực tuyến VNPAY, gửi email xác nhận đặt bàn, tải ảnh món ăn Cloudinary, xuất hóa đơn PDF và thống kê doanh thu."
 
 ## User Scenarios & Testing *(mandatory)*
 

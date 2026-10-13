@@ -1,6 +1,6 @@
 # Hợp Đồng Giao Diện REST API Theo 3 Microservices (Phase 1 Interface Contracts)
 
-**Tính năng**: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến Cho Nhà Hàng (`001-qr-table-ordering`)  
+**Tính năng**: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt (`001-qr-table-ordering`)  
 **Định dạng dữ liệu**: `application/json` (riêng tải ảnh dùng `multipart/form-data`, ảnh QR dùng `image/png`, xuất hóa đơn dùng `application/pdf`)
 
 ---

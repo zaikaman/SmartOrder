@@ -1,8 +1,8 @@
 ---
-description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ thống đặt bàn và gọi món trực tuyến"
+description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ thống đặt bàn và gọi món trực tuyến - Nhà Hàng Ẩm Thực Bếp Việt"
 ---
 
-# Tasks: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến Cho Nhà Hàng
+# Tasks: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt
 
 **Input**: Tài liệu thiết kế từ `/specs/001-qr-table-ordering/` (`spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/rest-api.md`, `quickstart.md`)  
 **Prerequisites**: plan.md, spec.md, data-model.md, contracts/rest-api.md, research.md, quickstart.md  
@@ -34,42 +34,42 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 **Mục tiêu**: Xây dựng phần khung kết nối cơ sở dữ liệu, cơ chế xác thực JWT dùng chung, REST client liên service, cấu hình CORS, và bộ lọc xử lý lỗi toàn cục cho cả 3 Microservices trước khi đi vào nghiệp vụ cụ thể.
 
 ### 2.1. Service 1 - Auth & User Service (Cổng 8081)
-- [ ] T008 Tạo tệp pom.xml và Application runner cho Auth Service tại backend/auth-user-service/pom.xml và backend/auth-user-service/src/main/java/com/restaurant/auth/AuthUserServiceApplication.java
-- [ ] T009 Cấu hình application.yml hỗ trợ cả MySQL và H2 in-memory tại backend/auth-user-service/src/main/resources/application.yml
-- [ ] T010 [P] Định nghĩa thực thể User và UserRole enum tại backend/auth-user-service/src/main/java/com/restaurant/auth/entity/User.java và backend/auth-user-service/src/main/java/com/restaurant/auth/entity/UserRole.java
-- [ ] T011 [P] Tạo UserRepository tại backend/auth-user-service/src/main/java/com/restaurant/auth/repository/UserRepository.java
-- [ ] T012 Tạo JwtService phát hành và xác thực JWT Token tại backend/auth-user-service/src/main/java/com/restaurant/auth/security/JwtService.java
-- [ ] T013 Cấu hình Spring Security 6, PasswordEncoder và CorsConfig tại backend/auth-user-service/src/main/java/com/restaurant/auth/config/SecurityConfig.java
-- [ ] T014 Xây dựng GlobalExceptionHandler cho Auth Service tại backend/auth-user-service/src/main/java/com/restaurant/auth/exception/GlobalExceptionHandler.java
-- [ ] T015 Tạo DataInitializer nạp sẵn 3 tài khoản mặc định (admin, staff, customer) tại backend/auth-user-service/src/main/java/com/restaurant/auth/config/DataInitializer.java
+- [X] T008 Tạo tệp pom.xml và Application runner cho Auth Service tại backend/auth-user-service/pom.xml và backend/auth-user-service/src/main/java/com/restaurant/auth/AuthUserServiceApplication.java
+- [X] T009 Cấu hình application.yml hỗ trợ cả MySQL và H2 in-memory tại backend/auth-user-service/src/main/resources/application.yml
+- [X] T010 [P] Định nghĩa thực thể User và UserRole enum tại backend/auth-user-service/src/main/java/com/restaurant/auth/entity/User.java và backend/auth-user-service/src/main/java/com/restaurant/auth/entity/UserRole.java
+- [X] T011 [P] Tạo UserRepository tại backend/auth-user-service/src/main/java/com/restaurant/auth/repository/UserRepository.java
+- [X] T012 Tạo JwtService phát hành và xác thực JWT Token tại backend/auth-user-service/src/main/java/com/restaurant/auth/security/JwtService.java
+- [X] T013 Cấu hình Spring Security 6, PasswordEncoder và CorsConfig tại backend/auth-user-service/src/main/java/com/restaurant/auth/config/SecurityConfig.java
+- [X] T014 Xây dựng GlobalExceptionHandler cho Auth Service tại backend/auth-user-service/src/main/java/com/restaurant/auth/exception/GlobalExceptionHandler.java
+- [X] T015 Tạo DataInitializer nạp sẵn 3 tài khoản mặc định (admin, staff, customer) tại backend/auth-user-service/src/main/java/com/restaurant/auth/config/DataInitializer.java
 
 ### 2.2. Service 2 - Catalog & Table Service (Cổng 8082)
-- [ ] T016 Tạo tệp pom.xml và Application runner cho Catalog Service tại backend/catalog-table-service/pom.xml và backend/catalog-table-service/src/main/java/com/restaurant/catalog/CatalogTableServiceApplication.java
-- [ ] T017 Cấu hình application.yml cho Catalog Service tại backend/catalog-table-service/src/main/resources/application.yml
-- [ ] T018 [P] Định nghĩa thực thể DiningTable và TableStatus enum tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/entity/DiningTable.java và TableStatus.java
-- [ ] T019 [P] Định nghĩa thực thể MenuItem và MenuItemStatus enum tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/entity/MenuItem.java và MenuItemStatus.java
-- [ ] T020 [P] Tạo DiningTableRepository và MenuItemRepository tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/repository/DiningTableRepository.java và MenuItemRepository.java
-- [ ] T021 Tạo bộ lọc JwtAuthenticationFilter xác thực Token stateless tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/security/JwtAuthenticationFilter.java
-- [ ] T022 Cấu hình SecurityConfig cho phép Anonymous đọc GET công khai tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/config/SecurityConfig.java
-- [ ] T023 Xây dựng GlobalExceptionHandler cho Catalog Service tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/exception/GlobalExceptionHandler.java
-- [ ] T024 Tạo DataInitializer nạp sẵn 10 bàn ăn và menu mẫu phong phú tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/config/DataInitializer.java
+- [X] T016 Tạo tệp pom.xml và Application runner cho Catalog Service tại backend/catalog-table-service/pom.xml và backend/catalog-table-service/src/main/java/com/restaurant/catalog/CatalogTableServiceApplication.java
+- [X] T017 Cấu hình application.yml cho Catalog Service tại backend/catalog-table-service/src/main/resources/application.yml
+- [X] T018 [P] Định nghĩa thực thể DiningTable và TableStatus enum tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/entity/DiningTable.java và TableStatus.java
+- [X] T019 [P] Định nghĩa thực thể MenuItem và MenuItemStatus enum tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/entity/MenuItem.java và MenuItemStatus.java
+- [X] T020 [P] Tạo DiningTableRepository và MenuItemRepository tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/repository/DiningTableRepository.java và MenuItemRepository.java
+- [X] T021 Tạo bộ lọc JwtAuthenticationFilter xác thực Token stateless tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/security/JwtAuthenticationFilter.java
+- [X] T022 Cấu hình SecurityConfig cho phép Anonymous đọc GET công khai tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/config/SecurityConfig.java
+- [X] T023 Xây dựng GlobalExceptionHandler cho Catalog Service tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/exception/GlobalExceptionHandler.java
+- [X] T024 Tạo DataInitializer nạp sẵn 10 bàn ăn và menu mẫu phong phú tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/config/DataInitializer.java
 
 ### 2.3. Service 3 - Booking & Order Service (Cổng 8083)
-- [ ] T025 Tạo tệp pom.xml và Application runner cho Booking Service tại backend/booking-order-service/pom.xml và backend/booking-order-service/src/main/java/com/restaurant/booking/BookingOrderServiceApplication.java
-- [ ] T026 Cấu hình application.yml gồm VNPAY, Gmail SMTP và database tại backend/booking-order-service/src/main/resources/application.yml
-- [ ] T027 [P] Định nghĩa thực thể ReservationOrder kèm OrderStatus, PaymentMethod, PaymentStatus enums tại backend/booking-order-service/src/main/java/com/restaurant/booking/entity/ReservationOrder.java
-- [ ] T028 [P] Định nghĩa thực thể OrderItem tại backend/booking-order-service/src/main/java/com/restaurant/booking/entity/OrderItem.java
-- [ ] T029 [P] Tạo ReservationOrderRepository và OrderItemRepository tại backend/booking-order-service/src/main/java/com/restaurant/booking/repository/ReservationOrderRepository.java và OrderItemRepository.java
-- [ ] T030 Tạo bộ lọc JwtAuthenticationFilter tại backend/booking-order-service/src/main/java/com/restaurant/booking/security/JwtAuthenticationFilter.java
-- [ ] T031 Cấu hình SecurityConfig và RestClientConfig để gọi Catalog Service tại backend/booking-order-service/src/main/java/com/restaurant/booking/config/SecurityConfig.java và RestClientConfig.java
-- [ ] T032 Xây dựng GlobalExceptionHandler cho Booking Service tại backend/booking-order-service/src/main/java/com/restaurant/booking/exception/GlobalExceptionHandler.java
+- [X] T025 Tạo tệp pom.xml và Application runner cho Booking Service tại backend/booking-order-service/pom.xml và backend/booking-order-service/src/main/java/com/restaurant/booking/BookingOrderServiceApplication.java
+- [X] T026 Cấu hình application.yml gồm VNPAY, Gmail SMTP và database tại backend/booking-order-service/src/main/resources/application.yml
+- [X] T027 [P] Định nghĩa thực thể ReservationOrder kèm OrderStatus, PaymentMethod, PaymentStatus enums tại backend/booking-order-service/src/main/java/com/restaurant/booking/entity/ReservationOrder.java
+- [X] T028 [P] Định nghĩa thực thể OrderItem tại backend/booking-order-service/src/main/java/com/restaurant/booking/entity/OrderItem.java
+- [X] T029 [P] Tạo ReservationOrderRepository và OrderItemRepository tại backend/booking-order-service/src/main/java/com/restaurant/booking/repository/ReservationOrderRepository.java và OrderItemRepository.java
+- [X] T030 Tạo bộ lọc JwtAuthenticationFilter tại backend/booking-order-service/src/main/java/com/restaurant/booking/security/JwtAuthenticationFilter.java
+- [X] T031 Cấu hình SecurityConfig và RestClientConfig để gọi Catalog Service tại backend/booking-order-service/src/main/java/com/restaurant/booking/config/SecurityConfig.java và RestClientConfig.java
+- [X] T032 Xây dựng GlobalExceptionHandler cho Booking Service tại backend/booking-order-service/src/main/java/com/restaurant/booking/exception/GlobalExceptionHandler.java
 
 ### 2.4. Frontend Client Core (Cổng 5173)
-- [ ] T033 Định nghĩa các kiểu dữ liệu TypeScript (User, DiningTable, MenuItem, ReservationOrder, OrderItem) tại frontend/src/types/index.ts
-- [ ] T034 [P] Xây dựng Axios Client kết nối 3 Microservices (authApi, catalogApi, bookingApi) tại frontend/src/api/client.ts
-- [ ] T035 [P] Xây dựng Zustand Store quản lý phiên đăng nhập (useAuthStore) tại frontend/src/store/useAuthStore.ts
-- [ ] T036 [P] Xây dựng Zustand Store quản lý giỏ hàng món ăn theo bàn (useCartStore) tại frontend/src/store/useCartStore.ts
-- [ ] T037 Xây dựng Router và bộ bọc bảo vệ quyền truy cập (RoleGuard) tại frontend/src/components/layout/RoleGuard.tsx và frontend/src/App.tsx
+- [X] T033 Định nghĩa các kiểu dữ liệu TypeScript (User, DiningTable, MenuItem, ReservationOrder, OrderItem) tại frontend/src/types/index.ts
+- [X] T034 [P] Xây dựng Axios Client kết nối 3 Microservices (authApi, catalogApi, bookingApi) tại frontend/src/api/client.ts
+- [X] T035 [P] Xây dựng Zustand Store quản lý phiên đăng nhập (useAuthStore) tại frontend/src/store/useAuthStore.ts
+- [X] T036 [P] Xây dựng Zustand Store quản lý giỏ hàng món ăn theo bàn (useCartStore) tại frontend/src/store/useCartStore.ts
+- [X] T037 Xây dựng Router và bộ bọc bảo vệ quyền truy cập (RoleGuard) tại frontend/src/components/layout/RoleGuard.tsx và frontend/src/App.tsx
 
 ---
 

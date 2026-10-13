@@ -1,19 +1,20 @@
-# Implementation Plan: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến Cho Nhà Hàng
+# Implementation Plan: Hệ Thống Quản Lý Đặt Bàn và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt
 
-**Branch**: `001-qr-table-ordering` | **Date**: 2026-10-13 | **Spec**: [spec.md](file:///d:/DoAnJ2EE/specs/001-qr-table-ordering/spec.md)
+**Branch**: `main` | **Date**: 2026-10-13 | **Spec**: [spec.md](file:///d:/DoAnJ2EE/specs/001-qr-table-ordering/spec.md)
 **Input**: Feature specification from `/specs/001-qr-table-ordering/spec.md`
+**Concept**: Nhà Hàng Ẩm Thực Bếp Việt (Phong cách Ẩm thực Việt Nam truyền thống & đương đại: Cơm niêu cá kho tộ, lẩu riêu cua bắp bò sườn sụn, nem rán Hà Nội, chả cá Lã Vọng, trà sen, đồ uống giải khát).
 
 ## Summary
 
-Xây dựng **Hệ thống quản lý đặt bàn và gọi món trực tuyến cho nhà hàng / quán cà phê** phục vụ đồ án môn J2EE theo kiến trúc **Microservices (Spring Boot 3.4 + React 19)** vừa sức, chặt chẽ và sẵn sàng triển khai đám mây:
+Xây dựng **Hệ thống quản lý đặt bàn và gọi món trực tuyến cho Nhà Hàng Ẩm Thực Bếp Việt** phục vụ đồ án môn J2EE theo kiến trúc **Microservices (Spring Boot 3.4 + React 19)** vừa sức, chặt chẽ và sẵn sàng triển khai đám mây:
 1. **Phân chia 3 nhóm người dùng rõ ràng**:
-   - **Anonymous (Khách vãng lai)**: Xem thông tin nhà hàng, xem thực đơn (`MenuItem`), tra cứu bàn trống (`DiningTable`), quét mã QR xem món tại bàn.
-   - **Logged-in User (`CUSTOMER`)**: Đặt bàn trước, chọn món vào giỏ và gửi order gọi món, xem lịch sử đặt bàn/hóa đơn cá nhân, thanh toán trực tuyến qua API và tải hóa đơn PDF.
-   - **Admin / Staff (`ADMIN`, `STAFF`)**: Quản lý thực đơn (thêm/sửa/xóa món, giá, tải ảnh), quản lý sơ đồ bàn (`AVAILABLE`, `RESERVED`, `OCCUPIED`), xác nhận đơn đặt bàn, cập nhật trạng thái đơn món (`PREPARING` -> `SERVED` -> `COMPLETED`), xem thống kê doanh thu.
+   - **Anonymous (Khách vãng lai)**: Xem thông tin nhà hàng Bếp Việt, xem thực đơn (`MenuItem`), tra cứu bàn trống theo khu vực (`DiningTable`), quét mã QR xem món tại bàn.
+   - **Logged-in User (`CUSTOMER`)**: Đặt bàn trước, chọn món vào giỏ và gửi order gọi món, xem lịch sử đặt bàn/hóa đơn cá nhân, thanh toán trực tuyến qua API VNPAY và tải hóa đơn PDF.
+   - **Admin / Staff (`ADMIN`, `STAFF`)**: Quản lý thực đơn món Việt (thêm/sửa/xóa món, giá, tải ảnh Cloudinary), quản lý sơ đồ bàn (`AVAILABLE`, `RESERVED`, `OCCUPIED`), xác nhận đơn đặt bàn, cập nhật trạng thái đơn món (`PREPARING` -> `SERVED` -> `COMPLETED`), xem thống kê doanh thu.
 2. **Thiết kế 5 Entity cốt lõi**: `User`, `DiningTable`, `MenuItem`, `ReservationOrder` (Đặt bàn & Hóa đơn), và `OrderItem` (Chi tiết món đặt).
 3. **Kiến trúc 3 Microservices độc lập**:
    - **Service 1 - `auth-user-service` (Port `8081`)**: Đăng ký, đăng nhập, cấp phát JWT Token, phân quyền người dùng.
-   - **Service 2 - `catalog-table-service` (Port `8082`)**: Quản lý danh mục món ăn, bàn ăn, trạng thái bàn, sinh mã QR, tải ảnh món ăn lên Cloudinary. Cho phép Anonymous đọc dữ liệu công khai.
+   - **Service 2 - `catalog-table-service` (Port `8082`)**: Quản lý danh mục món ăn Bếp Việt, bàn ăn, trạng thái bàn, sinh mã QR, tải ảnh món ăn lên Cloudinary. Cho phép Anonymous đọc dữ liệu công khai.
    - **Service 3 - `booking-order-service` (Port `8083`)**: Xử lý đặt bàn, tạo order gọi món, cập nhật trạng thái chế biến, tích hợp cổng thanh toán **VNPAY Sandbox**, tự động gửi Email xác nhận qua **JavaMailSender (Gmail SMTP)**, xuất hóa đơn **PDF** và thống kê doanh thu.
 
 ## Technical Context
