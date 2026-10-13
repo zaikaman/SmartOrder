@@ -19,13 +19,13 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 
 **Mục tiêu**: Thiết lập toàn bộ cấu trúc thư mục gốc, Maven Multi-module cho 3 Backend Microservices, dự án Frontend React, các kiến trúc bảo mật, kết nối cơ sở dữ liệu và công cụ kiểm tra chất lượng tập trung `npm run verify`.
 
-- [ ] T001 Khởi tạo tệp package.json gốc tại d:/DoAnJ2EE/package.json định nghĩa các lệnh điều phối build, test và verify (npm run verify chạy cả Backend lẫn Frontend)
-- [ ] T002 Khởi tạo cấu hình Maven Parent POM tại backend/pom.xml quản lý Java 17, Spring Boot 3.4.x, dependencies chung (Lombok, Validation, JJWT, ZXing, OpenPDF) và 3 sub-modules (auth-user-service, catalog-table-service, booking-order-service)
-- [ ] T003 [P] Cài đặt Maven Wrapper tại backend/mvnw và backend/mvnw.cmd để build độc lập không phụ thuộc biến môi trường hệ thống
-- [ ] T004 [P] Khởi tạo dự án Frontend React 19 + TypeScript + Vite tại frontend/package.json, frontend/tsconfig.json và frontend/vite.config.ts hỗ trợ Proxy tới 3 cổng 8081, 8082, 8083
-- [ ] T005 [P] Cấu hình Tailwind CSS, PostCSS và Lucide Icons tại frontend/tailwind.config.js, frontend/postcss.config.js và frontend/src/index.css
-- [ ] T006 [P] Khởi tạo tệp cấu hình chạy đa container docker-compose.yml tại thư mục gốc d:/DoAnJ2EE/docker-compose.yml hỗ trợ 3 microservices và MySQL
-- [ ] T007 [P] Khởi tạo tệp cấu hình deploy Vercel tại frontend/vercel.json
+- [X] T001 Khởi tạo tệp package.json gốc tại d:/DoAnJ2EE/package.json định nghĩa các lệnh điều phối build, test và verify (npm run verify chạy cả Backend lẫn Frontend)
+- [X] T002 Khởi tạo cấu hình Maven Parent POM tại backend/pom.xml quản lý Java 17, Spring Boot 3.4.x, dependencies chung (Lombok, Validation, JJWT, ZXing, OpenPDF) và 3 sub-modules (auth-user-service, catalog-table-service, booking-order-service)
+- [X] T003 [P] Cài đặt Maven Wrapper tại backend/mvnw và backend/mvnw.cmd để build độc lập không phụ thuộc biến môi trường hệ thống
+- [X] T004 [P] Khởi tạo dự án Frontend React 19 + TypeScript + Vite tại frontend/package.json, frontend/tsconfig.json và frontend/vite.config.ts hỗ trợ Proxy tới 3 cổng 8081, 8082, 8083
+- [X] T005 [P] Cấu hình Tailwind CSS, PostCSS và Lucide Icons tại frontend/tailwind.config.js, frontend/postcss.config.js và frontend/src/index.css
+- [X] T006 [P] Khởi tạo tệp cấu hình chạy đa container docker-compose.yml tại thư mục gốc d:/DoAnJ2EE/docker-compose.yml hỗ trợ 3 microservices và MySQL
+- [X] T007 [P] Khởi tạo tệp cấu hình deploy Vercel tại frontend/vercel.json
 
 ---
 

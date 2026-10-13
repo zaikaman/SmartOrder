@@ -4,6 +4,7 @@ shell commands, and other important information, read the current plan at `specs
 <!-- SPECKIT END -->
 - Luôn nói bằng tiếng Việt có dấu và comment tiếng Việt có dấu các thứ nhưng code bằng tiếng anh
 - Không được tự commit
+- You're only allowed to work on the main branch, nowhere else.
 - Do not write mock or fake code, or hardcode anything, everything must be production-ready and real.
 - When you're done with your tasks, remember to run npm run verify to make sure everything is clean, and only run this when it's actually necessary, like large refactors, big code work, don't run it when you only updated docs for example.
 - Do not use the browser agent to verify the UI, the user will do that himself.

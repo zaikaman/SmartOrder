@@ -1,0 +1,27 @@
+{
+  "name": "restaurant-qr-ordering-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for Restaurant QR Code Table Booking and Ordering System",
+  "scripts": {
+    "verify": "npm run verify:backend && npm run verify:frontend",
+    "verify:backend": "cd backend && mvnw.cmd test",
+    "verify:frontend": "npm --prefix frontend run verify",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && mvnw.cmd clean package -DskipTests",
+    "build:frontend": "npm --prefix frontend run build",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "install:all": "npm install && npm --prefix frontend install",
+    "test": "npm run verify"
+  },
+  "keywords": [
+    "j2ee",
+    "spring-boot",
+    "microservices",
+    "react",
+    "qr-code",
+    "restaurant-ordering"
+  ],
+  "author": "",
+  "license": "ISC"
+}
