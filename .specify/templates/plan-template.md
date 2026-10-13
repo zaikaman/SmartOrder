@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **I. Clean Architecture & Separation of Concerns**: Are presentation, business logic, and persistence layers clearly separated with explicit interfaces?
+- **II. Code Quality & Readability Standards**: Are linting, formatting, and static analysis checks configured and enforced with zero warnings?
+- **III. Test-First & Automated Verification (NON-NEGOTIABLE)**: Are deterministic unit tests planned before or alongside implementation for all business logic and edge cases?
+- **IV. Integration & Contract Testing**: Are integration and contract tests specified for all API endpoints, database repositories, and external boundaries?
+- **V. Maintainability & Simplicity**: Is the design free of speculative abstractions (YAGNI), with all new dependencies explicitly justified?
 
 ## Project Structure
 
