@@ -25,10 +25,21 @@ export default {
           accent: '#b45309', // amber-700
           dark: '#1c1917', // stone-900
           light: '#f5f5f4', // stone-100
+        },
+        bepviet: {
+          brown: '#6d492f',
+          dark: '#3f2615',
+          sand: '#d7bda0',
+          sandLight: '#f3ece3',
+          cream: '#faf7f2',
+          clay: '#b84a28',
+          moss: '#2d5a27',
+          border: '#e6ded4'
         }
       },
       fontFamily: {
         sans: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
     },
   },

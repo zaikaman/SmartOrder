@@ -78,23 +78,23 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 **Mục tiêu**: Khách vãng lai (Anonymous) không cần đăng nhập có thể xem thông tin nhà hàng, duyệt thực đơn theo danh mục, tra cứu bàn trống, và quét mã QR tại bàn để mở thực đơn gắn với số bàn.
 
 ### Kiểm thử cho User Story 1
-- [ ] T038 [P] [US1] Viết Unit test kiểm tra MenuItemService và DiningTableService trả về dữ liệu công khai tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/service/CatalogPublicServiceTest.java
-- [ ] T039 [P] [US1] Viết Integration test cho các endpoint GET công khai (menu, tables, qr-image) tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/controller/CatalogPublicControllerTest.java
+- [X] T038 [P] [US1] Viết Unit test kiểm tra MenuItemService và DiningTableService trả về dữ liệu công khai tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/service/CatalogPublicServiceTest.java
+- [X] T039 [P] [US1] Viết Integration test cho các endpoint GET công khai (menu, tables, qr-image) tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/controller/CatalogPublicControllerTest.java
 
 ### Triển khai Backend cho User Story 1
-- [ ] T040 [P] [US1] Xây dựng QrCodeGeneratorService sử dụng Google ZXing sinh ảnh PNG mã QR tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/QrCodeGeneratorService.java
-- [ ] T041 [US1] Xây dựng MenuService xử lý truy vấn menu công khai tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/MenuService.java
-- [ ] T042 [US1] Xây dựng DiningTableService xử lý tra cứu bàn trống và thông tin bàn tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/DiningTableService.java
-- [ ] T043 [US1] Xây dựng PublicMenuController phục vụ /api/v1/menu/** tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/PublicMenuController.java
-- [ ] T044 [US1] Xây dựng PublicTableController phục vụ /api/v1/tables/** và /api/v1/tables/{id}/qr-image tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/PublicTableController.java
+- [X] T040 [P] [US1] Xây dựng QrCodeGeneratorService sử dụng Google ZXing sinh ảnh PNG mã QR tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/QrCodeGeneratorService.java
+- [X] T041 [US1] Xây dựng MenuService xử lý truy vấn menu công khai tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/MenuService.java
+- [X] T042 [US1] Xây dựng DiningTableService xử lý tra cứu bàn trống và thông tin bàn tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/DiningTableService.java
+- [X] T043 [US1] Xây dựng PublicMenuController phục vụ /api/v1/menu/** tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/PublicMenuController.java
+- [X] T044 [US1] Xây dựng PublicTableController phục vụ /api/v1/tables/** và /api/v1/tables/{id}/qr-image tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/PublicTableController.java
 
 ### Triển khai Frontend cho User Story 1
-- [ ] T045 [P] [US1] Xây dựng thanh điều hướng chung và chân trang tại frontend/src/components/layout/MainHeader.tsx và MainFooter.tsx
-- [ ] T046 [P] [US1] Xây dựng thẻ hiển thị món ăn (MenuItemCard) và thẻ bàn ăn (TableCard) tại frontend/src/components/common/MenuItemCard.tsx và TableCard.tsx
-- [ ] T047 [US1] Xây dựng Trang chủ giới thiệu nhà hàng tại frontend/src/pages/public/HomePage.tsx
-- [ ] T048 [US1] Xây dựng Trang xem thực đơn công khai kèm bộ lọc danh mục và tìm kiếm tại frontend/src/pages/public/PublicMenuPage.tsx
-- [ ] T049 [US1] Xây dựng Trang tra cứu sơ đồ bàn trống theo giờ tại frontend/src/pages/public/TableLookupPage.tsx
-- [ ] T050 [US1] Xây dựng Trang xem món tại bàn khi quét mã QR (/table/:tableNumber) tại frontend/src/pages/public/QrTableOrderPage.tsx
+- [X] T045 [P] [US1] Xây dựng thanh điều hướng chung và chân trang tại frontend/src/components/layout/MainHeader.tsx và MainFooter.tsx
+- [X] T046 [P] [US1] Xây dựng thẻ hiển thị món ăn (MenuItemCard) và thẻ bàn ăn (TableCard) tại frontend/src/components/common/MenuItemCard.tsx và TableCard.tsx
+- [X] T047 [US1] Xây dựng Trang chủ giới thiệu nhà hàng tại frontend/src/pages/public/HomePage.tsx
+- [X] T048 [US1] Xây dựng Trang xem thực đơn công khai kèm bộ lọc danh mục và tìm kiếm tại frontend/src/pages/public/PublicMenuPage.tsx
+- [X] T049 [US1] Xây dựng Trang tra cứu sơ đồ bàn trống theo giờ tại frontend/src/pages/public/TableLookupPage.tsx
+- [X] T050 [US1] Xây dựng Trang xem món tại bàn khi quét mã QR (/table/:tableNumber) tại frontend/src/pages/public/QrTableOrderPage.tsx
 
 ---
 
