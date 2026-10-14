@@ -198,7 +198,7 @@ export const QrTableOrderPage: React.FC = () => {
                 {/* Dish Thumb */}
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden shrink-0 bg-[#f3ece3]">
                   <img
-                    src={item.imageUrl || "https://images.unsplash.com/photo-1544025162-d76694265947?w=600"}
+                    src={item.imageUrl || "https://comnieubepviet.com/thumbs/675x600x1/upload/product/menu-21-tom-rang-trung-muoi-5429.jpg"}
                     alt={item.name}
                     className="w-full h-full object-cover object-center"
                     loading="lazy"

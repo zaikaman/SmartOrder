@@ -103,18 +103,21 @@ export const HomePage: React.FC = () => {
 
           {/* Hero Right Media Preview */}
           <div className="relative w-full max-w-md lg:max-w-lg">
-            <div className="relative rounded-2xl overflow-hidden border-4 border-[#d7bda0] shadow-2xl">
+            <div className="relative rounded-2xl overflow-hidden border-4 border-[#d7bda0] shadow-2xl bg-[#3f2615]">
               <img
-                src="https://comnieubepviet.com/thumbs/1366x660x1/upload/photo/3342641137490594067898603871296799908595091n-64200.jpeg"
-                alt="Cá Chốt Kho Tiêu Bếp Việt"
-                className="w-full h-80 sm:h-96 object-cover object-center"
+                src="https://comnieubepviet.com/upload/product/menu-21-tom-rang-trung-muoi-5429.jpg"
+                alt="Đặc sản Bếp Việt"
+                className="w-full h-80 sm:h-96 object-cover object-center transform hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white">
-                <span className="text-xs font-semibold text-[#d7bda0] uppercase tracking-wider block">
-                  Món Ăn Trứ Danh
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-end p-6 text-white">
+                <span className="inline-block text-xs font-bold text-[#d7bda0] uppercase tracking-widest mb-1">
+                  Đặc Sản Trứ Danh
                 </span>
-                <p className="font-serif text-lg font-bold">
-                  Cá Chốt Kho Tiêu & Cơm Niêu Cháy Giòn
+                <p className="font-serif text-xl sm:text-2xl font-bold leading-snug">
+                  Tôm Rang Trứng Muối & Cơm Niêu Cháy Giòn
+                </p>
+                <p className="text-xs text-[#e4d4c2] mt-1 line-clamp-1">
+                  Công thức gia truyền vàng ươm, đậm đà hương vị biển
                 </p>
               </div>
             </div>

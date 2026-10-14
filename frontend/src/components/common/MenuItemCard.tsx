@@ -28,8 +28,8 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, showOrderActio
 
   const isAvailable = item.status === 'AVAILABLE';
 
-  // Fallback high quality dish image if link fails
-  const fallbackImage = "https://images.unsplash.com/photo-1544025162-d76694265947?w=600";
+  // Fallback high quality dish image from Bep Viet if link fails
+  const fallbackImage = "https://comnieubepviet.com/thumbs/675x600x1/upload/product/menu-21-tom-rang-trung-muoi-5429.jpg";
 
   return (
     <div className="group relative bg-[#faf7f2] rounded-xl overflow-hidden border border-[#e8dbce] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">

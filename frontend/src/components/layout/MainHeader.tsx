@@ -72,14 +72,14 @@ export const MainHeader: React.FC = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo & Brand Identity */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-full bg-[#6d492f] border-2 border-[#d7bda0] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-full bg-[#6d492f] border-2 border-[#d7bda0] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden">
               <UtensilsCrossed className="w-6 h-6 text-[#faf7f2]" />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif text-2xl font-bold tracking-tight text-[#462c1a] group-hover:text-[#b84a28] transition-colors leading-none">
-                BẾP VIỆT
+              <span className="font-serif text-2xl font-bold text-[#462c1a] group-hover:text-[#b84a28] transition-colors leading-none">
+                Bếp Việt
               </span>
-              <span className="text-[11px] font-semibold tracking-[0.2em] text-[#6d492f] uppercase mt-1">
+              <span className="text-[11px] font-semibold tracking-wider text-[#6d492f] uppercase mt-1">
                 Cơm Niêu & Hải Sản
               </span>
             </div>

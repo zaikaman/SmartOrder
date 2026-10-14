@@ -38,8 +38,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"Lora"', '"Playfair Display"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', '"Lora"', 'serif'],
       },
     },
   },

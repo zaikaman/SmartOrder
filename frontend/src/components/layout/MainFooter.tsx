@@ -15,8 +15,8 @@ export const MainFooter: React.FC = () => {
                 <UtensilsCrossed className="w-5 h-5 text-[#faf7f2]" />
               </div>
               <div>
-                <h3 className="font-serif text-xl font-bold tracking-tight text-white leading-tight">
-                  NHÀ HÀNG BẾP VIỆT
+                <h3 className="font-serif text-xl font-bold text-white leading-tight">
+                  Nhà Hàng Bếp Việt
                 </h3>
                 <p className="text-xs uppercase tracking-widest text-[#d7bda0] font-semibold">
                   Cơm Niêu & Hải Sản
