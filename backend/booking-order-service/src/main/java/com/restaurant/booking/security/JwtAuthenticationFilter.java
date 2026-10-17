@@ -56,12 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String username = claims.getSubject();
             String role = (String) claims.get("role");
+            Object userIdObj = claims.get("userId");
+            Long userId = userIdObj instanceof Number ? ((Number) userIdObj).longValue() : null;
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         username,
-                        null,
+                        userId, // Dung credentials de chua userId giup controller trich xuat de dang
                         Collections.singletonList(authority)
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

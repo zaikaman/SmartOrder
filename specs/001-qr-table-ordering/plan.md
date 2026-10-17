@@ -8,21 +8,26 @@
 
 Xây dựng **Hệ thống quản lý đặt bàn và gọi món trực tuyến cho Nhà Hàng Ẩm Thực Bếp Việt** phục vụ đồ án môn J2EE theo kiến trúc **Microservices (Spring Boot 3.4 + React 19)** vừa sức, chặt chẽ và sẵn sàng triển khai đám mây:
 1. **Phân chia 3 nhóm người dùng rõ ràng**:
-   - **Anonymous (Khách vãng lai)**: Xem thông tin nhà hàng Bếp Việt, xem thực đơn (`MenuItem`), tra cứu bàn trống theo khu vực (`DiningTable`), quét mã QR xem món tại bàn.
+   - **Anonymous (Khách vãng lai)**: Xem thông tin nhà hàng Bếp Việt, xem thực đơn (`MenuItem`), tra cứu bàn trống theo khu vực (`DiningTable`), quét mã QR xem món tại bàn, sử dụng Trợ lý AI tư vấn mâm cơm Bếp Việt, đăng nhập bằng tài khoản hoặc Google OAuth2.
    - **Logged-in User (`CUSTOMER`)**: Đặt bàn trước, chọn món vào giỏ và gửi order gọi món, xem lịch sử đặt bàn/hóa đơn cá nhân, thanh toán trực tuyến qua API VNPAY và tải hóa đơn PDF.
    - **Admin / Staff (`ADMIN`, `STAFF`)**: Quản lý thực đơn món Việt (thêm/sửa/xóa món, giá, tải ảnh Cloudinary), quản lý sơ đồ bàn (`AVAILABLE`, `RESERVED`, `OCCUPIED`), xác nhận đơn đặt bàn, cập nhật trạng thái đơn món (`PREPARING` -> `SERVED` -> `COMPLETED`), xem thống kê doanh thu.
 2. **Thiết kế 5 Entity cốt lõi**: `User`, `DiningTable`, `MenuItem`, `ReservationOrder` (Đặt bàn & Hóa đơn), và `OrderItem` (Chi tiết món đặt).
 3. **Kiến trúc 3 Microservices độc lập**:
-   - **Service 1 - `auth-user-service` (Port `8081`)**: Đăng ký, đăng nhập, cấp phát JWT Token, phân quyền người dùng.
-   - **Service 2 - `catalog-table-service` (Port `8082`)**: Quản lý danh mục món ăn Bếp Việt, bàn ăn, trạng thái bàn, sinh mã QR, tải ảnh món ăn lên Cloudinary. Cho phép Anonymous đọc dữ liệu công khai.
+   - **Service 1 - `auth-user-service` (Port `8081`)**: Đăng ký, đăng nhập tài khoản thường và Google OAuth2, cấp phát JWT Token, phân quyền người dùng.
+   - **Service 2 - `catalog-table-service` (Port `8082`)**: Quản lý danh mục món ăn Bếp Việt, bàn ăn, trạng thái bàn, sinh mã QR, tải ảnh món ăn lên Cloudinary, tích hợp Trợ lý AI gợi ý món ăn. Cho phép Anonymous đọc dữ liệu công khai.
    - **Service 3 - `booking-order-service` (Port `8083`)**: Xử lý đặt bàn, tạo order gọi món, cập nhật trạng thái chế biến, tích hợp cổng thanh toán **VNPAY Sandbox**, tự động gửi Email xác nhận qua **JavaMailSender (Gmail SMTP)**, xuất hóa đơn **PDF** và thống kê doanh thu.
+4. **Hệ thống 12 màn hình giao diện hoàn chỉnh**:
+   - Khách vãng lai: (1) Trang chủ, (2) Xem thực đơn, (3) Tra cứu sơ đồ bàn, (4) Đặt món qua mã QR tại bàn, (5) Trợ lý AI tư vấn mâm cơm, (6) Đăng nhập & Đăng ký (hỗ trợ Google OAuth2).
+   - Khách hàng (`CUSTOMER`): (7) Đặt bàn trước & giỏ món, (8) Lịch sử đặt bàn & hóa đơn cá nhân, (9) Kết quả thanh toán VNPAY & xuất PDF.
+   - Nhân viên (`STAFF`): (10) Sơ đồ bàn & check-in khách, (11) Màn hình điều phối chế biến Bếp.
+   - Quản trị viên (`ADMIN`): (12) Bảng điều khiển quản trị menu, người dùng và biểu đồ doanh thu.
 
 ## Technical Context
 
 **Language/Version**: Java 17 LTS (Backend Microservices), TypeScript 5.x / Node.js 24.x (Frontend React)  
 **Primary Dependencies**:
-- **Backend (Maven Multi-module)**: Spring Boot 3.4.x (`spring-boot-starter-web`, `spring-boot-starter-data-jpa`, `spring-boot-starter-security`, `spring-boot-starter-validation`, `spring-boot-starter-mail`), JJWT (`io.jsonwebtoken`), Google ZXing (`com.google.zxing` sinh mã QR bàn), OpenPDF (`com.github.librepdf:openpdf` xuất hóa đơn PDF tiếng Việt), Cloudinary HTTP/REST integration, VNPAY HMAC-SHA512 integration.
-- **Frontend**: React 19, Vite 6, TypeScript, Tailwind CSS, React Router v7, Axios, TanStack Query v5, Zustand, Lucide React.  
+- **Backend (Maven Multi-module)**: Spring Boot 3.4.x (`spring-boot-starter-web`, `spring-boot-starter-data-jpa`, `spring-boot-starter-security`, `spring-boot-starter-validation`, `spring-boot-starter-mail`), JJWT (`io.jsonwebtoken`), Google Auth Library / Google ID Token verifier, Google ZXing (`com.google.zxing` sinh mã QR bàn), OpenPDF (`com.github.librepdf:openpdf` xuất hóa đơn PDF tiếng Việt), Cloudinary HTTP/REST integration, VNPAY HMAC-SHA512 integration.
+- **Frontend**: React 19, Vite 6, TypeScript, Tailwind CSS, React Router v7, Axios, TanStack Query v5, Zustand, Lucide React, Google OAuth2 React integration.  
 **Storage**: MySQL 8.x (tương thích Aiven MySQL Free Tier trên Cloud & MySQL cục bộ) và H2 Database ở chế độ tương thích MySQL (cho phát triển nhanh & kiểm thử tự động cô lập).  
 **Testing**: JUnit 5, Mockito, Spring Boot Test (`MockMvc`, `@SpringBootTest`) cho cả 3 Microservices; Vitest và React Testing Library cho Frontend.  
 **Target Platform**: Web Application đa thiết bị; sẵn sàng deploy Frontend lên **Vercel / Netlify**, Backend đóng gói JAR/Docker lên **Heroku**, và Database trên **Aiven MySQL / Heroku Data**.  

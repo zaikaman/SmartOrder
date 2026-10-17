@@ -13,12 +13,14 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
+import { CartDrawer } from '../common/CartDrawer';
 
 export const MainHeader: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { getTotalQuantity, tableNumber } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
   const cartCount = getTotalQuantity();
 
@@ -31,7 +33,9 @@ export const MainHeader: React.FC = () => {
     { to: '/', label: 'Trang chủ' },
     { to: '/menu', label: 'Thực đơn' },
     { to: '/tables', label: 'Sơ đồ bàn' },
+    { to: '/booking', label: 'Đặt bàn trước' },
     { to: '/table/T01', label: 'Gọi món tại bàn (QR)' },
+    ...(isAuthenticated ? [{ to: '/my-orders', label: 'Lịch sử đơn' }] : []),
   ];
 
   return (
@@ -117,10 +121,11 @@ export const MainHeader: React.FC = () => {
             </Link>
 
             {/* Cart Preview Button */}
-            <Link
-              to={tableNumber ? `/table/${tableNumber}` : '/menu'}
+            <button
+              type="button"
+              onClick={() => setCartDrawerOpen(true)}
               className="relative p-2.5 rounded-full bg-[#f3ece3] hover:bg-[#e8dcce] text-[#462c1a] border border-[#d7bda0]/70 transition-colors"
-              title="Giỏ món ăn"
+              title="Mở giỏ món ăn"
             >
               <ShoppingBag className="w-5 h-5" />
               {cartCount > 0 && (
@@ -128,7 +133,7 @@ export const MainHeader: React.FC = () => {
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* Authentication Buttons */}
             {isAuthenticated && user ? (
@@ -203,6 +208,8 @@ export const MainHeader: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Cart Drawer Component */}
+      <CartDrawer isOpen={cartDrawerOpen} onClose={() => setCartDrawerOpen(false)} />
     </header>
   );
 };

@@ -25,6 +25,8 @@ erDiagram
         VARCHAR full_name
         VARCHAR phone
         VARCHAR role "CUSTOMER | STAFF | ADMIN"
+        VARCHAR auth_provider "LOCAL | GOOGLE"
+        VARCHAR avatar_url
     }
 
     DINING_TABLES {
@@ -86,8 +88,10 @@ Lưu trữ thông tin tài khoản người dùng và phân quyền truy cập.
 | `password` | `VARCHAR(255)` / `String` | NOT NULL | Mật khẩu đã mã hóa BCrypt |
 | `email` | `VARCHAR(120)` / `String` | UNIQUE, NOT NULL | Địa chỉ email nhận xác nhận đặt bàn |
 | `full_name` | `VARCHAR(120)` / `String` | NOT NULL | Họ và tên khách hàng / nhân viên |
-| `phone` | `VARCHAR(20)` / `String` | NOT NULL | Số điện thoại liên hệ |
+| `phone` | `VARCHAR(20)` / `String` | NULLABLE (đối với Google login) | Số điện thoại liên hệ |
 | `role` | `VARCHAR(20)` / `UserRole` | NOT NULL | Enum: `CUSTOMER`, `STAFF`, `ADMIN` |
+| `auth_provider` | `VARCHAR(20)` / `String` | NOT NULL, Default `'LOCAL'` | Nguồn xác thực: `'LOCAL'`, `'GOOGLE'` |
+| `avatar_url` | `VARCHAR(255)` / `String` | NULLABLE | Đường dẫn ảnh đại diện (lấy từ Google nếu có) |
 | `active` | `BOOLEAN` / `boolean` | NOT NULL, Default `true` | Trạng thái hoạt động của tài khoản |
 | `created_at` | `TIMESTAMP` / `Instant` | NOT NULL | Thời điểm tạo tài khoản |
 

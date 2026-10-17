@@ -8,6 +8,8 @@ export interface User {
   fullName: string;
   phone?: string;
   role: UserRole;
+  authProvider?: string;
+  avatarUrl?: string;
   active: boolean;
   createdAt?: string;
 }
@@ -109,6 +111,9 @@ export interface CreateOrderRequest {
   tableId: number;
   reservationTime: string;
   partySize: number;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
   note?: string;
   paymentMethod?: PaymentMethod;
   items?: CreateOrderItemRequest[];

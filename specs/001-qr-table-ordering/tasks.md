@@ -98,27 +98,27 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 
 ---
 
-## Phase 4: User Story 2 - Khách Đã Đăng Nhập Đặt Bàn, Gọi Món & Nhận Email (Priority: P1)
+## Phase 4: User Story 2 - Khách Đã Đăng Nhập Đặt Bàn, Gọi Món, Google OAuth2 & Nhận Email (Priority: P1)
 
-**Mục tiêu**: Khách hàng đăng ký/đăng nhập tài khoản (`CUSTOMER`), đặt bàn trước theo khung giờ có chống trùng, chọn món vào giỏ hàng gửi order, tự động nhận email xác nhận qua Gmail SMTP, và xem lịch sử cá nhân.
+**Mục tiêu**: Khách hàng đăng ký/đăng nhập tài khoản (`CUSTOMER`) bằng tài khoản thường hoặc Google OAuth2, đặt bàn trước theo khung giờ có chống trùng, chọn món vào giỏ hàng gửi order, tự động nhận email xác nhận qua Gmail SMTP, và xem lịch sử cá nhân.
 
 ### Kiểm thử cho User Story 2
-- [ ] T051 [P] [US2] Viết Unit test đăng ký, đăng nhập, tạo token JWT tại backend/auth-user-service/src/test/java/com/restaurant/auth/service/AuthServiceTest.java
-- [ ] T052 [P] [US2] Viết Unit test kiểm tra logic đặt bàn, chống trùng khung giờ, tính tổng tiền order tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/BookingOrderServiceTest.java
-- [ ] T053 [P] [US2] Viết Integration test tạo đơn đặt bàn và order của Customer tại backend/booking-order-service/src/test/java/com/restaurant/booking/controller/BookingCustomerControllerTest.java
+- [X] T051 [P] [US2] Viết Unit test đăng ký, đăng nhập tài khoản thường và Google OAuth2, tạo token JWT tại backend/auth-user-service/src/test/java/com/restaurant/auth/service/AuthServiceTest.java
+- [X] T052 [P] [US2] Viết Unit test kiểm tra logic đặt bàn, chống trùng khung giờ, tính tổng tiền order tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/BookingOrderServiceTest.java
+- [X] T053 [P] [US2] Viết Integration test tạo đơn đặt bàn và order của Customer tại backend/booking-order-service/src/test/java/com/restaurant/booking/controller/BookingCustomerControllerTest.java
 
 ### Triển khai Backend cho User Story 2
-- [ ] T054 [P] [US2] Xây dựng AuthService và UserController tại backend/auth-user-service/src/main/java/com/restaurant/auth/service/AuthService.java và backend/auth-user-service/src/main/java/com/restaurant/auth/controller/AuthController.java
-- [ ] T055 [P] [US2] Xây dựng EmailNotificationService sử dụng JavaMailSender gửi email HTML xác nhận đặt bàn qua Gmail SMTP tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/EmailNotificationService.java
-- [ ] T056 [US2] Xây dựng CatalogTableClient trong Booking Service để truy vấn giá món và cập nhật trạng thái bàn tại backend/booking-order-service/src/main/java/com/restaurant/booking/client/CatalogTableClient.java
-- [ ] T057 [US2] Xây dựng BookingOrderService tạo đơn đặt bàn, tính tổng tiền và lưu OrderItem tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/BookingOrderService.java
-- [ ] T058 [US2] Xây dựng BookingOrderController phục vụ /api/v1/orders cho Customer tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/BookingOrderController.java
+- [X] T054 [P] [US2] Xây dựng AuthService và AuthController hỗ trợ login, register và Google OAuth2 (POST /api/v1/auth/google) tại backend/auth-user-service/src/main/java/com/restaurant/auth/service/AuthService.java và backend/auth-user-service/src/main/java/com/restaurant/auth/controller/AuthController.java
+- [X] T055 [P] [US2] Xây dựng EmailNotificationService sử dụng JavaMailSender gửi email HTML xác nhận đặt bàn qua Gmail SMTP tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/EmailNotificationService.java
+- [X] T056 [US2] Xây dựng CatalogTableClient trong Booking Service để truy vấn giá món và cập nhật trạng thái bàn tại backend/booking-order-service/src/main/java/com/restaurant/booking/client/CatalogTableClient.java
+- [X] T057 [US2] Xây dựng BookingOrderService tạo đơn đặt bàn, tính tổng tiền và lưu OrderItem tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/BookingOrderService.java
+- [X] T058 [US2] Xây dựng BookingOrderController phục vụ /api/v1/orders cho Customer tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/BookingOrderController.java
 
 ### Triển khai Frontend cho User Story 2
-- [ ] T059 [P] [US2] Xây dựng Trang Đăng nhập và Trang Đăng ký tại frontend/src/pages/public/LoginPage.tsx và RegisterPage.tsx
-- [ ] T060 [US2] Xây dựng Form Đặt bàn trước chọn bàn và thời gian tại frontend/src/pages/customer/BookingAndOrderPage.tsx
-- [ ] T061 [US2] Xây dựng Ngăn kéo giỏ hàng (CartDrawer) và chức năng xác nhận gửi order tại frontend/src/components/common/CartDrawer.tsx
-- [ ] T062 [US2] Xây dựng Trang Lịch sử đặt bàn và đơn gọi món cá nhân tại frontend/src/pages/customer/MyOrdersHistoryPage.tsx
+- [X] T059 [P] [US2] Xây dựng Trang Đăng nhập và Trang Đăng ký hỗ trợ nút Đăng nhập bằng Google tại frontend/src/pages/public/LoginPage.tsx và RegisterPage.tsx
+- [X] T060 [US2] Xây dựng Form Đặt bàn trước chọn bàn và thời gian tại frontend/src/pages/customer/BookingAndOrderPage.tsx
+- [X] T061 [US2] Xây dựng Ngăn kéo giỏ hàng (CartDrawer) và chức năng xác nhận gửi order tại frontend/src/components/common/CartDrawer.tsx
+- [X] T062 [US2] Xây dựng Trang Lịch sử đặt bàn và đơn gọi món cá nhân tại frontend/src/pages/customer/MyOrdersHistoryPage.tsx
 
 ---
 
@@ -175,18 +175,20 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 - [ ] T082 [US5] Xây dựng AdminMenuController phục vụ CRUD menu kèm tải ảnh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminMenuController.java
 - [ ] T083 [US5] Xây dựng AdminTableController phục vụ CRUD bàn ăn tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminTableController.java
 - [ ] T084 [US5] Xây dựng StatisticsService và AdminStatisticsController thống kê doanh thu tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/StatisticsService.java và backend/booking-order-service/src/main/java/com/restaurant/booking/controller/AdminStatisticsController.java
+- [ ] T084b [P] [US5] Xây dựng AiRecommendationService và AiRecommendationController phục vụ gợi ý mâm cơm Bếp Việt thông minh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/AiRecommendationService.java
 
 ### Triển khai Frontend cho User Story 5
 - [ ] T085 [P] [US5] Xây dựng Trang Quản lý Thực đơn kèm form upload ảnh Cloudinary tại frontend/src/pages/admin/AdminMenuManagementPage.tsx
 - [ ] T086 [P] [US5] Xây dựng Trang Quản lý Bàn kèm modal in/tải mã QR bàn tại frontend/src/pages/admin/AdminTableQrPage.tsx
 - [ ] T087 [P] [US5] Xây dựng Trang Quản lý Người dùng và phân quyền tại frontend/src/pages/admin/AdminUsersPage.tsx
 - [ ] T088 [US5] Xây dựng Trang Bảng điều khiển Thống kê Doanh thu và Top món bán chạy tại frontend/src/pages/admin/AdminRevenueStatsPage.tsx
+- [ ] T088b [P] [US5] Xây dựng Modal / Trang Trợ lý AI gợi ý món ăn (AiFoodAssistantModal) tại frontend/src/components/common/AiFoodAssistantModal.tsx
 
 ---
 
-## Phase 8: Polish, Packaging & Cloud Deployment (Heroku + Vercel)
+## Phase 8: Polish, Packaging, Báo Cáo Đồ Án & Cloud Deployment (Heroku + Vercel)
 
-**Mục tiêu**: Hoàn thiện các tệp Dockerfile cho từng service, tệp Procfile cho Heroku, kịch bản chạy kiểm thử tự động npm run verify trên toàn bộ workspace và hướng dẫn báo cáo đồ án.
+**Mục tiêu**: Hoàn thiện các tệp Dockerfile cho từng service, tệp Procfile cho Heroku, kịch bản chạy kiểm thử tự động npm run verify trên toàn bộ workspace, và biên soạn Báo cáo đồ án đầy đủ (docs/REPORT.md).
 
 - [ ] T089 [P] Tạo Dockerfile cho Service 1 tại backend/auth-user-service/Dockerfile
 - [ ] T090 [P] Tạo Dockerfile cho Service 2 tại backend/catalog-table-service/Dockerfile
@@ -195,6 +197,7 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 - [ ] T093 Cập nhật kịch bản npm run verify tại package.json gốc để chạy toàn bộ bộ kiểm thử Backend trên cả 3 microservices và build Frontend
 - [ ] T094 Chạy kiểm tra thực tế toàn bộ test suite và build qua npm run verify để đảm bảo zero warning và zero lỗi
 - [ ] T095 [P] Viết tệp README.md đầy đủ tại d:/DoAnJ2EE/README.md hướng dẫn chi tiết chạy cục bộ, tài khoản mẫu, test VNPAY Sandbox và deploy Heroku/Vercel
+- [ ] T096 [P] Biên soạn Báo cáo đồ án J2EE đầy đủ (docs/REPORT.md) bao gồm đặt vấn đề, kiến trúc Microservices, sơ đồ ERD, luồng xác thực Google OAuth2, thanh toán VNPAY, hướng dẫn sử dụng và kết quả đạt được.
 
 ---
 

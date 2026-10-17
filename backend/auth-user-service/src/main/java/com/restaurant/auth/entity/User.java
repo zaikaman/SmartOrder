@@ -56,6 +56,13 @@ public class User {
     @Builder.Default
     private UserRole role = UserRole.CUSTOMER;
 
+    @Column(name = "auth_provider", nullable = false, length = 20)
+    @Builder.Default
+    private String authProvider = "LOCAL";
+
+    @Column(name = "avatar_url", length = 255)
+    private String avatarUrl;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;

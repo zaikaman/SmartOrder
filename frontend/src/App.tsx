@@ -6,6 +6,10 @@ import { HomePage } from './pages/public/HomePage';
 import { PublicMenuPage } from './pages/public/PublicMenuPage';
 import { TableLookupPage } from './pages/public/TableLookupPage';
 import { QrTableOrderPage } from './pages/public/QrTableOrderPage';
+import { LoginPage } from './pages/public/LoginPage';
+import { RegisterPage } from './pages/public/RegisterPage';
+import { BookingAndOrderPage } from './pages/customer/BookingAndOrderPage';
+import { MyOrdersHistoryPage } from './pages/customer/MyOrdersHistoryPage';
 
 // Placeholder view cho cac route danh cho cac Phase tiep theo (Phase 4 -> Phase 7)
 const PlaceholderView = ({ title, desc }: { title: string; desc: string }) => (
@@ -42,21 +46,15 @@ export default function App() {
             <Route path="/table/:tableNumber" element={<QrTableOrderPage />} />
 
             {/* Auth Routes */}
-            <Route
-              path="/login"
-              element={<PlaceholderView title="Đăng Nhập Khách Hàng / Nhân Viên" desc="Đăng nhập tài khoản để đặt bàn trước và lưu trữ lịch sử gọi món." />}
-            />
-            <Route
-              path="/register"
-              element={<PlaceholderView title="Đăng Ký Tài Khoản" desc="Tạo tài khoản khách hàng mới để nhận ưu đãi từ Nhà hàng Bếp Việt." />}
-            />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
             {/* 2. Customer Protected Routes (Phase 4) */}
             <Route
               path="/booking"
               element={
                 <RoleGuard allowedRoles={['CUSTOMER', 'STAFF', 'ADMIN']}>
-                  <PlaceholderView title="Đặt Bàn Trước & Chọn Món" desc="Chọn bàn, chọn khung giờ chống trùng lặp và gửi order món ăn." />
+                  <BookingAndOrderPage />
                 </RoleGuard>
               }
             />
@@ -64,7 +62,7 @@ export default function App() {
               path="/my-orders"
               element={
                 <RoleGuard allowedRoles={['CUSTOMER', 'STAFF', 'ADMIN']}>
-                  <PlaceholderView title="Lịch Sử Đặt Bàn & Hóa Đơn Cá Nhân" desc="Danh sách các đơn đặt bàn và gọi món của bạn kèm hóa đơn PDF." />
+                  <MyOrdersHistoryPage />
                 </RoleGuard>
               }
             />

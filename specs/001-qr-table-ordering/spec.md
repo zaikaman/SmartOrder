@@ -113,10 +113,28 @@ Quản trị viên (`ADMIN`) quản lý danh mục thực đơn (thêm, sửa, x
 - **FR-010**: Hệ thống PHẢI tích hợp cổng thanh toán trực tuyến để tạo đường dẫn thanh toán cho đơn đặt bàn/hóa đơn gọi món và xác thực kết quả thanh toán tự động.
 - **FR-011**: Hệ thống PHẢI hỗ trợ xuất hóa đơn định dạng PDF tiếng Việt có dấu đầy đủ thông tin đơn hàng và chi tiết các món đã gọi.
 - **FR-012**: Hệ thống PHẢI cung cấp báo cáo thống kê doanh thu theo khoảng thời gian, số lượng đơn hoàn thành và danh sách món ăn bán chạy dành cho Quản trị viên.
+- **FR-013 (Đăng nhập Gmail/Google OAuth2)**: Hệ thống PHẢI hỗ trợ đăng nhập nhanh bằng tài khoản Gmail / Google OAuth2, tự động tạo tài khoản `CUSTOMER` nếu là lần đầu đăng nhập, và cấp phát JWT token an toàn.
+- **FR-014 (Tích hợp Trợ lý AI - Điểm cộng)**: Hệ thống PHẢI tích hợp tính năng Trợ lý AI Gợi Ý Mâm Cơm & Tư Vấn Món Ăn Bếp Việt (AI Menu Planner & Recommendation Assistant). Thực khách có thể nhập số lượng người ăn, ngân sách dự kiến, yêu cầu khẩu vị (ví dụ: thích hải sản, không cay, có trẻ em, ăn chay) để AI tự động phân tích 22 món ăn trong thực đơn thực tế và đề xuất combo bữa ăn tối ưu kèm giải thích và nút 1-click thêm vào giỏ hàng.
+- **FR-015 (Giao diện tối thiểu 10 màn hình)**: Hệ thống PHẢI sở hữu giao diện người dùng trực quan, responsive, thiết kế theo nhận diện ẩm thực Cơm Niêu Bếp Việt với tối thiểu 12 màn hình chức năng:
+  1. `Trang chủ`: Giới thiệu không gian, văn hóa ẩm thực Bếp Việt, món tiêu biểu và quy trình gọi món QR (`/`)
+  2. `Trang Thực đơn`: Duyệt 22 món ăn theo 5 danh mục, tìm kiếm theo từ khóa thời gian thực (`/menu`)
+  3. `Trang Sơ đồ bàn`: Tra cứu bàn trống, lọc theo khu vực (Tầng 1, Tầng 2, VIP) và sức chứa kèm mã QR (`/tables`)
+  4. `Trang Gọi món tại bàn qua QR`: Thực đơn riêng gắn số bàn, giỏ hàng nổi, ghi chú gia vị từng món (`/table/:tableNumber`)
+  5. `Trang Đăng nhập`: Hỗ trợ đăng nhập truyền thống và Đăng nhập 1-click bằng Gmail / Google (`/login`)
+  6. `Trang Đăng ký`: Mở tài khoản khách hàng mới (`/register`)
+  7. `Trang Đặt bàn trước & Gọi món trước`: Form chọn bàn, ngày giờ, số khách chống trùng lặp (`/booking`)
+  8. `Trang Lịch sử đơn hàng cá nhân`: Theo dõi trạng thái đơn đặt bàn, đơn gọi món của Customer (`/my-orders`)
+  9. `Trang Tiếp nhận kết quả thanh toán VNPAY`: Xác minh chữ ký số giao dịch và hiển thị hóa đơn (`/payment/vnpay-return`)
+  10. `Màn hình Bếp KDS (Kitchen Order Board)`: Dành cho Bếp/Staff cập nhật Đang nấu -> Đã phục vụ (`/staff/orders`)
+  11. `Màn hình Quản lý sơ đồ bàn cho Nhân viên`: Tiếp nhận khách, check-in, đổi trạng thái bàn (`/staff/tables`)
+  12. `Trang Quản trị thực đơn Admin`: CRUD món ăn, tải ảnh lên Cloudinary (`/admin/menu`)
+  13. `Trang Quản trị bàn & xuất mã QR`: Tạo bàn mới, tải ảnh PNG mã QR bàn (`/admin/tables`)
+  14. `Trang Thống kê doanh thu`: Báo cáo doanh thu, biểu đồ và Top món bán chạy (`/admin/stats`)
+- **FR-016 (Báo cáo đồ án)**: Dự án PHẢI có tài liệu báo cáo đồ án hoàn chỉnh (`docs/REPORT.md`) bao gồm: Đặt vấn đề, Kiến trúc Microservices, Thiết kế CSDL qua Spring Data JPA, Hợp đồng REST API, Bảo mật OAuth2/JWT, Tích hợp VNPAY, Spring Mail, AI Gemini, Hướng dẫn chạy và Kết luận.
 
 ### Key Entities *(include if feature involves data)*
 
-- **User (Account)**: Tài khoản người dùng gồm `id`, `username`, `password`, `email`, `full_name`, `phone`, `role` (`CUSTOMER`, `ADMIN`, `STAFF`), `active`.
+- **User (Account)**: Tài khoản người dùng gồm `id`, `username`, `password`, `email`, `full_name`, `phone`, `role` (`CUSTOMER`, `ADMIN`, `STAFF`), `auth_provider` (`LOCAL`, `GOOGLE`), `active`.
 - **DiningTable (Table - Bàn ăn)**: Thông tin bàn ăn gồm `id`, `table_number`, `capacity` (số ghế), `area`, `status` (`AVAILABLE`, `RESERVED`, `OCCUPIED`), `qr_code_url`.
 - **MenuItem (Món ăn)**: Thông tin món ăn gồm `id`, `name`, `price`, `description`, `category`, `image_url`, `status` (`AVAILABLE`, `OUT_OF_STOCK`, `INACTIVE`).
 - **Reservation / Order (Đặt bàn & Đơn gọi món/Hóa đơn)**: Lưu thông tin đặt bàn và hóa đơn gọi món gồm `id`, `order_code`, `user_id`, `table_id`, `reservation_time`, `party_size`, `total_amount`, `payment_method`, `payment_status`, `status` (`PENDING`, `CONFIRMED`, `PREPARING`, `SERVED`, `COMPLETED`, `CANCELLED`).
@@ -127,12 +145,13 @@ Quản trị viên (`ADMIN`) quản lý danh mục thực đơn (thêm, sửa, x
 ### Measurable Outcomes
 
 - **SC-001**: Khách vãng lai (Anonymous) có thể quét mã QR hoặc truy cập trang chủ để xem thực đơn và tra cứu bàn trống trong thời gian phản hồi dưới 2 giây mà không cần đăng nhập.
-- **SC-002**: Khách hàng đã đăng nhập có thể hoàn tất quy trình đặt bàn trước hoặc gửi đơn gọi món trong dưới 90 giây và nhận được thông tin xác nhận qua email.
-- **SC-003**: 100% các đơn hàng thanh toán trực tuyến có tổng số tiền (`total_amount`) bằng chính xác tổng `subtotal` của các dòng `OrderItem` và xuất được tệp hóa đơn PDF hợp lệ trong dưới 5 giây.
-- **SC-004**: 100% các yêu cầu truy cập trái phép giữa 3 nhóm người dùng (Anonymous, Logged-in Customer, Admin/Staff) bị chặn chính xác theo ma trận phân quyền.
-- **SC-005**: Hệ thống đảm bảo tính độc lập của từng phân hệ chức năng (Xác thực & Người dùng, Thực đơn & Bàn ăn, Đặt bàn & Đơn hàng) và sẵn sàng đóng gói triển khai lên môi trường đám mây.
+- **SC-002**: Khách hàng có thể đăng nhập bằng Gmail / Google trong 1 thao tác hoặc đăng ký/đăng nhập truyền thống và hoàn tất đặt bàn trong dưới 90 giây.
+- **SC-003**: 100% các đơn hàng thanh toán trực tuyến qua VNPAY Sandbox có chữ ký số HMAC-SHA512 hợp lệ, khớp đúng số tiền và xuất được tệp hóa đơn PDF tiếng Việt trong dưới 5 giây.
+- **SC-004**: Trợ lý AI gợi ý mâm cơm phân tích thực đơn và trả về combo món phù hợp theo số người, ngân sách và sở thích trong dưới 3 giây.
+- **SC-005**: 100% các yêu cầu truy cập trái phép giữa 3 nhóm người dùng (Anonymous, Logged-in Customer, Admin/Staff) bị chặn chính xác theo ma trận phân quyền.
+- **SC-006**: Toàn bộ hệ thống đáp ứng đủ 12 màn hình giao diện người dùng, tổ chức sạch sẽ theo 3 Spring Boot microservices và 1 ứng dụng Frontend React, kèm tài liệu báo cáo đồ án đầy đủ.
 
 ## Assumptions
 
-- Khách vãng lai có thể xem toàn bộ thực đơn và trạng thái bàn qua mã QR công khai; khi thực hiện giao dịch đặt bàn, gửi đơn gọi món hoặc thanh toán trực tuyến, khách sử dụng tài khoản `CUSTOMER` đã đăng nhập để gắn kết lịch sử đơn hàng và nhận email xác nhận.
-- Các dịch vụ bên thứ ba (Cổng thanh toán VNPAY Sandbox, Gửi Email qua Gmail SMTP (App Password), Lưu trữ ảnh qua Cloudinary) được cấu hình thông qua biến môi trường để dễ dàng chuyển đổi giữa môi trường phát triển cục bộ và môi trường triển khai đám mây (Heroku, Vercel, Aiven MySQL).
+- Khách vãng lai có thể xem toàn bộ thực đơn và trạng thái bàn qua mã QR công khai; khi thực hiện giao dịch đặt bàn, gửi đơn gọi món hoặc thanh toán trực tuyến, khách sử dụng tài khoản `CUSTOMER` đã đăng nhập (bằng tài khoản thường hoặc tài khoản Google) để gắn kết lịch sử đơn hàng và nhận email xác nhận.
+- Các dịch vụ bên thứ ba (Cổng thanh toán VNPAY Sandbox, Gửi Email qua Gmail SMTP, Lưu trữ ảnh qua Cloudinary, Google OAuth2 / AI Gemini Service) được cấu hình thông qua biến môi trường để dễ dàng chuyển đổi giữa môi trường phát triển cục bộ và môi trường triển khai đám mây (Docker, Heroku, Vercel).

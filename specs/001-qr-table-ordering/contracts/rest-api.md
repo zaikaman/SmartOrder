@@ -12,13 +12,14 @@ Quản lý đăng ký, đăng nhập, cấp phát JWT Token và phân quyền ng
 | Phương thức | Đường dẫn | Nhóm người dùng | Mô tả |
 |---|---|---|---|
 | `POST` | `/api/v1/auth/register` | `Anonymous` | Đăng ký tài khoản Khách hàng (`CUSTOMER`) mới |
-| `POST` | `/api/v1/auth/login` | `Anonymous` | Đăng nhập và nhận JWT `accessToken` chứa `userId`, `username`, `email`, `role` |
+| `POST` | `/api/v1/auth/login` | `Anonymous` | Đăng nhập bằng tài khoản nội bộ và nhận JWT `accessToken` |
+| `POST` | `/api/v1/auth/google` | `Anonymous` | Đăng nhập bằng Google ID Token (Google OAuth2), tự động tạo tài khoản nếu chưa có và trả về JWT |
 | `GET` | `/api/v1/users/me` | `Logged-in User`, `Staff`, `Admin` | Lấy thông tin tài khoản hiện tại từ JWT Token |
 | `GET` | `/api/v1/admin/users` | `Admin` | Danh sách toàn bộ người dùng trong hệ thống |
 | `PATCH` | `/api/v1/admin/users/{id}/role` | `Admin` | Cập nhật vai trò người dùng (`CUSTOMER`, `STAFF`, `ADMIN`) |
 | `PATCH` | `/api/v1/admin/users/{id}/status` | `Admin` | Khóa / Mở khóa tài khoản người dùng |
 
-**Mẫu phản hồi đăng nhập (`POST /api/v1/auth/login` - `200 OK`)**:
+**Mẫu phản hồi đăng nhập (`POST /api/v1/auth/login` hoặc `POST /api/v1/auth/google` - `200 OK`)**:
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs...",
@@ -47,6 +48,7 @@ Quản lý danh mục món ăn (`MenuItem`), bàn ăn (`DiningTable`), trạng t
 |---|---|---|---|
 | `GET` | `/api/v1/menu` | `Anonymous` | Xem danh sách thực đơn (hỗ trợ lọc theo `category`, `keyword`, `status`) |
 | `GET` | `/api/v1/menu/{id}` | `Anonymous` | Xem chi tiết một món ăn |
+| `POST` | `/api/v1/menu/ai-recommend` | `Anonymous`, `Logged-in User` | Trợ lý AI gợi ý mâm cơm Bếp Việt tối ưu theo số người, ngân sách và sở thích |
 | `GET` | `/api/v1/tables` | `Anonymous` | Xem sơ đồ bàn ăn và tra cứu bàn trống (lọc theo `status`, `minCapacity`, `area`) |
 | `GET` | `/api/v1/tables/number/{tableNumber}` | `Anonymous` | Quét mã QR tại bàn: lấy thông tin chi tiết bàn theo `table_number` cùng thực đơn đang phục vụ |
 | `GET` | `/api/v1/tables/{id}/qr-image` | `Anonymous`, `Staff`, `Admin` | Kết xuất hình ảnh PNG mã QR của bàn dẫn tới URL `/table/{tableNumber}` |
