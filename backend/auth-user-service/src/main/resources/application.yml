@@ -28,6 +28,9 @@ jwt:
   secret: ${JWT_SECRET:DoAnJ2EE_SuperSecretKey_For_Jwt_Authentication_2026_Minimum32Bytes}
   expiration-ms: ${JWT_EXPIRATION:86400000}
 
+google:
+  client-id: ${GOOGLE_CLIENT_ID:610122029992-9avsfbips2dr983jvfjfkvcchkr2jluk.apps.googleusercontent.com}
+
 logging:
   level:
     com.restaurant.auth: INFO

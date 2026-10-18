@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { LayoutGrid } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { LayoutGrid, Info, ShieldCheck } from 'lucide-react';
 import { catalogApi } from '../../api/client';
 import { DiningTable } from '../../types';
 import { TableCard } from '../../components/common/TableCard';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export const TableLookupPage: React.FC = () => {
+  const { user } = useAuthStore();
   const [tables, setTables] = useState<DiningTable[]>([]);
   const [selectedArea, setSelectedArea] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [minCapacity, setMinCapacity] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const isStaffOrAdmin = user?.role === 'STAFF' || user?.role === 'ADMIN';
 
   useEffect(() => {
     const fetchTables = async () => {
@@ -50,13 +55,58 @@ export const TableLookupPage: React.FC = () => {
             Sơ Đồ Bàn Ăn Bếp Việt
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#462c1a]">
-            Tra Cứu Bàn Trống & Mã QR Tại Bàn
+            Tra Cứu Bàn Trống & Đặt Chỗ Trực Tuyến
           </h1>
           <p className="text-sm text-[#7d6756] max-w-xl mx-auto">
             Xem trực quan trạng thái bàn ăn theo từng tầng và khu vực phòng VIP.
-            Thực khách có thể xem mã QR để trải nghiệm gọi món tại bàn.
+            Quý khách có thể lựa chọn bàn còn trống để đặt bàn trước kèm gọi món cho bữa tiệc.
           </p>
         </div>
+
+        {/* Business Logic Guide Banner */}
+        <div className="bg-[#fff9f2] border border-[#e8dbce] rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm text-xs">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-bold text-[#462c1a] flex items-center gap-1">
+              <Info className="w-3.5 h-3.5 text-[#b84a28]" />
+              Quy tắc trạng thái bàn:
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#2d5a27]" />
+              <span className="text-[#2d5a27] font-semibold">Bàn trống:</span>
+              <span className="text-[#6d4f43]">Có thể đặt bàn trước trực tuyến.</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#b84a28]" />
+              <span className="text-[#b84a28] font-semibold">Đang có khách:</span>
+              <span className="text-[#6d4f43]">Khách đang dùng bữa tại quán (không thể đặt từ xa).</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#c85a17]" />
+              <span className="text-[#c85a17] font-semibold">Đã đặt trước:</span>
+              <span className="text-[#6d4f43]">Bàn đã được giữ chỗ.</span>
+            </div>
+          </div>
+
+          <div className="text-[#8c6d60] font-medium border-t md:border-t-0 md:border-l border-[#e8dbce] pt-2 md:pt-0 md:pl-4">
+            Quý khách đang ngồi tại nhà hàng? Vui lòng quét mã QR vật lý dán trên mặt bàn để gọi món trực tiếp vào bếp.
+          </div>
+        </div>
+
+        {/* Staff/Admin Notice Banner */}
+        {isStaffOrAdmin && (
+          <div className="bg-[#533722] text-[#faf7f2] p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-sm">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#d7bda0]" />
+              <span>Chế độ Nhân viên / Quản lý: Bạn có thể xem tem mã QR in ấn hoặc truy cập POS các bàn đang có khách.</span>
+            </div>
+            <Link
+              to="/staff/tables"
+              className="px-3 py-1.5 rounded-lg bg-[#b84a28] hover:bg-[#a13e20] text-white font-bold transition shadow-sm whitespace-nowrap"
+            >
+              Mở màn hình Quản lý sơ đồ bàn POS
+            </Link>
+          </div>
+        )}
 
         {/* Filter Toolbar */}
         <div className="bg-[#f3ece3] p-5 rounded-2xl border border-[#e8dbce] flex flex-wrap items-center justify-between gap-4 shadow-sm">

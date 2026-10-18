@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { authApi } from '../../api/client';
 import { AuthResponse } from '../../types';
 import { Lock, User, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuthStore();
+  const googleBtnRef = useRef<HTMLDivElement>(null);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +24,68 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Lay trang can redirect sau khi dang nhap thanh cong (neu co)
-  const from = (location.state as any)?.from?.pathname || '/';
+  const searchParams = new URLSearchParams(location.search);
+  const from = (location.state as any)?.from?.pathname || (location.state as any)?.returnUrl || searchParams.get('returnUrl') || '/';
+
+  // Khoi tao Google Identity Services
+  useEffect(() => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '610122029992-9avsfbips2dr983jvfjfkvcchkr2jluk.apps.googleusercontent.com';
+
+    const handleCredentialResponse = async (response: any) => {
+      try {
+        setGoogleLoading(true);
+        setError(null);
+
+        // response.credential la Google ID Token (JWT) duoc ky boi Google
+        const res = await authApi.post<AuthResponse>('/auth/google', {
+          credential: response.credential,
+        });
+
+        login(res.data);
+        navigate(from, { replace: true });
+      } catch (err: any) {
+        const msg = err.response?.data?.message || err.response?.data || 'Đăng nhập bằng Google thất bại.';
+        setError(typeof msg === 'string' ? msg : 'Lỗi xác thực Google OAuth2.');
+      } finally {
+        setGoogleLoading(false);
+      }
+    };
+
+    const initGoogle = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        if (googleBtnRef.current) {
+          window.google.accounts.id.renderButton(googleBtnRef.current, {
+            theme: 'outline',
+            size: 'large',
+            width: googleBtnRef.current.offsetWidth || 340,
+            text: 'signin_with',
+            shape: 'pill',
+            locale: 'vi',
+          });
+        }
+      }
+    };
+
+    // Neu script chua load kip thi cho mot chut
+    if (window.google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(interval);
+          initGoogle();
+        }
+      }, 300);
+      return () => clearInterval(interval);
+    }
+  }, [from, login, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,37 +112,11 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      setGoogleLoading(true);
-      setError(null);
-
-      // Kiem tra hoac khoi tao Google Identity Services (GIS)
-      // Trong moi truong thuc te/demo, cho phep nhap nhanh email Google de login OAuth2
-      const googleEmail = window.prompt(
-        'Đăng nhập với Google OAuth2:\nNhập email Gmail của bạn để xác thực liên kết:',
-        'khachhang.google@gmail.com'
-      );
-
-      if (!googleEmail || !googleEmail.includes('@')) {
-        setGoogleLoading(false);
-        return;
-      }
-
-      const res = await authApi.post<AuthResponse>('/auth/google', {
-        credential: 'google_jwt_oauth_client_token_' + Date.now(),
-        email: googleEmail.trim().toLowerCase(),
-        name: googleEmail.split('@')[0],
-        picture: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-      });
-
-      login(res.data);
-      navigate(from, { replace: true });
-    } catch (err: any) {
-      const msg = err.response?.data?.message || err.response?.data || 'Đăng nhập bằng Google thất bại.';
-      setError(typeof msg === 'string' ? msg : 'Lỗi kết nối Google OAuth2.');
-    } finally {
-      setGoogleLoading(false);
+  const handleGoogleFallbackClick = () => {
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt();
+    } else {
+      setError('Thư viện Google OAuth2 đang tải, vui lòng thử lại sau 1-2 giây.');
     }
   };
 
@@ -100,13 +142,18 @@ export const LoginPage: React.FC = () => {
           </div>
         )}
 
-        {/* Google OAuth2 Button */}
+        {/* Google OAuth2 Button - Chi duy nhat 1 nut tieng Viet */}
         <div>
+          {/* Container render Google GIS Official Button */}
+          <div ref={googleBtnRef} className="w-full flex justify-center"></div>
+
+          {/* Neu Google GIS render cham hoac bi block, nut nay se hien thi du phong */}
           <button
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleFallbackClick}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[#d1c2b4] rounded-2xl text-sm font-semibold text-[#462c1a] bg-[#faf7f2] hover:bg-[#f3ebe1] transition duration-200 shadow-sm disabled:opacity-50"
+            id="google-custom-btn"
+            className="w-full hidden items-center justify-center gap-3 px-4 py-3 border border-[#d1c2b4] rounded-2xl text-sm font-semibold text-[#462c1a] bg-[#faf7f2] hover:bg-[#f3ebe1] active:scale-[0.99] transition duration-200 shadow-sm disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -126,8 +173,9 @@ export const LoginPage: React.FC = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>{googleLoading ? 'Đang kết nối...' : 'Tiếp tục với Google'}</span>
+            <span>{googleLoading ? 'Đang kết nối Google...' : 'Đăng nhập bằng Google'}</span>
           </button>
+        </div>
 
           <div className="relative my-6 text-center">
             <div className="absolute inset-0 flex items-center">
@@ -137,7 +185,6 @@ export const LoginPage: React.FC = () => {
               Hoặc dùng tài khoản nội bộ
             </span>
           </div>
-        </div>
 
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>

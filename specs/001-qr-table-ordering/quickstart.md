@@ -49,19 +49,30 @@ $env:CLOUDINARY_API_SECRET=""
 
 ---
 
-## 3. Khởi Chạy 3 Microservices Backend & Frontend
+## 3. Khởi Chạy Nhanh Toàn Bộ Hệ Thống Trong 1 Terminal
 
-### Bước 1: Chạy 3 Microservices Backend
-Từ thư mục `d:\DoAnJ2EE\backend`:
+Tại thư mục gốc dự án `d:\DoAnJ2EE`:
 
 ```powershell
-# Biên dịch toàn bộ 3 services
-.\mvnw.cmd clean install -DskipTests
+npm run start
+```
 
-# Khởi chạy từng service (hoặc dùng npm run start:backend từ thư mục gốc)
-.\mvnw.cmd -pl auth-user-service spring-boot:run
-.\mvnw.cmd -pl catalog-table-service spring-boot:run
-.\mvnw.cmd -pl booking-order-service spring-boot:run
+Lệnh này sẽ tự động khởi chạy đồng thời cả 4 thành phần trong cùng 1 cửa sổ terminal với màu sắc phân biệt trực quan:
+- **`[AUTH:8081]`**: Auth & User Microservice (`http://localhost:8081`)
+- **`[CATALOG:8082]`**: Catalog & Table Microservice (`http://localhost:8082`)
+- **`[BOOKING:8083]`**: Booking & Order Microservice (`http://localhost:8083`)
+- **`[FRONTEND:5173]`**: Giao diện React Vite (`http://localhost:5173`)
+
+*(Nhấn `Ctrl + C` để dừng đồng thời toàn bộ các services).*
+
+### Các Lệnh Khởi Chạy Tùy Chọn Khác:
+
+```powershell
+# Chỉ chạy 3 microservices backend trong 1 terminal:
+npm run start:backend
+
+# Chỉ chạy giao diện frontend:
+npm run start:frontend
 ```
 
 ### Bước 2: Chạy Frontend (React + Vite)

@@ -4,6 +4,12 @@
   "private": true,
   "description": "Monorepo for Restaurant QR Code Table Booking and Ordering System",
   "scripts": {
+    "start": "concurrently -k -p \"[{name}]\" -n \"AUTH:8081,CATALOG:8082,BOOKING:8083,FRONTEND:5173\" -c \"blue,green,magenta,yellow\" \"npm run start:auth\" \"npm run start:catalog\" \"npm run start:booking\" \"npm run start:frontend\"",
+    "start:backend": "concurrently -k -p \"[{name}]\" -n \"AUTH:8081,CATALOG:8082,BOOKING:8083\" -c \"blue,green,magenta\" \"npm run start:auth\" \"npm run start:catalog\" \"npm run start:booking\"",
+    "start:auth": "cd backend && mvnw.cmd spring-boot:run -pl auth-user-service",
+    "start:catalog": "cd backend && mvnw.cmd spring-boot:run -pl catalog-table-service",
+    "start:booking": "cd backend && mvnw.cmd spring-boot:run -pl booking-order-service",
+    "start:frontend": "npm --prefix frontend run dev",
     "verify": "npm run verify:backend && npm run verify:frontend",
     "verify:backend": "cd backend && mvnw.cmd test",
     "verify:frontend": "npm --prefix frontend run verify",
@@ -23,5 +29,8 @@
     "restaurant-ordering"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
 }

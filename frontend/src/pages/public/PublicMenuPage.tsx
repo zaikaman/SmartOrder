@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, UtensilsCrossed, Sparkles } from 'lucide-react';
+import { Search, UtensilsCrossed, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { catalogApi } from '../../api/client';
 import { MenuItem } from '../../types';
 import { MenuItemCard } from '../../components/common/MenuItemCard';
@@ -10,6 +10,23 @@ export const PublicMenuPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [keyword, setKeyword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Sticky & Pagination states
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [headerHeight, setHeaderHeight] = useState<number>(110);
+
+  // Measure dynamic header height so filter bar sits flush underneath
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const headerEl = document.querySelector('header');
+      if (headerEl) {
+        setHeaderHeight(headerEl.offsetHeight);
+      }
+    };
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, []);
 
   // Fetch categories
   useEffect(() => {
@@ -39,6 +56,7 @@ export const PublicMenuPage: React.FC = () => {
 
         const res = await catalogApi.get<MenuItem[]>('/menu', { params });
         setItems(res.data);
+        setCurrentPage(1);
       } catch (err) {
         console.error('Không thể tải danh sách thực đơn', err);
       } finally {
@@ -49,6 +67,28 @@ export const PublicMenuPage: React.FC = () => {
     const timer = setTimeout(fetchMenu, 250);
     return () => clearTimeout(timer);
   }, [selectedCategory, keyword]);
+
+  // Pagination calculation: 20 items per page
+  const itemsPerPage = 20;
+  const totalItemsCount = items.length;
+  const totalPages = Math.ceil(totalItemsCount / itemsPerPage) || 1;
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentDishes = items.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    const gridEl = document.getElementById('menu-items-grid');
+    if (gridEl) {
+      const topOffset = gridEl.getBoundingClientRect().top + window.scrollY - headerHeight - 120;
+      window.scrollTo({
+        top: Math.max(0, topOffset),
+        behavior: 'smooth',
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#faf7f2] py-10 px-4 sm:px-6 lg:px-8">
@@ -68,8 +108,11 @@ export const PublicMenuPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Filter & Search Bar */}
-        <div className="bg-[#f3ece3] p-4 sm:p-5 rounded-2xl border border-[#e8dbce] space-y-4 shadow-sm">
+        {/* Filter & Search Bar - Sticky underneath header */}
+        <div 
+          className="sticky z-30 bg-[#f3ece3]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-[#e8dbce] space-y-4 shadow-sm transition-all"
+          style={{ top: `${headerHeight + 6}px` }}
+        >
           {/* Search Box */}
           <div className="relative max-w-md mx-auto">
             <input
@@ -85,7 +128,10 @@ export const PublicMenuPage: React.FC = () => {
           {/* Category Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center">
             <button
-              onClick={() => setSelectedCategory('ALL')}
+              onClick={() => {
+                setSelectedCategory('ALL');
+                setCurrentPage(1);
+              }}
               className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
                 selectedCategory === 'ALL'
                   ? 'bg-[#6d492f] text-white shadow-[#6d492f]/30'
@@ -98,7 +144,10 @@ export const PublicMenuPage: React.FC = () => {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setCurrentPage(1);
+                }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
                   selectedCategory === cat
                     ? 'bg-[#6d492f] text-white shadow-[#6d492f]/30'
@@ -127,10 +176,59 @@ export const PublicMenuPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {items.map((item) => (
-              <MenuItemCard key={item.id} item={item} showOrderAction={true} />
-            ))}
+          <div id="menu-items-grid" className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {currentDishes.map((item) => (
+                <MenuItemCard key={item.id} item={item} showOrderAction={true} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalItemsCount > itemsPerPage ? (
+              <div className="pt-6 border-t border-[#e8dbce] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs text-[#7d6756]">
+                  Hiển thị món <strong className="text-[#462c1a]">{startIndex + 1} - {Math.min(endIndex, totalItemsCount)}</strong> trong tổng số <strong className="text-[#462c1a]">{totalItemsCount}</strong> món ăn
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3.5 py-2 rounded-xl border border-[#d7bda0] bg-white text-xs font-semibold text-[#6d492f] hover:bg-[#e8dcce] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1 shadow-sm"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Trước</span>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-9 h-9 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                        currentPage === pageNum
+                          ? 'bg-[#6d492f] text-white shadow-[#6d492f]/30'
+                          : 'bg-white text-[#6d492f] border border-[#d7bda0]/60 hover:bg-[#e8dcce]'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3.5 py-2 rounded-xl border border-[#d7bda0] bg-white text-xs font-semibold text-[#6d492f] hover:bg-[#e8dcce] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1 shadow-sm"
+                  >
+                    <span>Sau</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-xs text-[#8c6d60]">
+                Đang hiển thị toàn bộ {totalItemsCount} món ăn
+              </div>
+            )}
           </div>
         )}
       </div>
