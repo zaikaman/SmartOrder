@@ -23,11 +23,11 @@ export const LoginPage: React.FC = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lay trang can redirect sau khi dang nhap thanh cong (neu co)
+  // Lấy trang cần chuyển hướng sau khi đăng nhập thành công (nếu có)
   const searchParams = new URLSearchParams(location.search);
   const from = (location.state as any)?.from?.pathname || (location.state as any)?.returnUrl || searchParams.get('returnUrl') || '/';
 
-  // Khoi tao Google Identity Services
+  // Khởi tạo Google Identity Services
   useEffect(() => {
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '610122029992-9avsfbips2dr983jvfjfkvcchkr2jluk.apps.googleusercontent.com';
 
@@ -36,7 +36,7 @@ export const LoginPage: React.FC = () => {
         setGoogleLoading(true);
         setError(null);
 
-        // response.credential la Google ID Token (JWT) duoc ky boi Google
+        // response.credential là Google ID Token (JWT) được ký bởi Google
         const res = await authApi.post<AuthResponse>('/auth/google', {
           credential: response.credential,
         });
@@ -233,27 +233,58 @@ export const LoginPage: React.FC = () => {
           </div>
         </form>
 
-        {/* Tai khoan mau de nguoi cham thi va giang vien test nhanh */}
-        <div className="bg-[#FFFBEB] p-4 rounded-2xl border border-[#FDE68A] text-xs text-[#92400E] space-y-1">
-          <p className="font-bold">Tài khoản thử nghiệm sẵn có:</p>
+        {/* Tài khoản mẫu để người chấm thi và giảng viên kiểm thử nhanh */}
+        <div className="bg-[#FFFBEB] p-4 rounded-2xl border border-[#FDE68A] text-xs text-[#92400E] space-y-1.5">
+          <div className="flex justify-between items-center">
+            <p className="font-bold">Tài khoản thử nghiệm sẵn có:</p>
+            <span className="text-[10px] text-amber-700 italic">Bấm để tự điền nhanh</span>
+          </div>
           <div className="grid grid-cols-3 gap-2 pt-1 font-mono">
-            <div>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername('khachhang');
+                setPassword('123456');
+                setError(null);
+              }}
+              className="text-left p-2 rounded-xl bg-white/70 hover:bg-white border border-[#FDE68A] hover:border-amber-400 transition cursor-pointer"
+              title="Bấm để tự động điền tài khoản Khách hàng"
+            >
               <p className="font-semibold text-gray-700">Khách hàng:</p>
-              <p>khachhang</p>
+              <p className="text-[#8B1E0F] font-bold">khachhang</p>
               <p className="text-gray-500">123456</p>
-            </div>
-            <div>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername('staff01');
+                setPassword('123456');
+                setError(null);
+              }}
+              className="text-left p-2 rounded-xl bg-white/70 hover:bg-white border border-[#FDE68A] hover:border-amber-400 transition cursor-pointer"
+              title="Bấm để tự động điền tài khoản Nhân viên"
+            >
               <p className="font-semibold text-gray-700">Nhân viên:</p>
-              <p>staff01</p>
+              <p className="text-[#8B1E0F] font-bold">staff01</p>
               <p className="text-gray-500">123456</p>
-            </div>
-            <div>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername('admin');
+                setPassword('123456');
+                setError(null);
+              }}
+              className="text-left p-2 rounded-xl bg-white/70 hover:bg-white border border-[#FDE68A] hover:border-amber-400 transition cursor-pointer"
+              title="Bấm để tự động điền tài khoản Quản trị"
+            >
               <p className="font-semibold text-gray-700">Quản trị:</p>
-              <p>admin</p>
+              <p className="text-[#8B1E0F] font-bold">admin</p>
               <p className="text-gray-500">123456</p>
-            </div>
+            </button>
           </div>
         </div>
+
 
         <div className="text-center text-sm text-[#7d6756]">
           Chưa có tài khoản?{' '}

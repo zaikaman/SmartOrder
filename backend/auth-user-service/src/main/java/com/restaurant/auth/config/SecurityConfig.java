@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Cau hinh Spring Security 6 va CORS cho Auth Service.
+ * Cấu hình Spring Security 6 và CORS cho Auth Service.
  */
 @Configuration
 @EnableWebSecurity
@@ -42,7 +42,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Cho phep H2 Console
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Cho phép H2 Console
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**", "/h2-console/**").permitAll()

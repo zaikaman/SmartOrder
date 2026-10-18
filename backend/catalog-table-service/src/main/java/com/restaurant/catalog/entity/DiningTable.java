@@ -11,7 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 
 /**
- * Thuc the Ban an trong Nha Hang Am Thuc Bep Viet.
+ * Thực thể Bàn ăn trong Nhà Hàng Ẩm Thực Bếp Việt.
  */
 @Entity
 @Table(name = "dining_tables")

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Service 3: Booking & Order Service (Port 8083)
- * Xu ly dat ban truoc, goi mon tai ban, thanh toan VNPAY Sandbox, gui Email xac nhan va xuat hoa don PDF.
+ * Xử lý đặt bàn trước, gọi món tại bàn, thanh toán VNPAY Sandbox, gửi Email xác nhận và xuất hóa đơn PDF.
  */
 @SpringBootApplication
 public class BookingOrderServiceApplication {

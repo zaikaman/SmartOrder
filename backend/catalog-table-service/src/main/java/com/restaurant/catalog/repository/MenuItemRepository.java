@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Repository truy van du lieu Mon an trong thuc don.
+ * Repository truy vấn dữ liệu Món ăn trong thực đơn.
  */
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {

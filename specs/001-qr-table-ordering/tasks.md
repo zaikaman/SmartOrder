@@ -127,18 +127,18 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 **Mục tiêu**: Nhân viên và Bếp (`STAFF`, `ADMIN`) xem danh sách đơn gọi món, xác nhận đặt bàn, cập nhật trạng thái đơn món (`PREPARING` -> `SERVED` -> `COMPLETED`), và quản lý trạng thái bàn thời gian thực.
 
 ### Kiểm thử cho User Story 3
-- [ ] T063 [P] [US3] Viết Unit test cập nhật trạng thái món và trạng thái bàn tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/StaffOrderServiceTest.java
-- [ ] T064 [P] [US3] Viết Integration test bảo vệ endpoint Staff bằng quyền ROLE_STAFF tại backend/booking-order-service/src/test/java/com/restaurant/booking/controller/StaffOrderControllerTest.java
+- [X] T063 [P] [US3] Viết Unit test cập nhật trạng thái món và trạng thái bàn tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/StaffOrderServiceTest.java
+- [X] T064 [P] [US3] Viết Integration test bảo vệ endpoint Staff bằng quyền ROLE_STAFF tại backend/booking-order-service/src/test/java/com/restaurant/booking/controller/StaffOrderControllerTest.java
 
 ### Triển khai Backend cho User Story 3
-- [ ] T065 [US3] Bổ sung logic cập nhật trạng thái đơn và giải phóng bàn trong BookingOrderService tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/BookingOrderService.java
-- [ ] T066 [US3] Xây dựng StaffOrderController phục vụ /api/v1/staff/orders/** tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/StaffOrderController.java
-- [ ] T067 [US3] Bổ sung endpoint /api/v1/staff/tables/{id}/status trong CatalogTableService tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/StaffTableController.java
+- [X] T065 [US3] Bổ sung logic cập nhật trạng thái đơn và giải phóng bàn trong BookingOrderService tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/BookingOrderService.java
+- [X] T066 [US3] Xây dựng StaffOrderController phục vụ /api/v1/staff/orders/** tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/StaffOrderController.java
+- [X] T067 [US3] Bổ sung endpoint /api/v1/staff/tables/{id}/status trong CatalogTableService tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/StaffTableController.java
 
 ### Triển khai Frontend cho User Story 3
-- [ ] T068 [P] [US3] Xây dựng thanh bên dành cho Nhân viên tại frontend/src/components/layout/StaffSidebar.tsx
-- [ ] T069 [US3] Xây dựng Màn hình Bếp điều phối đơn món (KitchenOrderBoard) cập nhật Đang nấu -> Đã phục vụ tại frontend/src/pages/staff/StaffOrderKitchenPage.tsx
-- [ ] T070 [US3] Xây dựng Màn hình Quản lý sơ đồ bàn và tiếp nhận khách (StaffTableMap) tại frontend/src/pages/staff/StaffTableManagementPage.tsx
+- [X] T068 [P] [US3] Xây dựng thanh bên dành cho Nhân viên tại frontend/src/components/layout/StaffSidebar.tsx
+- [X] T069 [US3] Xây dựng Màn hình Bếp điều phối đơn món (KitchenOrderBoard) cập nhật Đang nấu -> Đã phục vụ tại frontend/src/pages/staff/StaffOrderKitchenPage.tsx
+- [X] T070 [US3] Xây dựng Màn hình Quản lý sơ đồ bàn và tiếp nhận khách (StaffTableMap) tại frontend/src/pages/staff/StaffTableManagementPage.tsx
 
 ---
 

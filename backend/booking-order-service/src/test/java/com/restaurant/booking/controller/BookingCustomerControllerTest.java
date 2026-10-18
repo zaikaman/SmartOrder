@@ -48,14 +48,14 @@ class BookingCustomerControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    @DisplayName("API POST /api/v1/orders tao don dat ban thanh cong")
+    @DisplayName("API POST /api/v1/orders tạo đơn đặt bàn thành công")
     @WithMockUser(username = "customer1", roles = "CUSTOMER")
     void testCreateOrder() throws Exception {
         CreateOrderRequest request = CreateOrderRequest.builder()
                 .tableId(1L)
                 .reservationTime(Instant.now().plusSeconds(3600))
                 .partySize(2)
-                .customerName("Nguyen Van B")
+                .customerName("Nguyễn Văn B")
                 .customerEmail("vanb@gmail.com")
                 .paymentMethod(PaymentMethod.VNPAY)
                 .build();
@@ -81,7 +81,7 @@ class BookingCustomerControllerTest {
     }
 
     @Test
-    @DisplayName("API GET /api/v1/orders/my tra ve danh sach lich su don")
+    @DisplayName("API GET /api/v1/orders/my trả về danh sách lịch sử đơn")
     @WithMockUser(username = "customer1", roles = "CUSTOMER")
     void testGetMyOrders() throws Exception {
         OrderDto mockDto = OrderDto.builder()

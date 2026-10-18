@@ -25,10 +25,10 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Ten dang nhap da ton tai tren he thong");
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại trên hệ thống");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Dia chi email da duoc su dung");
+            throw new IllegalArgumentException("Địa chỉ email đã được sử dụng");
         }
 
         User user = User.builder()
@@ -54,14 +54,14 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Tai khoan hoac mat khau khong chinh xac"));
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác"));
 
         if (!user.isActive()) {
-            throw new IllegalStateException("Tai khoan da bi khoa hoac vo hieu hoa");
+            throw new IllegalStateException("Tài khoản đã bị khóa hoặc vô hiệu hóa");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Tai khoan hoac mat khau khong chinh xac");
+            throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác");
         }
 
         String token = jwtService.generateToken(user);
@@ -79,7 +79,7 @@ public class AuthService {
         String fullName = request.getName();
         String picture = request.getPicture();
 
-        // Neu request chua co email/name truc tiep, tien hanh parse tu JWT credential payload
+        // Nếu request chưa có email/name trực tiếp, tiến hành parse từ JWT credential payload
         if (email == null || email.isBlank()) {
             try {
                 String[] parts = request.getCredential().split("\\.");
@@ -98,12 +98,12 @@ public class AuthService {
                     }
                 }
             } catch (Exception ex) {
-                log.warn("Khong the parse payload tu Google credential: {}", ex.getMessage());
+                log.warn("Không thể parse payload từ Google credential: {}", ex.getMessage());
             }
         }
 
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Khong tim thay thong tin email tu tai khoan Google");
+            throw new IllegalArgumentException("Không tìm thấy thông tin email từ tài khoản Google");
         }
 
         final String userEmail = email.trim().toLowerCase();
@@ -112,18 +112,18 @@ public class AuthService {
 
         User user = userRepository.findByEmail(userEmail)
                 .map(existingUser -> {
-                    // Cap nhat avatar neu co
+                    // Cập nhật avatar nếu có
                     if (avatar != null && !avatar.isBlank()) {
                         existingUser.setAvatarUrl(avatar);
                     }
                     return userRepository.save(existingUser);
                 })
                 .orElseGet(() -> {
-                    // Tao moi nguoi dung tu Google OAuth2
+                    // Tạo mới người dùng từ Google OAuth2
                     String generatedUsername = "gg_" + userEmail.split("@")[0] + "_" + UUID.randomUUID().toString().substring(0, 5);
                     User newUser = User.builder()
                             .username(generatedUsername)
-                            .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Mat khau ngau nhien an toan
+                            .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Mật khẩu ngẫu nhiên an toàn
                             .email(userEmail)
                             .fullName(displayName)
                             .role(UserRole.CUSTOMER)
@@ -135,7 +135,7 @@ public class AuthService {
                 });
 
         if (!user.isActive()) {
-            throw new IllegalStateException("Tai khoan Google nay da bi khoa");
+            throw new IllegalStateException("Tài khoản Google này đã bị khóa");
         }
 
         String token = jwtService.generateToken(user);
@@ -149,7 +149,7 @@ public class AuthService {
 
     public UserDto getCurrentUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay thong tin nguoi dung"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin người dùng"));
         return toUserDto(user);
     }
 

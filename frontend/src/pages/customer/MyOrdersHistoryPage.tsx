@@ -19,7 +19,7 @@ export const MyOrdersHistoryPage: React.FC = () => {
       const res = await bookingApi.get<ReservationOrder[]>('/orders/my');
       setOrders(res.data);
     } catch (err: any) {
-      console.error('Loi khi tai danh sach don hang', err);
+      console.error('Lỗi khi tải danh sách đơn hàng', err);
       setError('Không thể tải lịch sử đơn đặt bàn. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ export const MyOrdersHistoryPage: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* Banner chuc mung dat ban thanh cong neu co state tu trang booking */}
+      {/* Banner chúc mừng đặt bàn thành công nếu có state từ trang booking */}
       {newOrderCode && (
         <div className="mb-8 p-6 bg-[#ECFDF5] border border-[#A7F3D0] rounded-3xl flex items-start gap-4">
           <CheckCircle className="w-8 h-8 text-[#059669] flex-shrink-0 mt-0.5" />
@@ -179,7 +179,7 @@ export const MyOrdersHistoryPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Mon an goi kem */}
+                {/* Món ăn gọi kèm */}
                 {order.items && order.items.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[#9c8675] flex items-center gap-2">

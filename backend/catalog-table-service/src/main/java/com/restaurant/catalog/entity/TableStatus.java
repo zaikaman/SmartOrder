@@ -1,7 +1,7 @@
 package com.restaurant.catalog.entity;
 
 /**
- * Trang thai ban an: AVAILABLE (Trong), RESERVED (Da dat truoc), OCCUPIED (Dang co khach ngoi).
+ * Trạng thái bàn ăn: AVAILABLE (Trống), RESERVED (Đã đặt trước), OCCUPIED (Đang có khách ngồi).
  */
 public enum TableStatus {
     AVAILABLE,

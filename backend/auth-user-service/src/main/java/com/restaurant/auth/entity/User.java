@@ -11,7 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 
 /**
- * Thuc the Nguoi dung trong he thong Nha Hang Am Thuc Bep Viet.
+ * Thực thể Người dùng trong hệ thống Nhà Hàng Ẩm Thực Bếp Việt.
  */
 @Entity
 @Table(name = "users")

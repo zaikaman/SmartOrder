@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Repository truy van Chi tiet mon an trong hoa don.
+ * Repository truy vấn Chi tiết món ăn trong hóa đơn.
  */
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {

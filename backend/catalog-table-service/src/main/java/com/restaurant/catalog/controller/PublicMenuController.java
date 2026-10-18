@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller phuc vu cac API cong khai xem thuc don cho Khach vang lai.
+ * Controller phục vụ các API công khai xem thực đơn cho Khách vãng lai.
  */
 @RestController
 @RequestMapping("/api/v1/menu")

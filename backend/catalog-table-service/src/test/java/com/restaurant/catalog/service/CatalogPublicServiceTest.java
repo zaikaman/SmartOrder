@@ -70,7 +70,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("MenuService: Lay tat ca mon an co san thanh cong")
+    @DisplayName("MenuService: Lấy tất cả món ăn có sẵn thành công")
     void testGetAllMenuItemsAvailable() {
         when(menuItemRepository.findByStatus(MenuItemStatus.AVAILABLE))
                 .thenReturn(List.of(sampleItem));
@@ -84,7 +84,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("MenuService: Loc mon an theo danh muc")
+    @DisplayName("MenuService: Lọc món ăn theo danh mục")
     void testGetMenuItemsByCategory() {
         when(menuItemRepository.findByCategoryAndStatus("Khai vị", MenuItemStatus.AVAILABLE))
                 .thenReturn(List.of(sampleItem));
@@ -97,7 +97,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("MenuService: Tim mon an theo tu khoa")
+    @DisplayName("MenuService: Tìm món ăn theo từ khóa")
     void testGetMenuItemsByKeyword() {
         when(menuItemRepository.findByNameContainingIgnoreCaseAndStatus("cơm", MenuItemStatus.AVAILABLE))
                 .thenReturn(List.of(sampleItem));
@@ -110,7 +110,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("MenuService: Lay chi tiet mon an theo ID ton tai")
+    @DisplayName("MenuService: Lấy chi tiết món ăn theo ID tồn tại")
     void testGetMenuItemByIdFound() {
         when(menuItemRepository.findById(1L)).thenReturn(Optional.of(sampleItem));
 
@@ -121,7 +121,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("MenuService: Nem loi ResourceNotFoundException khi ID mon an khong ton tai")
+    @DisplayName("MenuService: Ném lỗi ResourceNotFoundException khi ID món ăn không tồn tại")
     void testGetMenuItemByIdNotFound() {
         when(menuItemRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -129,7 +129,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("DiningTableService: Lay danh sach ban an theo bo loc")
+    @DisplayName("DiningTableService: Lấy danh sách bàn ăn theo bộ lọc")
     void testGetAllTablesWithFilters() {
         DiningTable table2 = DiningTable.builder()
                 .id(2L)
@@ -149,7 +149,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("DiningTableService: Tim ban theo so ban tableNumber thanh cong")
+    @DisplayName("DiningTableService: Tìm bàn theo số bàn tableNumber thành công")
     void testGetTableByNumberFound() {
         when(diningTableRepository.findByTableNumber("T01")).thenReturn(Optional.of(sampleTable));
 
@@ -160,7 +160,7 @@ class CatalogPublicServiceTest {
     }
 
     @Test
-    @DisplayName("DiningTableService: Sinh anh PNG ma QR cho ban an thanh cong")
+    @DisplayName("DiningTableService: Sinh ảnh PNG mã QR cho bàn ăn thành công")
     void testGenerateTableQrPngSuccess() {
         when(diningTableRepository.findById(1L)).thenReturn(Optional.of(sampleTable));
         byte[] mockBytes = new byte[]{1, 2, 3, 4};

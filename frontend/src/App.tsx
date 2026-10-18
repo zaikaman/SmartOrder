@@ -10,8 +10,10 @@ import { LoginPage } from './pages/public/LoginPage';
 import { RegisterPage } from './pages/public/RegisterPage';
 import { BookingAndOrderPage } from './pages/customer/BookingAndOrderPage';
 import { MyOrdersHistoryPage } from './pages/customer/MyOrdersHistoryPage';
+import { StaffOrderKitchenPage } from './pages/staff/StaffOrderKitchenPage';
+import { StaffTableManagementPage } from './pages/staff/StaffTableManagementPage';
 
-// Placeholder view cho cac route danh cho cac Phase tiep theo (Phase 4 -> Phase 7)
+// Placeholder view cho các route dành cho các Phase tiếp theo (Phase 6 -> Phase 7)
 const PlaceholderView = ({ title, desc }: { title: string; desc: string }) => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center bg-[#faf7f2]">
     <div className="max-w-lg bg-white p-8 rounded-2xl border border-[#e8dbce] shadow-sm space-y-3">
@@ -76,7 +78,7 @@ export default function App() {
               path="/staff/tables"
               element={
                 <RoleGuard allowedRoles={['STAFF', 'ADMIN']}>
-                  <PlaceholderView title="Quản Lý Sơ Đồ Bàn Nhân Viên" desc="Tiếp nhận khách và cập nhật trạng thái bàn ăn thời gian thực." />
+                  <StaffTableManagementPage />
                 </RoleGuard>
               }
             />
@@ -84,7 +86,7 @@ export default function App() {
               path="/staff/orders"
               element={
                 <RoleGuard allowedRoles={['STAFF', 'ADMIN']}>
-                  <PlaceholderView title="Màn Hình Điều Phối Bếp" desc="Cập nhật trạng thái món: Đang nấu -> Đã phục vụ -> Hoàn thành." />
+                  <StaffOrderKitchenPage />
                 </RoleGuard>
               }
             />

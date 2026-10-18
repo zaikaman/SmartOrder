@@ -48,8 +48,8 @@ public class CatalogTableClient {
                     .retrieve()
                     .body(MenuItemInfo.class);
         } catch (Exception ex) {
-            log.error("Khong the lay thong tin mon an ID {}: {}", menuItemId, ex.getMessage());
-            throw new IllegalArgumentException("Khong tim thay mon an ID: " + menuItemId);
+            log.error("Không thể lấy thông tin món ăn ID {}: {}", menuItemId, ex.getMessage());
+            throw new IllegalArgumentException("Không tìm thấy món ăn ID: " + menuItemId);
         }
     }
 
@@ -66,11 +66,25 @@ public class CatalogTableClient {
                     }
                 }
             }
-            throw new IllegalArgumentException("Khong tim thay ban an ID: " + tableId);
+            throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
         } catch (Exception ex) {
-            log.error("Loi khi lay thong tin ban an ID {}: {}", tableId, ex.getMessage());
-            // Fallback khi catalog table service chua bat trong moi truong mock/test
-            throw new IllegalArgumentException("Khong tim thay ban an ID: " + tableId);
+            log.error("Lỗi khi lấy thông tin bàn ăn ID {}: {}", tableId, ex.getMessage());
+            // Fallback khi catalog table service chưa bật trong môi trường mock/test
+            throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
+        }
+    }
+
+    public void updateTableStatus(Long tableId, String status) {
+        try {
+            catalogRestClient.patch()
+                    .uri("/api/v1/staff/tables/{id}/status", tableId)
+                    .body(java.util.Map.of("status", status))
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Cập nhật thành công trạng thái bàn ID {} sang {}", tableId, status);
+        } catch (Exception ex) {
+            log.warn("Không thể cập nhật trạng thái bàn ID {} qua Catalog Service: {}", tableId, ex.getMessage());
         }
     }
 }
+

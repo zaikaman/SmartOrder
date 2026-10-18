@@ -1,7 +1,7 @@
 package com.restaurant.catalog.entity;
 
 /**
- * Trang thai phuc vu mon an: AVAILABLE (Dang ban), OUT_OF_STOCK (Het mon), INACTIVE (Ngung ban).
+ * Trạng thái phục vụ món ăn: AVAILABLE (Đang bán), OUT_OF_STOCK (Hết món), INACTIVE (Ngừng bán).
  */
 public enum MenuItemStatus {
     AVAILABLE,

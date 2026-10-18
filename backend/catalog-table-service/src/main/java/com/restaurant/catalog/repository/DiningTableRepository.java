@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository truy van du lieu Ban an.
+ * Repository truy vấn dữ liệu Bàn ăn.
  */
 @Repository
 public interface DiningTableRepository extends JpaRepository<DiningTable, Long> {

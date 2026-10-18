@@ -38,14 +38,14 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phep VNPAY callback khong can token
+                        // Cho phép VNPAY callback không cần token
                         .requestMatchers("/api/v1/payments/vnpay/return").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        // Phuc vu nhan vien quan ly don va bep
+                        // Phục vụ nhân viên quản lý đơn và bếp
                         .requestMatchers("/api/v1/staff/**").hasAnyRole("STAFF", "ADMIN")
-                        // Phuc vu thong ke Admin
+                        // Phục vụ thống kê Admin
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        // Cac endpoint dat ban va thanh toan yeu cau da dang nhap
+                        // Các endpoint đặt bàn và thanh toán yêu cầu đã đăng nhập
                         .requestMatchers("/api/v1/orders/**", "/api/v1/payments/**").authenticated()
                         .anyRequest().authenticated()
                 )

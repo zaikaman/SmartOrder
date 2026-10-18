@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository truy van du lieu Don dat ban va Hoa don goi mon.
+ * Repository truy vấn dữ liệu Đơn đặt bàn và Hóa đơn gọi món.
  */
 @Repository
 public interface ReservationOrderRepository extends JpaRepository<ReservationOrder, Long> {
@@ -27,7 +27,7 @@ public interface ReservationOrderRepository extends JpaRepository<ReservationOrd
     List<ReservationOrder> findByTableIdAndStatusIn(Long tableId, List<OrderStatus> statuses);
 
     /**
-     * Kiem tra chong trung lich dat ban tren cung 1 ban trong khoang thoi gian (+/- 2 gio).
+     * Kiểm tra chống trùng lịch đặt bàn trên cùng 1 bàn trong khoảng thời gian (+/- 2 giờ).
      */
     @Query("SELECT COUNT(r) > 0 FROM ReservationOrder r " +
            "WHERE r.tableId = :tableId " +

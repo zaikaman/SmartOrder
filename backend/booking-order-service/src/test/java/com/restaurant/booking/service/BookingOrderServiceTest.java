@@ -49,13 +49,13 @@ class BookingOrderServiceTest {
     }
 
     @Test
-    @DisplayName("Tao don dat ban kem goi mon thanh cong va tinh dung tong tien")
+    @DisplayName("Tạo đơn đặt bàn kèm gọi món thành công và tính đúng tổng tiền")
     void testCreateOrderSuccess() {
         CreateOrderRequest request = CreateOrderRequest.builder()
                 .tableId(2L)
                 .reservationTime(testTime)
                 .partySize(4)
-                .customerName("Nguyen Van A")
+                .customerName("Nguyễn Văn A")
                 .customerEmail("vana@gmail.com")
                 .customerPhone("0987654321")
                 .paymentMethod(PaymentMethod.VNPAY)
@@ -82,13 +82,13 @@ class BookingOrderServiceTest {
 
         when(catalogTableClient.getMenuItem(10L)).thenReturn(CatalogTableClient.MenuItemInfo.builder()
                 .id(10L)
-                .name("Com nieu ca kho to")
+                .name("Cơm niêu cá kho tộ")
                 .price(BigDecimal.valueOf(120000))
                 .build());
 
         when(catalogTableClient.getMenuItem(20L)).thenReturn(CatalogTableClient.MenuItemInfo.builder()
                 .id(20L)
-                .name("Canh cua mong toi")
+                .name("Canh cua mồng tơi")
                 .price(BigDecimal.valueOf(60000))
                 .build());
 
@@ -114,7 +114,7 @@ class BookingOrderServiceTest {
     }
 
     @Test
-    @DisplayName("Bao loi khi ban da bi dat trung trong khoang 2 gio")
+    @DisplayName("Báo lỗi khi bàn đã bị đặt trùng trong khoảng 2 giờ")
     void testCreateOrderConflictThrowsException() {
         CreateOrderRequest request = CreateOrderRequest.builder()
                 .tableId(2L)
@@ -128,7 +128,7 @@ class BookingOrderServiceTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> bookingOrderService.createOrder(1L, request));
 
-        assertTrue(ex.getMessage().contains("da co khach dat"));
+        assertTrue(ex.getMessage().contains("đã có khách đặt"));
         verify(orderRepository, never()).save(any(ReservationOrder.class));
     }
 }

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thuc the Dat ban va Hoa don goi mon trong he thong Nha Hang Am Thuc Bep Viet.
+ * Thực thể Đặt bàn và Hóa đơn gọi món trong hệ thống Nhà Hàng Ẩm Thực Bếp Việt.
  */
 @Entity
 @Table(name = "reservation_orders")

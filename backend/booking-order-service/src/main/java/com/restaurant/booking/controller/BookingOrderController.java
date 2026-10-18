@@ -23,7 +23,7 @@ public class BookingOrderController {
         if (auth != null && auth.getCredentials() instanceof Long) {
             return (Long) auth.getCredentials();
         }
-        // Neu khong tim thay userId trong credentials (vi du khi test), tra ve 1L fallback
+        // Nếu không tìm thấy userId trong credentials (ví dụ khi test), trả về 1L fallback
         return 1L;
     }
 

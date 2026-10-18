@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Service 1: Authentication & User Management Service (Port 8081)
- * Quan ly tai khoan, dang ky, dang nhap va phan quyen nguoi dung.
+ * Quản lý tài khoản, đăng ký, đăng nhập và phân quyền người dùng.
  */
 @SpringBootApplication
 public class AuthUserServiceApplication {

@@ -1,7 +1,7 @@
 package com.restaurant.booking.entity;
 
 /**
- * Trang thai thanh toan: UNPAID (Chua thanh toan), PAID (Da thanh toan), FAILED (Thanh toan that bai).
+ * Trạng thái thanh toán: UNPAID (Chưa thanh toán), PAID (Đã thanh toán), FAILED (Thanh toán thất bại).
  */
 public enum PaymentStatus {
     UNPAID,

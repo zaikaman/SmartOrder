@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Service sinh hinh anh ma QR PNG su dung thu vien Google ZXing.
+ * Service sinh hình ảnh mã QR PNG sử dụng thư viện Google ZXing.
  */
 @Service
 public class QrCodeGeneratorService {
 
     public byte[] generateQrCodePng(String content, int width, int height) {
         if (content == null || content.isBlank()) {
-            throw new IllegalArgumentException("Noi dung ma QR khong duoc de trong");
+            throw new IllegalArgumentException("Nội dung mã QR không được để trống");
         }
 
         try {
@@ -37,7 +37,7 @@ public class QrCodeGeneratorService {
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
             return outputStream.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("Loi khi sinh anh ma QR: " + e.getMessage(), e);
+            throw new RuntimeException("Lỗi khi sinh ảnh mã QR: " + e.getMessage(), e);
         }
     }
 }

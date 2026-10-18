@@ -12,7 +12,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * Thuc the Chi tiet mon an trong don dat ban / don goi mon.
+ * Thực thể Chi tiết món ăn trong đơn đặt bàn / đơn gọi món.
  */
 @Entity
 @Table(name = "order_items")

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Service phat hanh va xac thuc JWT Token.
+ * Service phát hành và xác thực JWT Token.
  */
 @Service
 public class JwtService {

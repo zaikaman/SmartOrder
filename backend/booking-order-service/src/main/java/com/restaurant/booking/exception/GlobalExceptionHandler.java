@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Xu ly loi toan cuc cho Booking & Order Service.
+ * Xử lý lỗi toàn cục cho Booking & Order Service.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now().toString());
         body.put("status", HttpStatus.FORBIDDEN.value());
         body.put("error", "Forbidden");
-        body.put("message", "Ban khong co quyen thuc hien hanh dong nay.");
+        body.put("message", "Bạn không có quyền thực hiện hành động này.");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }

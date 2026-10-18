@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Service xu ly nghiep vu Thuc don (Menu Item) cho Catalog Service.
+ * Service xử lý nghiệp vụ Thực đơn (Menu Item) cho Catalog Service.
  */
 @Service
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class MenuService {
 
     public MenuItem getMenuItemById(Long id) {
         return menuItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay mon an voi ma ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy món ăn với mã ID: " + id));
     }
 
     public List<String> getDistinctCategories() {

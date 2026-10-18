@@ -18,7 +18,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   const location = useLocation();
 
   if (requireAuth && !isAuthenticated) {
-    // Luu lai duong dan de sau khi dang nhap quay lai
+    // Lưu lại đường dẫn để sau khi đăng nhập quay lại
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -27,15 +27,15 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
       return (
         <div className="min-h-screen flex items-center justify-center bg-stone-100 p-4">
           <div className="max-w-md w-full bg-white p-6 rounded-xl shadow border border-stone-200 text-center">
-            <h2 className="text-xl font-bold text-stone-900 mb-2">Truy cap bi tu choi</h2>
+            <h2 className="text-xl font-bold text-stone-900 mb-2">Truy cập bị từ chối</h2>
             <p className="text-stone-600 text-sm mb-4">
-              Tai khoan cua ban khong co quyen truy cap vao khu vuc quan ly nay.
+              Tài khoản của bạn không có quyền truy cập vào khu vực quản lý này.
             </p>
             <a
               href="/"
               className="inline-block px-4 py-2 bg-orange-700 text-white rounded-lg text-sm font-medium hover:bg-orange-800 transition"
             >
-              Quay ve Trang chu
+              Quay về Trang chủ
             </a>
           </div>
         </div>

@@ -27,7 +27,7 @@ export const BookingAndOrderPage: React.FC = () => {
   });
   const [date, setDate] = useState(() => {
     const today = new Date();
-    today.setDate(today.getDate() + 1); // Mac dinh ngay mai
+    today.setDate(today.getDate() + 1); // Mặc định ngày mai
     return today.toISOString().split('T')[0];
   });
   const [time, setTime] = useState('18:30');
@@ -35,7 +35,7 @@ export const BookingAndOrderPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('VNPAY');
   const [note, setNote] = useState('');
 
-  // Thong tin lien he khach hang
+  // Thông tin liên hệ khách hàng
   const [customerName, setCustomerName] = useState(user?.fullName || '');
   const [customerEmail, setCustomerEmail] = useState(user?.email || '');
   const [customerPhone, setCustomerPhone] = useState(user?.phone || '0901234567');
@@ -125,10 +125,10 @@ export const BookingAndOrderPage: React.FC = () => {
       const res = await bookingApi.post('/orders', orderPayload);
       const createdOrder = res.data;
 
-      // Xoa gio hang sau khi dat thanh cong
+      // Xóa giỏ hàng sau khi đặt thành công
       clearCart();
 
-      // Chuyen sang trang lich su don hoac trang thong bao
+      // Chuyển sang trang lịch sử đơn hoặc trang thông báo
       navigate('/my-orders', {
         state: { newOrderCode: createdOrder.orderCode },
       });
@@ -167,9 +167,9 @@ export const BookingAndOrderPage: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cot 1 & 2: Thong tin thoi gian & Chon ban */}
+        {/* Cột 1 & 2: Thông tin thời gian & Chọn bàn */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Card 1: Thoi gian & So luong khach */}
+          {/* Card 1: Thời gian & Số lượng khách */}
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#e8dbce] shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-[#462c1a] flex items-center gap-2">
               <Calendar className="w-5 h-5 text-[#8B1E0F]" />
@@ -227,7 +227,7 @@ export const BookingAndOrderPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 2: Chon ban an */}
+          {/* Card 2: Chọn bàn ăn */}
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#e8dbce] shadow-sm space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="font-serif text-xl font-bold text-[#462c1a] flex items-center gap-2">
@@ -293,7 +293,7 @@ export const BookingAndOrderPage: React.FC = () => {
             )}
           </div>
 
-          {/* Card 3: Thong tin nguoi dat & Ghi chu */}
+          {/* Card 3: Thông tin người đặt & Ghi chú */}
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#e8dbce] shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-[#462c1a]">
               3. Thông Tin Liên Hệ & Ghi Chú
@@ -355,7 +355,7 @@ export const BookingAndOrderPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Cot 3: Tom tat don hang & Thanh toan */}
+        {/* Cột 3: Tóm tắt đơn hàng & Thanh toán */}
         <div className="space-y-6">
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#e8dbce] shadow-sm space-y-6 sticky top-24">
             <h2 className="font-serif text-xl font-bold text-[#462c1a] flex items-center gap-2">
@@ -363,7 +363,7 @@ export const BookingAndOrderPage: React.FC = () => {
               <span>Tóm Tắt Đặt Bàn</span>
             </h2>
 
-            {/* Thong tin ban */}
+            {/* Thông tin bàn */}
             <div className="p-4 rounded-2xl bg-[#faf7f2] border border-[#e8dbce] text-xs space-y-1.5 text-[#7d6756]">
               <p>
                 <strong className="text-[#462c1a]">Vị trí bàn:</strong> {selectedTable?.tableNumber || 'Chưa chọn'} ({selectedTable?.area})
@@ -376,7 +376,7 @@ export const BookingAndOrderPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Danh sach mon an */}
+            {/* Danh sách món ăn */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#9c8675]">
                 Món Gọi Kèm ({items.length} món)
@@ -401,7 +401,7 @@ export const BookingAndOrderPage: React.FC = () => {
               )}
             </div>
 
-            {/* Phuong thuc thanh toan */}
+            {/* Phương thức thanh toán */}
             <div className="space-y-2 pt-2 border-t border-[#e8dbce]">
               <label className="block text-xs font-bold text-[#462c1a] uppercase tracking-wider">
                 Phương Thức Thanh Toán
@@ -432,7 +432,7 @@ export const BookingAndOrderPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Tong tien */}
+            {/* Tổng tiền */}
             <div className="pt-4 border-t border-[#e8dbce] flex justify-between items-center">
               <span className="text-sm font-bold text-[#462c1a]">Tổng tiền dự kiến:</span>
               <span className="font-serif text-2xl font-black text-[#8B1E0F]">

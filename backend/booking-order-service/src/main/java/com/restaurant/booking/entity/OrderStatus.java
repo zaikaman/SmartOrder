@@ -1,8 +1,8 @@
 package com.restaurant.booking.entity;
 
 /**
- * Trang thai don dat ban / goi mon:
- * PENDING -> CONFIRMED -> PREPARING (Dang nau) -> SERVED (Da phuc vu) -> COMPLETED / CANCELLED.
+ * Trạng thái đơn đặt bàn / gọi món:
+ * PENDING -> CONFIRMED -> PREPARING (Đang nấu) -> SERVED (Đã phục vụ) -> COMPLETED / CANCELLED.
  */
 public enum OrderStatus {
     PENDING,

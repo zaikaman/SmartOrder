@@ -32,7 +32,7 @@ public class EmailNotificationService {
 
     public boolean sendReservationConfirmationEmail(ReservationOrder order) {
         if (order.getCustomerEmail() == null || order.getCustomerEmail().isBlank()) {
-            log.warn("Don dat ban {} khong co email nguoi nhan", order.getOrderCode());
+            log.warn("Đơn đặt bàn {} không có email người nhận", order.getOrderCode());
             return false;
         }
 
@@ -40,7 +40,7 @@ public class EmailNotificationService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail, "Nha Hang Am Thuc Bep Viet");
+            helper.setFrom(fromEmail, "Nhà Hàng Ẩm Thực Bếp Việt");
             helper.setTo(order.getCustomerEmail());
             helper.setSubject("[Bếp Việt] Xác nhận đặt bàn thành công - Mã đơn: " + order.getOrderCode());
 
@@ -48,10 +48,10 @@ public class EmailNotificationService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
-            log.info("Da gui email xac nhan dat ban thanh cong toi {}", order.getCustomerEmail());
+            log.info("Đã gửi email xác nhận đặt bàn thành công tới {}", order.getCustomerEmail());
             return true;
         } catch (Exception ex) {
-            log.error("Khong the gui email xac nhan toi {}: {}", order.getCustomerEmail(), ex.getMessage());
+            log.error("Không thể gửi email xác nhận tới {}: {}", order.getCustomerEmail(), ex.getMessage());
             return false;
         }
     }

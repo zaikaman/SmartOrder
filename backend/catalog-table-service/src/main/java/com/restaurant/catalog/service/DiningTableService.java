@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service xu ly nghiep vu Ban an (Dining Table) va sinh ma QR cho Catalog Service.
+ * Service xử lý nghiệp vụ Bàn ăn (Dining Table) và sinh mã QR cho Catalog Service.
  */
 @Service
 @RequiredArgsConstructor
@@ -40,18 +40,27 @@ public class DiningTableService {
 
     public DiningTable getTableById(Long id) {
         return tableRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay ban an voi ma ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bàn ăn với mã ID: " + id));
     }
 
     public DiningTable getTableByNumber(String tableNumber) {
         return tableRepository.findByTableNumber(tableNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay ban an voi so ban: " + tableNumber));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bàn ăn với số bàn: " + tableNumber));
     }
 
     public byte[] generateTableQrPng(Long tableId, int width, int height) {
         DiningTable table = getTableById(tableId);
         String targetUrl = frontendUrl + "/table/" + table.getTableNumber();
-        log.info("Dang sinh ma QR cho ban {} voi URL: {}", table.getTableNumber(), targetUrl);
+        log.info("Đang sinh mã QR cho bàn {} với URL: {}", table.getTableNumber(), targetUrl);
         return qrCodeGeneratorService.generateQrCodePng(targetUrl, width, height);
     }
+
+    @Transactional
+    public DiningTable updateTableStatus(Long id, TableStatus status) {
+        DiningTable table = getTableById(id);
+        table.setStatus(status);
+        log.info("Cập nhật trạng thái bàn {} (ID: {}) thành {}", table.getTableNumber(), id, status);
+        return tableRepository.save(table);
+    }
 }
+

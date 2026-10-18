@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * Bo loc xac thuc JWT tren moi request den Auth Service.
+ * Bộ lọc xác thực JWT trên mỗi request đến Auth Service.
  */
 @Component
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception ex) {
-            // Bo qua loi token khong hop le, Security Context se tu dong chan neu endpoint can bao ve
+            // Bỏ qua lỗi token không hợp lệ, Security Context sẽ tự động chặn nếu endpoint cần bảo vệ
         }
 
         filterChain.doFilter(request, response);

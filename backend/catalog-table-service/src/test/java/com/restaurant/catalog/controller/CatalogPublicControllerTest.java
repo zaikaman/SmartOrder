@@ -65,7 +65,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/menu: Anonymous truy van menu thanh cong")
+    @DisplayName("GET /api/v1/menu: Anonymous truy vấn menu thành công")
     void testGetPublicMenu() throws Exception {
         mockMvc.perform(get("/api/v1/menu"))
                 .andExpect(status().isOk())
@@ -74,7 +74,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/menu/{id}: Anonymous xem chi tiet mon an")
+    @DisplayName("GET /api/v1/menu/{id}: Anonymous xem chi tiết món ăn")
     void testGetMenuItemById() throws Exception {
         mockMvc.perform(get("/api/v1/menu/" + savedItemId))
                 .andExpect(status().isOk())
@@ -83,7 +83,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/menu/categories: Lay danh sach danh muc mon an")
+    @DisplayName("GET /api/v1/menu/categories: Lấy danh sách danh mục món ăn")
     void testGetMenuCategories() throws Exception {
         mockMvc.perform(get("/api/v1/menu/categories"))
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/tables: Anonymous xem danh sach ban an")
+    @DisplayName("GET /api/v1/tables: Anonymous xem danh sách bàn ăn")
     void testGetPublicTables() throws Exception {
         mockMvc.perform(get("/api/v1/tables"))
                 .andExpect(status().isOk())
@@ -100,7 +100,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/tables/number/{tableNumber}: Quet ma QR tim ban T10")
+    @DisplayName("GET /api/v1/tables/number/{tableNumber}: Quét mã QR tìm bàn T10")
     void testGetTableByNumber() throws Exception {
         mockMvc.perform(get("/api/v1/tables/number/T10"))
                 .andExpect(status().isOk())
@@ -109,7 +109,7 @@ class CatalogPublicControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/tables/{id}/qr-image: Xuat anh PNG ma QR ban an")
+    @DisplayName("GET /api/v1/tables/{id}/qr-image: Xuất ảnh PNG mã QR bàn ăn")
     void testGetTableQrImage() throws Exception {
         mockMvc.perform(get("/api/v1/tables/" + savedTableId + "/qr-image"))
                 .andExpect(status().isOk())

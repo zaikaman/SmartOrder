@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 /**
- * Bo loc xac thuc JWT cho Booking & Order Service.
+ * Bộ lọc xác thực JWT cho Booking & Order Service.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

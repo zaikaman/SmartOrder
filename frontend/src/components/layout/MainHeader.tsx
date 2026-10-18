@@ -36,7 +36,11 @@ export const MainHeader: React.FC = () => {
     { to: '/booking', label: 'Đặt bàn trước' },
     { to: '/table/T01', label: 'Gọi món tại bàn (QR)' },
     ...(isAuthenticated ? [{ to: '/my-orders', label: 'Lịch sử đơn' }] : []),
+    ...(isAuthenticated && (user?.role === 'STAFF' || user?.role === 'ADMIN')
+      ? [{ to: '/staff/orders', label: 'Bếp & Điều phối' }]
+      : []),
   ];
+
 
   return (
     <header className="sticky top-0 z-50 bg-[#faf7f2]/95 backdrop-blur-md border-b border-[#e8dbce] transition-all">

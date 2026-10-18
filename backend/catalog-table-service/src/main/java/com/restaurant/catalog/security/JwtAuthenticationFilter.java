@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 /**
- * Bo loc xac thuc JWT stateless cho Catalog Service.
+ * Bộ lọc xác thực JWT stateless cho Catalog Service.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception ignored) {
-            // Khong nem loi tai filter, endpoint bao ve se tu dong yeu cau xac thuc
+            // Không ném lỗi tại filter, endpoint bảo vệ sẽ tự động yêu cầu xác thực
         }
 
         filterChain.doFilter(request, response);

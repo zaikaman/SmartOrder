@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Service 2: Catalog & Dining Table Service (Port 8082)
- * Quan ly thuc don am thuc Viet Nam, ban an, ma QR va tai anh Cloudinary.
+ * Quản lý thực đơn ẩm thực Việt Nam, bàn ăn, mã QR và tải ảnh Cloudinary.
  */
 @SpringBootApplication
 public class CatalogTableServiceApplication {

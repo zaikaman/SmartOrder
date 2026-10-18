@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-// Helper de lay Token hien tai tu localStorage
+// Helper để lấy Token hiện tại từ localStorage
 const getAuthToken = (): string | null => {
   try {
     const authStorage = localStorage.getItem('auth-storage');
@@ -9,12 +9,12 @@ const getAuthToken = (): string | null => {
       return parsed.state?.token || null;
     }
   } catch (e) {
-    console.error('Loi khi doc token tu localStorage', e);
+    console.error('Lỗi khi đọc token từ localStorage', e);
   }
   return null;
 };
 
-// Ham gan Interceptor gan Token va xu ly response
+// Hàm gắn Interceptor gắn Token và xử lý response
 const setupInterceptors = (instance: AxiosInstance): AxiosInstance => {
   instance.interceptors.request.use((config) => {
     const token = getAuthToken();
@@ -30,8 +30,8 @@ const setupInterceptors = (instance: AxiosInstance): AxiosInstance => {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        // Neu bi 401 Unauthorized tren cac route yeu cau dang nhap, co the xoa token va chuyen huong
-        console.warn('Phien dang nhap het han hoac khong hop le.');
+        // Nếu bị 401 Unauthorized trên các route yêu cầu đăng nhập, có thể xóa token và chuyển hướng
+        console.warn('Phiên đăng nhập hết hạn hoặc không hợp lệ.');
       }
       return Promise.reject(error);
     }

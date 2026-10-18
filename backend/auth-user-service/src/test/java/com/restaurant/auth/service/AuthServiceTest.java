@@ -47,7 +47,7 @@ class AuthServiceTest {
                 .username("khachhang01")
                 .password("encoded_pass")
                 .email("khachhang01@gmail.com")
-                .fullName("Nguyen Van An")
+                .fullName("Nguyễn Văn An")
                 .phone("0901234567")
                 .role(UserRole.CUSTOMER)
                 .authProvider("LOCAL")
@@ -56,13 +56,13 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Dang ky tai khoan moi thanh cong")
+    @DisplayName("Đăng ký tài khoản mới thành công")
     void testRegisterSuccess() {
         RegisterRequest request = RegisterRequest.builder()
                 .username("khachhang01")
                 .password("MatKhau123")
                 .email("khachhang01@gmail.com")
-                .fullName("Nguyen Van An")
+                .fullName("Nguyễn Văn An")
                 .phone("0901234567")
                 .build();
 
@@ -82,7 +82,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Dang nhap thanh cong voi thong tin chinh xac")
+    @DisplayName("Đăng nhập thành công với thông tin chính xác")
     void testLoginSuccess() {
         LoginRequest request = LoginRequest.builder()
                 .username("khachhang01")
@@ -101,7 +101,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Dang nhap that bai khi sai mat khau")
+    @DisplayName("Đăng nhập thất bại khi sai mật khẩu")
     void testLoginWrongPassword() {
         LoginRequest request = LoginRequest.builder()
                 .username("khachhang01")
@@ -115,7 +115,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Dang nhap Google OAuth2 thanh cong cho nguoi dung moi")
+    @DisplayName("Đăng nhập Google OAuth2 thành công cho người dùng mới")
     void testGoogleLoginNewUser() {
         GoogleLoginRequest request = GoogleLoginRequest.builder()
                 .credential("mock_google_credential")

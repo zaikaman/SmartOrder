@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller phuc vu cac API cong khai tra cuu ban an va xuat ma QR ban.
+ * Controller phục vụ các API công khai tra cứu bàn ăn và xuất mã QR bàn.
  */
 @RestController
 @RequestMapping("/api/v1/tables")

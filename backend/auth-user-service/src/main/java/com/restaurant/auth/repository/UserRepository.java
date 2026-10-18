@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Repository truy van du lieu nguoi dung.
+ * Repository truy vấn dữ liệu người dùng.
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

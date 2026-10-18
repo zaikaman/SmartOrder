@@ -28,35 +28,35 @@ public class BookingOrderService {
 
     @Transactional
     public OrderDto createOrder(Long userId, CreateOrderRequest request) {
-        // 1. Kiem tra chong trung lich dat ban tren cung 1 ban trong khoang +/- 2 gio
+        // 1. Kiểm tra chống trùng lịch đặt bàn trên cùng 1 bàn trong khoảng +/- 2 giờ
         Instant startTime = request.getReservationTime().minus(2, ChronoUnit.HOURS);
         Instant endTime = request.getReservationTime().plus(2, ChronoUnit.HOURS);
 
         boolean hasConflict = orderRepository.existsConflictingReservation(request.getTableId(), startTime, endTime);
         if (hasConflict) {
-            throw new IllegalArgumentException("Ban an nay da co khach dat trong khoang thoi gian nay (trung lap trong vong 2 gio). Vui long chon ban khac hoac khung gio khac.");
+            throw new IllegalArgumentException("Bàn ăn này đã có khách đặt trong khoảng thời gian này (trùng lặp trong vòng 2 giờ). Vui lòng chọn bàn khác hoặc khung giờ khác.");
         }
 
-        // 2. Lay thong tin ban an tu Catalog Table Service
-        String tableNumber = "Ban " + request.getTableId();
+        // 2. Lấy thông tin bàn ăn từ Catalog Table Service
+        String tableNumber = "Bàn " + request.getTableId();
         try {
             CatalogTableClient.TableInfo tableInfo = catalogTableClient.getTable(request.getTableId());
             if (tableInfo != null && tableInfo.getTableNumber() != null) {
                 tableNumber = tableInfo.getTableNumber();
             }
         } catch (Exception ex) {
-            log.warn("Khong the lay chi tiet ten ban tu Catalog Service, su dung mac dinh: {}", ex.getMessage());
+            log.warn("Không thể lấy chi tiết tên bàn từ Catalog Service, sử dụng mặc định: {}", ex.getMessage());
         }
 
-        // 3. Sinh ma don dat ban doc nhat
+        // 3. Sinh mã đơn đặt bàn độc nhất
         String orderCode = "BV" + System.currentTimeMillis() % 10000000 + String.format("%02d", request.getTableId());
 
         ReservationOrder order = ReservationOrder.builder()
                 .orderCode(orderCode)
                 .userId(userId)
-                .customerName(request.getCustomerName() != null ? request.getCustomerName() : "Khach hang")
+                .customerName(request.getCustomerName() != null ? request.getCustomerName() : "Khách hàng")
                 .customerEmail(request.getCustomerEmail())
-                .customerPhone(request.getCustomerPhone() != null ? request.getCustomerPhone() : "Chua cung cap")
+                .customerPhone(request.getCustomerPhone() != null ? request.getCustomerPhone() : "Chưa cung cấp")
                 .tableId(request.getTableId())
                 .tableNumber(tableNumber)
                 .reservationTime(request.getReservationTime())
@@ -69,7 +69,7 @@ public class BookingOrderService {
                 .emailSent(false)
                 .build();
 
-        // 4. Tinh tien va luu cac OrderItem neu co goi mon kem theo
+        // 4. Tính tiền và lưu các OrderItem nếu có gọi món kèm theo
         BigDecimal total = BigDecimal.ZERO;
         if (request.getItems() != null && !request.getItems().isEmpty()) {
             for (CreateOrderItemRequest itemReq : request.getItems()) {
@@ -92,10 +92,10 @@ public class BookingOrderService {
         }
         order.setTotalAmount(total);
 
-        // 5. Luu don hang vao CSDL
+        // 5. Lưu đơn hàng vào CSDL
         ReservationOrder savedOrder = orderRepository.save(order);
 
-        // 6. Gui email xac nhan cho khach hang
+        // 6. Gửi email xác nhận cho khách hàng
         try {
             boolean sent = emailNotificationService.sendReservationConfirmationEmail(savedOrder);
             if (sent) {
@@ -103,7 +103,7 @@ public class BookingOrderService {
                 orderRepository.save(savedOrder);
             }
         } catch (Exception ex) {
-            log.warn("Gui email xac nhan khong thanh cong: {}", ex.getMessage());
+            log.warn("Gửi email xác nhận không thành công: {}", ex.getMessage());
         }
 
         return toDto(savedOrder);
@@ -120,14 +120,64 @@ public class BookingOrderService {
     @Transactional(readOnly = true)
     public OrderDto getOrderById(Long orderId, Long userId) {
         ReservationOrder order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay don hang ID: " + orderId));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng ID: " + orderId));
 
         if (userId != null && !order.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Quyen truy cap don hang bi tu choi");
+            throw new IllegalArgumentException("Quyền truy cập đơn hàng bị từ chối");
         }
 
         return toDto(order);
     }
+
+    @Transactional(readOnly = true)
+    public List<OrderDto> getStaffOrders(OrderStatus status) {
+        List<ReservationOrder> orders;
+        if (status != null) {
+            orders = orderRepository.findByStatusOrderByCreatedAtDesc(status);
+        } else {
+            orders = orderRepository.findAll(org.springframework.data.domain.Sort.by(
+                    org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        }
+        return orders.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OrderDto updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        ReservationOrder order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng ID: " + orderId));
+
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(newStatus);
+        log.info("Nhân viên cập nhật đơn {} từ {} sang {}", order.getOrderCode(), oldStatus, newStatus);
+
+        // Tự động cập nhật trạng thái bàn sang Catalog Service
+        if (newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.CANCELLED) {
+            catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+        } else if (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.PREPARING) {
+            catalogTableClient.updateTableStatus(order.getTableId(), "OCCUPIED");
+        }
+
+        ReservationOrder updated = orderRepository.save(order);
+        return toDto(updated);
+    }
+
+    @Transactional
+    public OrderDto payCash(Long orderId) {
+        ReservationOrder order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng ID: " + orderId));
+
+        order.setPaymentMethod(PaymentMethod.CASH);
+        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setStatus(OrderStatus.COMPLETED);
+        log.info("Nhân viên xác nhận thanh toán tiền mặt cho đơn {}", order.getOrderCode());
+
+        // Giải phóng bàn khi đã thanh toán xong và hoàn tất
+        catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+
+        ReservationOrder updated = orderRepository.save(order);
+        return toDto(updated);
+    }
+
 
     public OrderDto toDto(ReservationOrder order) {
         List<OrderItemDto> itemDtos = null;

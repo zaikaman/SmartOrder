@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
- * Thuc the Mon an trong Thuc don Nha Hang Am Thuc Bep Viet.
+ * Thực thể Món ăn trong Thực đơn Nhà Hàng Ẩm Thực Bếp Việt.
  */
 @Entity
 @Table(name = "menu_items")

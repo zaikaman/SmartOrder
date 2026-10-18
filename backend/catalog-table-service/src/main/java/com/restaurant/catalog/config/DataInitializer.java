@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Nap san 10 ban an va thuc don am thuc Viet Nam cho Nha Hang Am Thuc Bep Viet.
+ * Nạp sẵn 10 bàn ăn và thực đơn ẩm thực Việt Nam cho Nhà Hàng Ẩm Thực Bếp Việt.
  */
 @Component
 @RequiredArgsConstructor
@@ -34,25 +34,25 @@ public class DataInitializer implements CommandLineRunner {
     private void initTables() {
         if (tableRepository.count() == 0) {
             List<DiningTable> defaultTables = List.of(
-                    // Khu vuc Tang 1 (Gian chinh)
+                    // Khu vực Tầng 1 (Gian chính)
                     DiningTable.builder().tableNumber("T01").capacity(2).area("Tầng 1").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T01").build(),
                     DiningTable.builder().tableNumber("T02").capacity(4).area("Tầng 1").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T02").build(),
                     DiningTable.builder().tableNumber("T03").capacity(4).area("Tầng 1").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T03").build(),
                     DiningTable.builder().tableNumber("T04").capacity(6).area("Tầng 1").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T04").build(),
                     DiningTable.builder().tableNumber("T05").capacity(4).area("Tầng 1").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T05").build(),
 
-                    // Khu vuc Tang 2 (Ban cong gia dinh)
+                    // Khu vực Tầng 2 (Ban công gia đình)
                     DiningTable.builder().tableNumber("T06").capacity(6).area("Tầng 2").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T06").build(),
                     DiningTable.builder().tableNumber("T07").capacity(8).area("Tầng 2").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T07").build(),
                     DiningTable.builder().tableNumber("T08").capacity(8).area("Tầng 2").status(TableStatus.AVAILABLE).qrCodeUrl("/table/T08").build(),
 
-                    // Khu vuc Phong VIP (Tiep khach & Tiec rieng)
+                    // Khu vực Phòng VIP (Tiếp khách & Tiệc riêng)
                     DiningTable.builder().tableNumber("VIP01").capacity(10).area("Phòng VIP").status(TableStatus.AVAILABLE).qrCodeUrl("/table/VIP01").build(),
                     DiningTable.builder().tableNumber("VIP02").capacity(12).area("Phòng VIP").status(TableStatus.AVAILABLE).qrCodeUrl("/table/VIP02").build()
             );
 
             tableRepository.saveAll(defaultTables);
-            log.info("Khoi tao thanh cong {} ban an cho Nha Hang Bep Viet", defaultTables.size());
+            log.info("Khởi tạo thành công {} bàn ăn cho Nhà Hàng Bếp Việt", defaultTables.size());
         }
     }
 
@@ -247,7 +247,7 @@ public class DataInitializer implements CommandLineRunner {
             );
 
             menuRepository.saveAll(defaultItems);
-            log.info("Khoi tao thanh cong {} mon an thuc don cho Nha Hang Bep Viet", defaultItems.size());
+            log.info("Khởi tạo thành công {} món ăn thực đơn cho Nhà Hàng Bếp Việt", defaultItems.size());
         }
     }
 }
