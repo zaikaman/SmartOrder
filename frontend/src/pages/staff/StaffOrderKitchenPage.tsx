@@ -60,8 +60,8 @@ export const StaffOrderKitchenPage: React.FC = () => {
 
     try {
       const url = selectedStatus === 'ALL' 
-        ? '/api/v1/staff/orders' 
-        : `/api/v1/staff/orders?status=${selectedStatus}`;
+        ? '/staff/orders' 
+        : `/staff/orders?status=${selectedStatus}`;
       const res = await bookingApi.get<ReservationOrder[]>(url);
       setOrders(Array.isArray(res.data) ? res.data : []);
     } catch (err: any) {
@@ -83,7 +83,7 @@ export const StaffOrderKitchenPage: React.FC = () => {
     setActionLoadingId(orderId);
     setSuccessMessage(null);
     try {
-      await bookingApi.patch(`/api/v1/staff/orders/${orderId}/status`, {
+      await bookingApi.patch(`/staff/orders/${orderId}/status`, {
         status: newStatus,
       });
       setSuccessMessage(`Đã cập nhật trạng thái đơn sang ${newStatus}`);
@@ -105,7 +105,7 @@ export const StaffOrderKitchenPage: React.FC = () => {
     setActionLoadingId(orderId);
     setSuccessMessage(null);
     try {
-      await bookingApi.post(`/api/v1/staff/orders/${orderId}/pay-cash`);
+      await bookingApi.post(`/staff/orders/${orderId}/pay-cash`);
       setSuccessMessage('Xác nhận thanh toán tiền mặt thành công! Đã giải phóng bàn.');
       await fetchOrders(false);
     } catch (err: any) {
@@ -190,7 +190,7 @@ export const StaffOrderKitchenPage: React.FC = () => {
       <StaffSidebar />
 
       {/* Vùng nội dung trung tâm */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
+      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
         {/* Tiêu đề & Công cụ thao tác nhanh */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-[#e8dbce] shadow-sm">
           <div>
@@ -558,7 +558,7 @@ export const StaffOrderKitchenPage: React.FC = () => {
             })}
           </div>
         )}
-      </main>
+      </div>
 
       {/* Modal xem trước và tải hóa đơn PDF */}
       <InvoicePreviewModal

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { catalogApi } from '../../api/client';
 import { MenuItem, MenuItemRequest, MenuItemStatus } from '../../types';
 import { Plus, Search, Filter, Edit2, Trash2, CheckCircle2, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
@@ -376,9 +377,14 @@ export const AdminMenuManagementPage: React.FC = () => {
       </div>
 
       {/* Modal Thêm / Chỉnh Sửa Món Ăn */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-[#e8dbce] space-y-4 max-h-[90vh] overflow-y-auto">
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+            onClick={() => setIsModalOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-[#e8dbce] space-y-4 max-h-[90vh] overflow-y-auto my-auto animate-fadeIn">
             <div className="flex items-center justify-between border-b border-[#f0e6da] pb-3">
               <h3 className="font-serif text-lg font-bold text-[#3a2012]">
                 {editingItem ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn Mới'}
@@ -496,13 +502,19 @@ export const AdminMenuManagementPage: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal Xác Nhận Xóa */}
-      {deletingItem && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-[#e8dbce] space-y-4 text-xs">
+      {deletingItem && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+            onClick={() => setDeletingItem(null)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-[#e8dbce] space-y-4 text-xs my-auto animate-fadeIn">
             <div className="font-serif text-lg font-bold text-rose-800 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-rose-600" />
               <span>Xác Nhận Xóa Món</span>
@@ -528,7 +540,8 @@ export const AdminMenuManagementPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { catalogApi } from '../../api/client';
 import { DiningTable, DiningTableRequest, TableStatus } from '../../types';
 import { Plus, QrCode, Printer, Download, Edit2, Trash2, CheckCircle2, AlertCircle, X, Users, MapPin, Eye } from 'lucide-react';
@@ -275,8 +276,8 @@ export const AdminTableQrPage: React.FC = () => {
         )}
 
         {/* Thanh lọc khu vực */}
-        <div className="bg-white p-4 rounded-2xl border border-[#e8dbce] shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+        <div className="bg-white p-4 rounded-2xl border border-[#e8dbce] shadow-sm flex items-center justify-between w-full max-w-full overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 no-scrollbar w-full min-w-0">
             <MapPin className="w-4 h-4 text-[#a89584] shrink-0" />
             <button
               onClick={() => setSelectedArea('ALL')}
@@ -397,9 +398,14 @@ export const AdminTableQrPage: React.FC = () => {
       </div>
 
       {/* Modal Xem & In mã QR */}
-      {qrModalTable && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-[#e8dbce] text-center space-y-4">
+      {qrModalTable && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+            onClick={() => setQrModalTable(null)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-[#e8dbce] text-center space-y-4 my-auto animate-fadeIn">
             <div className="flex items-center justify-between border-b border-[#f0e6da] pb-3">
               <h3 className="font-serif text-lg font-bold text-[#3a2012]">Mã QR Bàn {qrModalTable.tableNumber}</h3>
               <button onClick={() => setQrModalTable(null)} className="text-stone-400 hover:text-stone-600">
@@ -435,13 +441,19 @@ export const AdminTableQrPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal Thêm / Sửa Bàn Ăn */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#e8dbce] space-y-4">
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+            onClick={() => setIsModalOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#e8dbce] space-y-4 my-auto animate-fadeIn">
             <div className="flex items-center justify-between border-b border-[#f0e6da] pb-3">
               <h3 className="font-serif text-lg font-bold text-[#3a2012]">
                 {editingTable ? 'Cập Nhật Bàn Ăn' : 'Thêm Bàn Ăn Mới'}
@@ -520,13 +532,19 @@ export const AdminTableQrPage: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal Xác Nhận Xóa Bàn */}
-      {deletingTable && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-[#e8dbce] space-y-4 text-xs">
+      {deletingTable && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+            onClick={() => setDeletingTable(null)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-[#e8dbce] space-y-4 text-xs my-auto animate-fadeIn">
             <div className="font-serif text-lg font-bold text-rose-800 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-rose-600" />
               <span>Xác Nhận Xóa Bàn</span>
@@ -552,7 +570,8 @@ export const AdminTableQrPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

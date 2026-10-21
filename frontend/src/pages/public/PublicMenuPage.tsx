@@ -110,23 +110,23 @@ export const PublicMenuPage: React.FC = () => {
 
         {/* Filter & Search Bar - Sticky underneath header */}
         <div 
-          className="sticky z-30 bg-[#f3ece3]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-[#e8dbce] space-y-4 shadow-sm transition-all"
+          className="sticky z-30 bg-[#f3ece3]/95 backdrop-blur-md p-3 sm:p-5 rounded-2xl border border-[#e8dbce] space-y-3 sm:space-y-4 shadow-sm transition-all w-full max-w-full overflow-hidden"
           style={{ top: `${headerHeight + 6}px` }}
         >
           {/* Search Box */}
-          <div className="relative max-w-md mx-auto">
+          <div className="relative max-w-md mx-auto w-full">
             <input
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Tìm kiếm món ăn (cá kho, tôm rang, canh chua...)"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-[#d7bda0] text-sm text-[#462c1a] placeholder-[#8c6d60]/70 focus:outline-none focus:ring-2 focus:ring-[#b84a28]"
+              className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl bg-white border border-[#d7bda0] text-xs sm:text-sm text-[#462c1a] placeholder-[#8c6d60]/70 focus:outline-none focus:ring-2 focus:ring-[#b84a28]"
             />
-            <Search className="w-4 h-4 text-[#8c6d60] absolute left-3.5 top-3.5" />
+            <Search className="w-4 h-4 text-[#8c6d60] absolute left-3.5 top-3 sm:top-3.5" />
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar w-full min-w-0 justify-start sm:justify-center">
             <button
               onClick={() => {
                 setSelectedCategory('ALL');

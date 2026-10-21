@@ -109,9 +109,9 @@ export const TableLookupPage: React.FC = () => {
         )}
 
         {/* Filter Toolbar */}
-        <div className="bg-[#f3ece3] p-5 rounded-2xl border border-[#e8dbce] flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div className="bg-[#f3ece3] p-4 sm:p-5 rounded-2xl border border-[#e8dbce] flex flex-wrap items-center justify-between gap-4 shadow-sm w-full max-w-full overflow-hidden">
           {/* Area Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar w-full sm:w-auto min-w-0">
             <span className="text-xs font-bold text-[#462c1a] mr-1 hidden sm:inline">Khu vực:</span>
             {areas.map((area) => (
               <button

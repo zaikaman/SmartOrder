@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, UtensilsCrossed } from 'lucide-react';
 import { MenuItem } from '../../types';
 import { useCartStore } from '../../store/useCartStore';
 
@@ -28,20 +28,31 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, showOrderActio
 
   const isAvailable = item.status === 'AVAILABLE';
 
-  // Fallback high quality dish image from Bep Viet if link fails
-  const fallbackImage = "https://comnieubepviet.com/thumbs/675x600x1/upload/product/menu-21-tom-rang-trung-muoi-5429.jpg";
-
   return (
     <div className="group relative bg-[#faf7f2] rounded-xl overflow-hidden border border-[#e8dbce] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
       {/* Image Container */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f3ece3]">
-        <img
-          src={imgError || !item.imageUrl ? fallbackImage : item.imageUrl}
-          alt={item.name}
-          onError={() => setImgError(true)}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
+        {imgError || !item.imageUrl ? (
+          <div className="w-full h-full bg-gradient-to-br from-[#f3ece3] via-[#ebdccf] to-[#dfcbba] flex flex-col items-center justify-center p-4 text-center select-none">
+            <div className="w-12 h-12 rounded-full bg-[#6d492f]/10 border border-[#6d492f]/20 flex items-center justify-center mb-2">
+              <UtensilsCrossed className="w-6 h-6 text-[#6d492f]" />
+            </div>
+            <span className="font-serif text-xs font-bold text-[#462c1a] line-clamp-1">
+              {item.name}
+            </span>
+            <span className="text-[10px] text-[#8c6d60] uppercase tracking-wider mt-0.5">
+              Bếp Việt Đặc Sản
+            </span>
+          </div>
+        ) : (
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        )}
 
         {/* Category Tag */}
         <span className="absolute top-3 left-3 bg-[#3f2615]/85 backdrop-blur-sm text-[#f5ede3] text-[11px] font-semibold px-2.5 py-1 rounded-md tracking-wide">

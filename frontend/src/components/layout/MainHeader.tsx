@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Phone, 
   MapPin, 
@@ -10,7 +10,14 @@ import {
   Menu, 
   X, 
   ShoppingBag,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  Shield,
+  ChefHat,
+  Utensils,
+  QrCode,
+  Users,
+  BarChart3
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
@@ -19,11 +26,14 @@ import { AiFoodAssistantModal } from '../common/AiFoodAssistantModal';
 
 export const MainHeader: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { getTotalQuantity, tableNumber } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const adminDropdownRef = useRef<HTMLDivElement>(null);
 
   const cartCount = getTotalQuantity();
 
@@ -32,53 +42,76 @@ export const MainHeader: React.FC = () => {
     navigate('/');
   };
 
-  const navLinks = [
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminDropdownRef.current && !adminDropdownRef.current.contains(event.target as Node)) {
+        setAdminDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close dropdown and mobile menu on route change
+  useEffect(() => {
+    setAdminDropdownOpen(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  const baseLinks = [
     { to: '/', label: 'Trang chủ' },
     { to: '/menu', label: 'Thực đơn' },
     { to: '/tables', label: 'Sơ đồ bàn' },
     { to: '/booking', label: 'Đặt bàn trước' },
-    { to: '/table/T01', label: 'Gọi món tại bàn (QR)' },
     ...(isAuthenticated ? [{ to: '/my-orders', label: 'Lịch sử đơn' }] : []),
-    ...(isAuthenticated && (user?.role === 'STAFF' || user?.role === 'ADMIN')
-      ? [{ to: '/staff/orders', label: 'Bếp & Đơn món' }]
-      : []),
-    ...(isAuthenticated && user?.role === 'ADMIN'
-      ? [
-          { to: '/admin/menu', label: 'QL Menu' },
-          { to: '/admin/tables', label: 'QL Bàn & QR' },
-          { to: '/admin/users', label: 'QL Người dùng' },
-          { to: '/admin/stats', label: 'Thống kê DT' },
-        ]
-      : []),
   ];
+
+  const staffAdminLinks = user?.role === 'ADMIN'
+    ? [
+        { to: '/staff/orders', label: 'Bếp & Gọi món', icon: ChefHat },
+        { to: '/admin/menu', label: 'Quản lý Menu', icon: Utensils },
+        { to: '/admin/tables', label: 'Quản lý Bàn & QR', icon: QrCode },
+        { to: '/admin/users', label: 'Quản trị Người dùng', icon: Users },
+        { to: '/admin/stats', label: 'Thống kê Doanh thu', icon: BarChart3 },
+      ]
+    : user?.role === 'STAFF'
+    ? [
+        { to: '/staff/orders', label: 'Điều phối Bếp & Gọi món', icon: ChefHat },
+        { to: '/staff/tables', label: 'Sơ đồ & Tiếp nhận bàn', icon: LayoutGrid },
+      ]
+    : [];
+
+  const isStaffOrAdminActive = staffAdminLinks.some(link => location.pathname.startsWith(link.to));
 
   return (
     <header className="sticky top-0 z-50 bg-[#faf7f2]/95 backdrop-blur-md border-b border-[#e8dbce] transition-all">
       {/* Top Banner Bar */}
-      <div className="bg-[#6d492f] text-[#f5ede3] text-xs py-1.5 px-4 sm:px-8 border-b border-[#5a3b25]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1">
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <span className="flex items-center gap-1.5">
+      <div className="bg-[#6d492f] text-[#f5ede3] text-xs py-1.5 px-3 sm:px-6 lg:px-8 border-b border-[#5a3b25]">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-2">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-medium min-w-0">
+            <span className="flex items-center gap-1.5 shrink-0">
               <Phone className="w-3.5 h-3.5 text-[#d7bda0]" />
-              Hotline: <strong className="text-white font-semibold tracking-wide">0843 093 999</strong>
+              <span className="hidden xs:inline">Hotline:</span>
+              <strong className="text-white font-semibold tracking-wide">0843 093 999</strong>
             </span>
-            <span className="hidden md:flex items-center gap-1.5 text-[#e4d4c2]">
-              <Clock className="w-3.5 h-3.5 text-[#d7bda0]" />
-              Mở cửa: 10:00 - 22:00 hàng ngày
+            <span className="hidden md:flex items-center gap-1.5 text-[#e4d4c2] truncate">
+              <Clock className="w-3.5 h-3.5 text-[#d7bda0] shrink-0" />
+              10:00 - 22:00
             </span>
-            <span className="hidden lg:flex items-center gap-1.5 text-[#e4d4c2]">
-              <MapPin className="w-3.5 h-3.5 text-[#d7bda0]" />
-              Đại lộ Hùng Vương, Phú Thủy, Phan Thiết
+            <span className="hidden lg:flex items-center gap-1.5 text-[#e4d4c2] truncate">
+              <MapPin className="w-3.5 h-3.5 text-[#d7bda0] shrink-0" />
+              Đại lộ Hùng Vương, Phan Thiết
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {tableNumber && (
-              <span className="bg-[#b84a28] text-white px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide shadow-sm">
-                Bàn đang chọn: {tableNumber}
+              <span className="bg-[#b84a28] text-white px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide shadow-sm truncate max-w-[120px] sm:max-w-none">
+                Bàn: {tableNumber}
               </span>
             )}
-            <span className="text-[#d7bda0] hidden sm:inline text-[11px] tracking-wider uppercase font-semibold">
+            <span className="text-[#d7bda0] hidden md:inline text-[11px] tracking-wider uppercase font-semibold">
               Hương Vị Cơm Niêu & Hải Sản Truyền Thống
             </span>
           </div>
@@ -86,26 +119,26 @@ export const MainHeader: React.FC = () => {
       </div>
 
       {/* Main Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 sm:h-20">
           {/* Logo & Brand Identity */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-12 h-12 rounded-full bg-[#6d492f] border-2 border-[#d7bda0] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden">
-              <UtensilsCrossed className="w-6 h-6 text-[#faf7f2]" />
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#6d492f] border-2 border-[#d7bda0] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden shrink-0">
+              <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5 text-[#faf7f2]" />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif text-2xl font-bold text-[#462c1a] group-hover:text-[#b84a28] transition-colors leading-none">
+              <span className="font-serif text-lg sm:text-2xl font-bold text-[#462c1a] group-hover:text-[#b84a28] transition-colors leading-none">
                 Bếp Việt
               </span>
-              <span className="text-[11px] font-semibold tracking-wider text-[#6d492f] uppercase mt-1">
+              <span className="text-[9px] sm:text-[11px] font-semibold tracking-wider text-[#6d492f] uppercase mt-0.5">
                 Cơm Niêu & Hải Sản
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
-            {navLinks.map((link) => (
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
+            {baseLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -120,41 +153,82 @@ export const MainHeader: React.FC = () => {
                 {link.label}
               </NavLink>
             ))}
+
+            {/* Dropdown for Staff / Admin */}
+            {staffAdminLinks.length > 0 && (
+              <div className="relative" ref={adminDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
+                  className={`flex items-center gap-1.5 text-xs font-bold tracking-wide transition-colors py-1.5 px-3 rounded-lg border ${
+                    isStaffOrAdminActive
+                      ? 'bg-[#6d492f] text-white border-[#6d492f] shadow-xs'
+                      : 'bg-[#f3ece3] text-[#462c1a] border-[#d7bda0]/70 hover:bg-[#ebdccf]'
+                  }`}
+                >
+                  {user?.role === 'ADMIN' ? (
+                    <Shield className="w-3.5 h-3.5 text-amber-500" />
+                  ) : (
+                    <ChefHat className="w-3.5 h-3.5 text-[#b84a28]" />
+                  )}
+                  <span>{user?.role === 'ADMIN' ? 'Quản Trị Hệ Thống' : 'Khu Nghiệp Vụ'}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${adminDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {adminDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-[#e8dbce] py-1.5 z-50 animate-fadeIn">
+                    <div className="px-3 py-1.5 border-b border-[#f0e6dc] text-[10px] font-bold text-[#8c6d60] uppercase tracking-wider">
+                      {user?.role === 'ADMIN' ? 'Menu Quản Trị Viên' : 'Chức Năng Nhân Viên'}
+                    </div>
+                    {staffAdminLinks.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          onClick={() => setAdminDropdownOpen(false)}
+                          className={`flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
+                            location.pathname === item.to
+                              ? 'bg-[#faf5ef] text-[#b84a28] font-bold'
+                              : 'text-[#462c1a] hover:bg-[#f8f4ef] hover:text-[#b84a28]'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4 text-[#8c6d60]" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Actions & User Section */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Nút Kích hoạt Trợ lý AI */}
             <button
               type="button"
               onClick={() => setAiModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#8b3d1b] to-[#b84a28] text-white text-xs font-bold shadow-xs hover:shadow transition"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-[#8b3d1b] to-[#b84a28] text-white text-xs font-bold shadow-xs hover:shadow transition"
               title="Trợ lý AI gợi ý mâm cơm Bếp Việt"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
               <span className="hidden sm:inline">Trợ Lý AI</span>
+              <span className="sm:hidden text-[11px]">AI</span>
             </button>
-
-            {/* Table QR Quick View */}
-            <Link
-              to="/tables"
-              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-[#f3ece3] hover:bg-[#e8dcce] text-[#6d492f] border border-[#d7bda0]/60 transition-colors"
-              title="Tra cứu sơ đồ bàn"
-            >
-              <LayoutGrid className="w-4 h-4 text-[#b84a28]" />
-              <span className="hidden xl:inline">Sơ đồ bàn</span>
-            </Link>
 
             {/* Cart Preview Button */}
             <button
               type="button"
               onClick={() => setCartDrawerOpen(true)}
-              className="relative p-2.5 rounded-full bg-[#f3ece3] hover:bg-[#e8dcce] text-[#462c1a] border border-[#d7bda0]/70 transition-colors"
+              className="relative p-2 sm:p-2.5 rounded-full bg-[#f3ece3] hover:bg-[#e8dcce] text-[#462c1a] border border-[#d7bda0]/70 transition-colors"
               title="Mở giỏ món ăn"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#b84a28] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">
+                <span className="absolute -top-1 -right-1 bg-[#b84a28] text-white text-[10px] sm:text-[11px] font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow">
                   {cartCount}
                 </span>
               )}
@@ -162,9 +236,9 @@ export const MainHeader: React.FC = () => {
 
             {/* Authentication Buttons */}
             {isAuthenticated && user ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-[#e8dbce]">
+              <div className="flex items-center gap-1 sm:gap-2 pl-1.5 sm:pl-2 border-l border-[#e8dbce]">
                 <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-xs font-bold text-[#462c1a] leading-tight max-w-[120px] truncate">
+                  <span className="text-xs font-bold text-[#462c1a] leading-tight max-w-[100px] truncate">
                     {user.fullName || user.username}
                   </span>
                   <span className="text-[10px] text-[#8c6d60] uppercase tracking-wider font-semibold">
@@ -173,23 +247,23 @@ export const MainHeader: React.FC = () => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-[#8c6d60] hover:text-[#b84a28] hover:bg-[#f3ece3] rounded-full transition-colors"
+                  className="p-1.5 sm:p-2 text-[#8c6d60] hover:text-[#b84a28] hover:bg-[#f3ece3] rounded-full transition-colors"
                   title="Đăng xuất"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Link
                   to="/login"
-                  className="text-xs font-semibold text-[#6d492f] hover:text-[#b84a28] px-2.5 sm:px-3 py-2 rounded-lg hover:bg-[#f3ece3] transition-colors"
+                  className="text-xs font-semibold text-[#6d492f] hover:text-[#b84a28] px-2 sm:px-2.5 py-1.5 rounded-lg hover:bg-[#f3ece3] transition-colors"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="text-xs font-semibold bg-[#6d492f] hover:bg-[#533722] text-[#faf7f2] px-3 sm:px-3.5 py-2 rounded-lg shadow-sm transition-colors"
+                  className="hidden sm:inline-block text-xs font-semibold bg-[#6d492f] hover:bg-[#533722] text-[#faf7f2] px-3 py-1.5 rounded-lg shadow-sm transition-colors"
                 >
                   Đăng ký
                 </Link>
@@ -199,10 +273,10 @@ export const MainHeader: React.FC = () => {
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-[#462c1a] hover:bg-[#f3ece3] rounded-lg transition-colors"
+              className="lg:hidden p-1.5 text-[#462c1a] hover:bg-[#f3ece3] rounded-lg transition-colors ml-0.5"
               aria-label="Mở menu điều hướng"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
@@ -210,17 +284,61 @@ export const MainHeader: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#faf7f2] border-b border-[#e8dbce] px-4 pt-2 pb-6 space-y-2">
-          {navLinks.map((link) => (
+        <div className="lg:hidden bg-[#faf7f2] border-b border-[#e8dbce] px-4 pt-3 pb-6 space-y-2 max-h-[80vh] overflow-y-auto">
+          {baseLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-md text-sm font-medium text-[#462c1a] hover:bg-[#f3ece3] hover:text-[#b84a28]"
+              className="block px-3 py-2 rounded-lg text-sm font-medium text-[#462c1a] hover:bg-[#f3ece3] hover:text-[#b84a28]"
             >
               {link.label}
             </Link>
           ))}
+
+          {/* Staff & Admin links in Mobile Menu */}
+          {staffAdminLinks.length > 0 && (
+            <div className="pt-2 border-t border-[#e8dbce]/70 space-y-1">
+              <span className="text-[10px] font-bold text-[#8c6d60] uppercase tracking-wider px-3 block mb-1">
+                {user?.role === 'ADMIN' ? 'Quản Trị Viên' : 'Khu Nghiệp Vụ'}
+              </span>
+              {staffAdminLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#6d492f] hover:bg-[#f3ece3] hover:text-[#b84a28]"
+                  >
+                    <Icon className="w-4 h-4 text-[#b84a28]" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Auth options in mobile if not logged in */}
+          {!isAuthenticated && (
+            <div className="pt-2 border-t border-[#e8dbce]/70 flex items-center gap-2">
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center py-2 rounded-lg text-xs font-bold text-[#6d492f] bg-[#f3ece3]"
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center py-2 rounded-lg text-xs font-bold text-white bg-[#6d492f]"
+              >
+                Đăng ký tài khoản
+              </Link>
+            </div>
+          )}
+
           <div className="pt-3 border-t border-[#e8dbce] flex flex-col gap-2">
             <button
               onClick={() => {

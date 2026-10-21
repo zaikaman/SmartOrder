@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   LayoutGrid, 
   RotateCw, 
@@ -36,12 +37,12 @@ export const StaffTableManagementPage: React.FC = () => {
 
     try {
       // 1. Tải danh sách toàn bộ bàn ăn
-      const tablesRes = await catalogApi.get<DiningTable[]>('/api/v1/tables');
+      const tablesRes = await catalogApi.get<DiningTable[]>('/tables');
       setTables(Array.isArray(tablesRes.data) ? tablesRes.data : []);
 
       // 2. Tải danh sách đơn đặt của nhân viên để map thông tin khách theo bàn
       try {
-        const ordersRes = await bookingApi.get<ReservationOrder[]>('/api/v1/staff/orders');
+        const ordersRes = await bookingApi.get<ReservationOrder[]>('/staff/orders');
         setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
       } catch (orderErr) {
         console.warn('Không thể lấy đơn hàng từ booking service:', orderErr);
@@ -67,7 +68,7 @@ export const StaffTableManagementPage: React.FC = () => {
     setUpdatingTableId(tableId);
     setSuccessMessage(null);
     try {
-      const res = await catalogApi.patch<DiningTable>(`/api/v1/staff/tables/${tableId}/status`, {
+      const res = await catalogApi.patch<DiningTable>(`/staff/tables/${tableId}/status`, {
         status: newStatus,
       });
 
@@ -167,7 +168,7 @@ export const StaffTableManagementPage: React.FC = () => {
       <StaffSidebar />
 
       {/* Vùng nội dung chính */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
+      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
         {/* Header trang & Thống kê */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-[#e8dbce] shadow-sm">
           <div>
@@ -429,9 +430,14 @@ export const StaffTableManagementPage: React.FC = () => {
         )}
 
         {/* Modal chi tiết bàn khi nhân viên bấm chọn */}
-        {selectedTable && (
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full border border-[#e8dbce] shadow-2xl p-6 space-y-5 animate-in zoom-in-95">
+        {selectedTable && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+              onClick={() => setSelectedTable(null)}
+              aria-hidden="true"
+            />
+            <div className="relative z-10 bg-white rounded-3xl max-w-md w-full border border-[#e8dbce] shadow-2xl p-6 space-y-5 my-auto animate-fadeIn">
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2">
@@ -547,9 +553,10 @@ export const StaffTableManagementPage: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
-      </main>
+      </div>
     </div>
   );
 };

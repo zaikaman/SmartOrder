@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Download, Printer, FileText, AlertCircle, RefreshCw } from 'lucide-react';
 import { bookingApi } from '../../api/client';
 
@@ -19,6 +20,26 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Khoa scroll man hinh va lang nghe phim Escape khi modal mo
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen || !orderId) {
@@ -91,11 +112,16 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#faf7f2] border border-[#e8dbce] rounded-2xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+      <div 
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn" 
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 bg-[#faf7f2] border border-[#e8dbce] rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-fadeIn">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-[#e8dbce]">
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-[#e8dbce] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#6d492f]/10 flex items-center justify-center text-[#6d492f]">
               <FileText className="w-5 h-5" />
@@ -145,7 +171,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
         {/* Content Body */}
         <div className="flex-1 bg-[#ede6dc]/30 p-4 overflow-hidden relative">
           {loading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#faf7f2]/80 backdrop-blur-xs z-10">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#faf7f2]/80 backdrop-blur-sm z-10">
               <RefreshCw className="w-8 h-8 text-[#6d492f] animate-spin mb-3" />
               <p className="text-sm font-medium text-[#462c1a]">Đang tạo và tải tệp hóa đơn PDF...</p>
               <p className="text-xs text-[#7d6756] mt-1">Xin vui lòng chờ trong giây lát</p>
@@ -195,4 +221,6 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };

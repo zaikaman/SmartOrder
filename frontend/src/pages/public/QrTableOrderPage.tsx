@@ -262,10 +262,10 @@ export const QrTableOrderPage: React.FC = () => {
 
       {/* 2. Category Navigation Sticky Bar */}
       <div 
-        className="sticky z-30 bg-[#faf7f2]/95 backdrop-blur-md border-b border-[#e8dbce] py-3 px-4 shadow-sm transition-all"
+        className="sticky z-30 bg-[#faf7f2]/95 backdrop-blur-md border-b border-[#e8dbce] py-3 px-3 sm:px-4 shadow-sm transition-all w-full max-w-full overflow-hidden"
         style={{ top: `${headerHeight}px` }}
       >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full min-w-0">
           {/* Table summary badge when sticky */}
           <div className="flex items-center gap-2 shrink-0">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#6d492f] text-white text-xs font-bold shadow-sm">
@@ -276,7 +276,7 @@ export const QrTableOrderPage: React.FC = () => {
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5 w-full min-w-0">
             <button
               onClick={() => {
                 setSelectedCategory('ALL');

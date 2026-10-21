@@ -3,14 +3,27 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     @apply bg-stone-50 text-stone-900 min-h-screen antialiased font-sans;
+    max-width: 100vw;
+    overflow-x: hidden;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-serif text-stone-900;
   }
+}
+
+/* Hide scrollbar for category tabs */
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom subtle scrollbar */

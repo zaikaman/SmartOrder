@@ -123,7 +123,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Floating QR Tag */}
-            <div className="absolute -bottom-6 -left-6 bg-[#faf7f2] text-[#462c1a] border-2 border-[#d7bda0] p-3.5 rounded-xl shadow-xl flex items-center gap-3">
+            <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-[#faf7f2] text-[#462c1a] border-2 border-[#d7bda0] p-3.5 rounded-xl shadow-xl items-center gap-3">
               <div className="p-2 bg-[#6d492f] text-white rounded-lg">
                 <QrCode className="w-6 h-6" />
               </div>
