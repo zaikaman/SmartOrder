@@ -10,11 +10,13 @@ import {
   CookingPot, 
   AlertCircle, 
   XCircle,
-  FileText
+  FileText,
+  CreditCard
 } from 'lucide-react';
 import { bookingApi } from '../../api/client';
 import { ReservationOrder, OrderStatus } from '../../types';
 import { StaffSidebar } from '../../components/layout/StaffSidebar';
+import { InvoicePreviewModal } from '../../components/common/InvoicePreviewModal';
 
 export const StaffOrderKitchenPage: React.FC = () => {
   const [orders, setOrders] = useState<ReservationOrder[]>([]);
@@ -25,6 +27,28 @@ export const StaffOrderKitchenPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<ReservationOrder | null>(null);
+  const [vnpayLoadingId, setVnpayLoadingId] = useState<number | null>(null);
+
+  const handleStaffCreateVnPayUrl = async (order: ReservationOrder) => {
+    setVnpayLoadingId(order.id);
+    try {
+      const res = await bookingApi.post('/payments/vnpay/create-url', {
+        orderId: order.id,
+      });
+      if (res.data?.paymentUrl) {
+        window.open(res.data.paymentUrl, '_blank');
+        setSuccessMessage(`Đã tạo liên kết VNPAY cho đơn #${order.orderCode}`);
+      } else {
+        alert('Không nhận được liên kết thanh toán từ cổng VNPAY.');
+      }
+    } catch (err: any) {
+      console.error('Lỗi khi tạo liên kết VNPAY:', err);
+      alert(err.response?.data?.message || 'Không thể tạo liên kết thanh toán VNPAY.');
+    } finally {
+      setVnpayLoadingId(null);
+    }
+  };
 
   const fetchOrders = async (showLoadingSpinner = true) => {
     if (showLoadingSpinner) {
@@ -419,7 +443,32 @@ export const StaffOrderKitchenPage: React.FC = () => {
 
                   {/* Thanh nút bấm hành động theo từng bước trạng thái */}
                   <div className="p-4 bg-[#faf7f2] border-t border-[#f0e6dc] flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Nút Xem / In Hóa Đơn PDF */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedInvoiceOrder(order)}
+                        className="px-3 py-1.5 text-xs text-[#6d492f] hover:bg-[#6d492f]/10 rounded-lg border border-[#e8dbce] transition font-semibold flex items-center gap-1.5"
+                        title="Xem và in hóa đơn PDF"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Hóa đơn PDF</span>
+                      </button>
+
+                      {/* Nút Tạo Link VNPAY cho khách quét */}
+                      {order.paymentStatus !== 'PAID' && order.status !== 'CANCELLED' && (
+                        <button
+                          type="button"
+                          disabled={vnpayLoadingId === order.id}
+                          onClick={() => handleStaffCreateVnPayUrl(order)}
+                          className="px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200 transition font-semibold flex items-center gap-1.5"
+                          title="Mở cổng thanh toán VNPAY Sandbox cho khách"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          <span>{vnpayLoadingId === order.id ? 'Đang tạo...' : 'Link VNPAY'}</span>
+                        </button>
+                      )}
+
                       {/* Nút hủy đơn khi chưa nấu */}
                       {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
                         <button
@@ -510,6 +559,14 @@ export const StaffOrderKitchenPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Modal xem trước và tải hóa đơn PDF */}
+      <InvoicePreviewModal
+        isOpen={selectedInvoiceOrder !== null}
+        onClose={() => setSelectedInvoiceOrder(null)}
+        orderId={selectedInvoiceOrder?.id || null}
+        orderCode={selectedInvoiceOrder?.orderCode || ''}
+      />
     </div>
   );
 };

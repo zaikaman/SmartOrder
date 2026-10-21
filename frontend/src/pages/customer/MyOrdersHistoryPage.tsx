@@ -2,15 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { bookingApi } from '../../api/client';
 import { ReservationOrder } from '../../types';
-import { Clock, MapPin, CheckCircle, Clock4, AlertCircle, RefreshCw, Utensils } from 'lucide-react';
+import { Clock, MapPin, CheckCircle, Clock4, AlertCircle, RefreshCw, Utensils, CreditCard, FileText } from 'lucide-react';
+import { InvoicePreviewModal } from '../../components/common/InvoicePreviewModal';
 
 export const MyOrdersHistoryPage: React.FC = () => {
   const location = useLocation();
   const [orders, setOrders] = useState<ReservationOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<ReservationOrder | null>(null);
+  const [payingOrderId, setPayingOrderId] = useState<number | null>(null);
 
   const newOrderCode = (location.state as any)?.newOrderCode;
+
+  const handlePayVnPay = async (order: ReservationOrder) => {
+    try {
+      setPayingOrderId(order.id);
+      const res = await bookingApi.post('/payments/vnpay/create-url', {
+        orderId: order.id,
+      });
+      if (res.data?.paymentUrl) {
+        window.location.href = res.data.paymentUrl;
+      } else {
+        alert('Không nhận được liên kết thanh toán từ máy chủ.');
+      }
+    } catch (err: any) {
+      console.error('Lỗi khi tạo liên kết thanh toán VNPAY:', err);
+      alert(err.response?.data?.message || 'Không thể tạo liên kết thanh toán VNPAY. Vui lòng thử lại sau.');
+    } finally {
+      setPayingOrderId(null);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -201,11 +223,59 @@ export const MyOrdersHistoryPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+                {/* Thanh nút bấm hành động */}
+                <div className="pt-4 border-t border-[#e8dbce]/70 flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs text-[#7d6756]">
+                    {order.paymentStatus === 'PAID' ? (
+                      <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
+                        <CheckCircle className="w-4 h-4" />
+                        Đã hoàn tất thanh toán trực tuyến
+                      </span>
+                    ) : (
+                      <span>Đơn chưa thanh toán - Có thể thanh toán qua VNPAY Sandbox</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Nút Xem / Tải Hóa Đơn PDF */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedInvoiceOrder(order)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#6d492f] bg-[#6d492f]/10 hover:bg-[#6d492f]/20 rounded-xl transition"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Hóa đơn PDF</span>
+                    </button>
+
+                    {/* Nút Thanh toán VNPAY */}
+                    {order.paymentStatus !== 'PAID' && order.status !== 'CANCELLED' && (
+                      <button
+                        type="button"
+                        disabled={payingOrderId === order.id}
+                        onClick={() => handlePayVnPay(order)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#8B1E0F] hover:bg-[#70180B] rounded-xl transition shadow-sm disabled:opacity-50"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>
+                          {payingOrderId === order.id ? 'Đang tạo liên kết...' : 'Thanh Toán VNPAY'}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
       )}
+
+      {/* Modal xem trước và tải hóa đơn PDF */}
+      <InvoicePreviewModal
+        isOpen={selectedInvoiceOrder !== null}
+        onClose={() => setSelectedInvoiceOrder(null)}
+        orderId={selectedInvoiceOrder?.id || null}
+        orderCode={selectedInvoiceOrder?.orderCode || ''}
+      />
     </div>
   );
 };

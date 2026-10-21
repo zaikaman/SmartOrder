@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Đọc GET công khai cho Anonymous (Khách vãng lai và quét QR)
                         .requestMatchers(HttpMethod.GET, "/api/v1/menu/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/menu/ai-recommend").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/tables/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         // Endpoint nhân viên và nội bộ cập nhật trạng thái bàn

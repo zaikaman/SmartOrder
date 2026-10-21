@@ -147,18 +147,18 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 **Mục tiêu**: Tích hợp cổng thanh toán VNPAY Sandbox tạo URL thanh toán trực tuyến ký HMAC-SHA512, xử lý callback chốt đơn, hỗ trợ thanh toán tiền mặt tại quầy, và xuất hóa đơn PDF tiếng Việt bằng OpenPDF.
 
 ### Kiểm thử cho User Story 4
-- [ ] T071 [P] [US4] Viết Unit test tạo URL thanh toán và kiểm tra chữ ký HMAC-SHA512 VNPAY tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/VnPayServiceTest.java
-- [ ] T072 [P] [US4] Viết Unit test kết xuất hóa đơn PDF chứa đầy đủ thông tin tiếng Việt tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/PdfInvoiceServiceTest.java
+- [x] T071 [P] [US4] Viết Unit test tạo URL thanh toán và kiểm tra chữ ký HMAC-SHA512 VNPAY tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/VnPayServiceTest.java
+- [x] T072 [P] [US4] Viết Unit test kết xuất hóa đơn PDF chứa đầy đủ thông tin tiếng Việt tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/PdfInvoiceServiceTest.java
 
 ### Triển khai Backend cho User Story 4
-- [ ] T073 [US4] Xây dựng VnPayService tạo URL thanh toán và xác minh SecureHash callback tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/VnPayService.java
-- [ ] T074 [US4] Xây dựng PdfInvoiceService sử dụng OpenPDF tạo file PDF hóa đơn có dấu tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/PdfInvoiceService.java
-- [ ] T075 [US4] Xây dựng PaymentController xử lý /api/v1/payments/vnpay/** và xuất PDF /api/v1/orders/{id}/invoice.pdf tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/PaymentController.java
+- [x] T073 [US4] Xây dựng VnPayService tạo URL thanh toán và xác minh SecureHash callback tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/VnPayService.java
+- [x] T074 [US4] Xây dựng PdfInvoiceService sử dụng OpenPDF tạo file PDF hóa đơn có dấu tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/PdfInvoiceService.java
+- [x] T075 [US4] Xây dựng PaymentController xử lý /api/v1/payments/vnpay/** và xuất PDF /api/v1/orders/{id}/invoice.pdf tại backend/booking-order-service/src/main/java/com/restaurant/booking/controller/PaymentController.java
 
 ### Triển khai Frontend cho User Story 4
-- [ ] T076 [P] [US4] Xây dựng modal xem trước và tải hóa đơn PDF (InvoicePreviewModal) tại frontend/src/components/common/InvoicePreviewModal.tsx
-- [ ] T077 [US4] Xây dựng Trang tiếp nhận kết quả thanh toán VNPAY (VnPayReturnPage) tại frontend/src/pages/customer/VnPayReturnPage.tsx
-- [ ] T078 [US4] Tích hợp nút Thanh toán trực tuyến và Xuất hóa đơn PDF trên trang quản lý đơn của Nhân viên và Khách hàng tại frontend/src/pages/staff/StaffOrderKitchenPage.tsx và MyOrdersHistoryPage.tsx
+- [x] T076 [P] [US4] Xây dựng modal xem trước và tải hóa đơn PDF (InvoicePreviewModal) tại frontend/src/components/common/InvoicePreviewModal.tsx
+- [x] T077 [US4] Xây dựng Trang tiếp nhận kết quả thanh toán VNPAY (VnPayReturnPage) tại frontend/src/pages/customer/VnPayReturnPage.tsx
+- [x] T078 [US4] Tích hợp nút Thanh toán trực tuyến và Xuất hóa đơn PDF trên trang quản lý đơn của Nhân viên và Khách hàng tại frontend/src/pages/staff/StaffOrderKitchenPage.tsx và MyOrdersHistoryPage.tsx
 
 ---
 
@@ -167,22 +167,22 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 **Mục tiêu**: Quản trị viên (`ADMIN`) thực hiện đầy đủ CRUD thực đơn kèm tải ảnh lên Cloudinary, quản lý danh sách bàn kèm in mã QR, quản lý tài khoản và xem biểu đồ thống kê doanh thu.
 
 ### Kiểm thử cho User Story 5
-- [ ] T079 [P] [US5] Viết Unit test tính toán thống kê doanh thu theo ngày/tháng tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/StatisticsServiceTest.java
-- [ ] T080 [P] [US5] Viết Integration test phân quyền ROLE_ADMIN cho các endpoint quản trị tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/controller/AdminCatalogControllerTest.java
+- [X] T079 [P] [US5] Viết Unit test tính toán thống kê doanh thu theo ngày/tháng tại backend/booking-order-service/src/test/java/com/restaurant/booking/service/StatisticsServiceTest.java
+- [X] T080 [P] [US5] Viết Integration test phân quyền ROLE_ADMIN cho các endpoint quản trị tại backend/catalog-table-service/src/test/java/com/restaurant/catalog/controller/AdminCatalogControllerTest.java
 
 ### Triển khai Backend cho User Story 5
-- [ ] T081 [P] [US5] Xây dựng CloudinaryService tải ảnh món ăn lên Cloudinary API tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/CloudinaryService.java
-- [ ] T082 [US5] Xây dựng AdminMenuController phục vụ CRUD menu kèm tải ảnh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminMenuController.java
-- [ ] T083 [US5] Xây dựng AdminTableController phục vụ CRUD bàn ăn tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminTableController.java
-- [ ] T084 [US5] Xây dựng StatisticsService và AdminStatisticsController thống kê doanh thu tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/StatisticsService.java và backend/booking-order-service/src/main/java/com/restaurant/booking/controller/AdminStatisticsController.java
-- [ ] T084b [P] [US5] Xây dựng AiRecommendationService và AiRecommendationController phục vụ gợi ý mâm cơm Bếp Việt thông minh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/AiRecommendationService.java
+- [X] T081 [P] [US5] Xây dựng CloudinaryService tải ảnh món ăn lên Cloudinary API tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/CloudinaryService.java
+- [X] T082 [US5] Xây dựng AdminMenuController phục vụ CRUD menu kèm tải ảnh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminMenuController.java
+- [X] T083 [US5] Xây dựng AdminTableController phục vụ CRUD bàn ăn tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/controller/AdminTableController.java
+- [X] T084 [US5] Xây dựng StatisticsService và AdminStatisticsController thống kê doanh thu tại backend/booking-order-service/src/main/java/com/restaurant/booking/service/StatisticsService.java và backend/booking-order-service/src/main/java/com/restaurant/booking/controller/AdminStatisticsController.java
+- [X] T084b [P] [US5] Xây dựng AiRecommendationService và AiRecommendationController phục vụ gợi ý mâm cơm Bếp Việt thông minh tại backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/AiRecommendationService.java
 
 ### Triển khai Frontend cho User Story 5
-- [ ] T085 [P] [US5] Xây dựng Trang Quản lý Thực đơn kèm form upload ảnh Cloudinary tại frontend/src/pages/admin/AdminMenuManagementPage.tsx
-- [ ] T086 [P] [US5] Xây dựng Trang Quản lý Bàn kèm modal in/tải mã QR bàn tại frontend/src/pages/admin/AdminTableQrPage.tsx
-- [ ] T087 [P] [US5] Xây dựng Trang Quản lý Người dùng và phân quyền tại frontend/src/pages/admin/AdminUsersPage.tsx
-- [ ] T088 [US5] Xây dựng Trang Bảng điều khiển Thống kê Doanh thu và Top món bán chạy tại frontend/src/pages/admin/AdminRevenueStatsPage.tsx
-- [ ] T088b [P] [US5] Xây dựng Modal / Trang Trợ lý AI gợi ý món ăn (AiFoodAssistantModal) tại frontend/src/components/common/AiFoodAssistantModal.tsx
+- [X] T085 [P] [US5] Xây dựng Trang Quản lý Thực đơn kèm form upload ảnh Cloudinary tại frontend/src/pages/admin/AdminMenuManagementPage.tsx
+- [X] T086 [P] [US5] Xây dựng Trang Quản lý Bàn kèm modal in/tải mã QR bàn tại frontend/src/pages/admin/AdminTableQrPage.tsx
+- [X] T087 [P] [US5] Xây dựng Trang Quản lý Người dùng và phân quyền tại frontend/src/pages/admin/AdminUsersPage.tsx
+- [X] T088 [US5] Xây dựng Trang Bảng điều khiển Thống kê Doanh thu và Top món bán chạy tại frontend/src/pages/admin/AdminRevenueStatsPage.tsx
+- [X] T088b [P] [US5] Xây dựng Modal / Trang Trợ lý AI gợi ý món ăn (AiFoodAssistantModal) tại frontend/src/components/common/AiFoodAssistantModal.tsx
 
 ---
 

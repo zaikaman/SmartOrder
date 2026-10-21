@@ -1,5 +1,6 @@
 package com.restaurant.catalog.service;
 
+import com.restaurant.catalog.dto.DiningTableRequest;
 import com.restaurant.catalog.entity.DiningTable;
 import com.restaurant.catalog.entity.TableStatus;
 import com.restaurant.catalog.exception.ResourceNotFoundException;
@@ -62,5 +63,55 @@ public class DiningTableService {
         log.info("Cập nhật trạng thái bàn {} (ID: {}) thành {}", table.getTableNumber(), id, status);
         return tableRepository.save(table);
     }
-}
 
+    @Transactional
+    public DiningTable createTable(DiningTableRequest request) {
+        String trimmedNumber = request.getTableNumber().trim();
+        tableRepository.findByTableNumber(trimmedNumber).ifPresent(t -> {
+            throw new IllegalArgumentException("Số bàn '" + trimmedNumber + "' đã tồn tại trong hệ thống.");
+        });
+
+        DiningTable table = DiningTable.builder()
+                .tableNumber(trimmedNumber)
+                .capacity(request.getCapacity())
+                .area(request.getArea().trim())
+                .status(request.getStatus() != null ? request.getStatus() : TableStatus.AVAILABLE)
+                .qrCodeUrl("/table/" + trimmedNumber)
+                .build();
+
+        DiningTable saved = tableRepository.save(table);
+        log.info("Đã tạo mới bàn ăn: ID={}, Số bàn='{}', Khu vực='{}'", saved.getId(), saved.getTableNumber(), saved.getArea());
+        return saved;
+    }
+
+    @Transactional
+    public DiningTable updateTable(Long id, DiningTableRequest request) {
+        DiningTable table = getTableById(id);
+        String trimmedNumber = request.getTableNumber().trim();
+
+        if (!table.getTableNumber().equalsIgnoreCase(trimmedNumber)) {
+            tableRepository.findByTableNumber(trimmedNumber).ifPresent(t -> {
+                throw new IllegalArgumentException("Số bàn '" + trimmedNumber + "' đã được sử dụng bởi bàn khác.");
+            });
+            table.setTableNumber(trimmedNumber);
+            table.setQrCodeUrl("/table/" + trimmedNumber);
+        }
+
+        table.setCapacity(request.getCapacity());
+        table.setArea(request.getArea().trim());
+        if (request.getStatus() != null) {
+            table.setStatus(request.getStatus());
+        }
+
+        DiningTable updated = tableRepository.save(table);
+        log.info("Đã cập nhật bàn ăn: ID={}, Số bàn='{}'", updated.getId(), updated.getTableNumber());
+        return updated;
+    }
+
+    @Transactional
+    public void deleteTable(Long id) {
+        DiningTable table = getTableById(id);
+        tableRepository.delete(table);
+        log.info("Đã xóa bàn ăn thành công: ID={}", id);
+    }
+}

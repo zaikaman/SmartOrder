@@ -9,11 +9,13 @@ import {
   LogOut, 
   Menu, 
   X, 
-  ShoppingBag
+  ShoppingBag,
+  Sparkles
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import { CartDrawer } from '../common/CartDrawer';
+import { AiFoodAssistantModal } from '../common/AiFoodAssistantModal';
 
 export const MainHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ export const MainHeader: React.FC = () => {
   const { getTotalQuantity, tableNumber } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   const cartCount = getTotalQuantity();
 
@@ -37,10 +40,17 @@ export const MainHeader: React.FC = () => {
     { to: '/table/T01', label: 'Gọi món tại bàn (QR)' },
     ...(isAuthenticated ? [{ to: '/my-orders', label: 'Lịch sử đơn' }] : []),
     ...(isAuthenticated && (user?.role === 'STAFF' || user?.role === 'ADMIN')
-      ? [{ to: '/staff/orders', label: 'Bếp & Điều phối' }]
+      ? [{ to: '/staff/orders', label: 'Bếp & Đơn món' }]
+      : []),
+    ...(isAuthenticated && user?.role === 'ADMIN'
+      ? [
+          { to: '/admin/menu', label: 'QL Menu' },
+          { to: '/admin/tables', label: 'QL Bàn & QR' },
+          { to: '/admin/users', label: 'QL Người dùng' },
+          { to: '/admin/stats', label: 'Thống kê DT' },
+        ]
       : []),
   ];
-
 
   return (
     <header className="sticky top-0 z-50 bg-[#faf7f2]/95 backdrop-blur-md border-b border-[#e8dbce] transition-all">
@@ -79,7 +89,7 @@ export const MainHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo & Brand Identity */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group shrink-0">
             <div className="w-12 h-12 rounded-full bg-[#6d492f] border-2 border-[#d7bda0] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden">
               <UtensilsCrossed className="w-6 h-6 text-[#faf7f2]" />
             </div>
@@ -94,13 +104,13 @@ export const MainHeader: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `text-sm font-semibold tracking-wide transition-colors py-1 border-b-2 ${
+                  `text-xs font-bold tracking-wide transition-colors py-1 border-b-2 whitespace-nowrap ${
                     isActive
                       ? 'text-[#b84a28] border-[#b84a28]'
                       : 'text-[#462c1a] border-transparent hover:text-[#6d492f] hover:border-[#d7bda0]'
@@ -113,15 +123,26 @@ export const MainHeader: React.FC = () => {
           </nav>
 
           {/* Actions & User Section */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
+            {/* Nút Kích hoạt Trợ lý AI */}
+            <button
+              type="button"
+              onClick={() => setAiModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#8b3d1b] to-[#b84a28] text-white text-xs font-bold shadow-xs hover:shadow transition"
+              title="Trợ lý AI gợi ý mâm cơm Bếp Việt"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+              <span className="hidden sm:inline">Trợ Lý AI</span>
+            </button>
+
             {/* Table QR Quick View */}
             <Link
               to="/tables"
-              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-[#f3ece3] hover:bg-[#e8dcce] text-[#6d492f] border border-[#d7bda0]/60 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-[#f3ece3] hover:bg-[#e8dcce] text-[#6d492f] border border-[#d7bda0]/60 transition-colors"
               title="Tra cứu sơ đồ bàn"
             >
               <LayoutGrid className="w-4 h-4 text-[#b84a28]" />
-              <span>Sơ đồ bàn</span>
+              <span className="hidden xl:inline">Sơ đồ bàn</span>
             </Link>
 
             {/* Cart Preview Button */}
@@ -143,7 +164,7 @@ export const MainHeader: React.FC = () => {
             {isAuthenticated && user ? (
               <div className="flex items-center gap-2 pl-2 border-l border-[#e8dbce]">
                 <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-xs font-bold text-[#462c1a] leading-tight">
+                  <span className="text-xs font-bold text-[#462c1a] leading-tight max-w-[120px] truncate">
                     {user.fullName || user.username}
                   </span>
                   <span className="text-[10px] text-[#8c6d60] uppercase tracking-wider font-semibold">
@@ -159,16 +180,16 @@ export const MainHeader: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link
                   to="/login"
-                  className="text-xs font-semibold text-[#6d492f] hover:text-[#b84a28] px-3 py-2 rounded-lg hover:bg-[#f3ece3] transition-colors"
+                  className="text-xs font-semibold text-[#6d492f] hover:text-[#b84a28] px-2.5 sm:px-3 py-2 rounded-lg hover:bg-[#f3ece3] transition-colors"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="text-xs font-semibold bg-[#6d492f] hover:bg-[#533722] text-[#faf7f2] px-3.5 py-2 rounded-lg shadow-sm transition-colors"
+                  className="text-xs font-semibold bg-[#6d492f] hover:bg-[#533722] text-[#faf7f2] px-3 sm:px-3.5 py-2 rounded-lg shadow-sm transition-colors"
                 >
                   Đăng ký
                 </Link>
@@ -178,7 +199,7 @@ export const MainHeader: React.FC = () => {
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#462c1a] hover:bg-[#f3ece3] rounded-lg transition-colors"
+              className="lg:hidden p-2 text-[#462c1a] hover:bg-[#f3ece3] rounded-lg transition-colors"
               aria-label="Mở menu điều hướng"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -189,31 +210,41 @@ export const MainHeader: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#faf7f2] border-b border-[#e8dbce] px-4 pt-2 pb-6 space-y-2">
+        <div className="lg:hidden bg-[#faf7f2] border-b border-[#e8dbce] px-4 pt-2 pb-6 space-y-2">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2.5 rounded-md text-base font-medium text-[#462c1a] hover:bg-[#f3ece3] hover:text-[#b84a28]"
+              className="block px-3 py-2 rounded-md text-sm font-medium text-[#462c1a] hover:bg-[#f3ece3] hover:text-[#b84a28]"
             >
               {link.label}
             </Link>
           ))}
-          <div className="pt-4 border-t border-[#e8dbce] flex flex-col gap-2">
-            <Link
-              to="/tables"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-[#d7bda0] bg-[#f3ece3] text-[#6d492f] font-semibold text-sm"
+          <div className="pt-3 border-t border-[#e8dbce] flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setAiModalOpen(true);
+              }}
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#8b3d1b] to-[#b84a28] text-white font-bold text-xs"
             >
-              <LayoutGrid className="w-4 h-4" />
-              Tra cứu sơ đồ bàn trống
-            </Link>
+              <Sparkles className="w-4 h-4 text-amber-200" />
+              Trợ lý AI Gợi ý mâm cơm Bếp Việt
+            </button>
           </div>
         </div>
       )}
+
       {/* Cart Drawer Component */}
       <CartDrawer isOpen={cartDrawerOpen} onClose={() => setCartDrawerOpen(false)} />
+
+      {/* AI Food Assistant Modal */}
+      <AiFoodAssistantModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onOpenCart={() => setCartDrawerOpen(true)}
+      />
     </header>
   );
 };

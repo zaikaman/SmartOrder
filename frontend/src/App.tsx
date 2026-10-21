@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { RoleGuard } from './components/layout/RoleGuard';
 import { MainHeader } from './components/layout/MainHeader';
 import { MainFooter } from './components/layout/MainFooter';
@@ -10,26 +10,13 @@ import { LoginPage } from './pages/public/LoginPage';
 import { RegisterPage } from './pages/public/RegisterPage';
 import { BookingAndOrderPage } from './pages/customer/BookingAndOrderPage';
 import { MyOrdersHistoryPage } from './pages/customer/MyOrdersHistoryPage';
+import { VnPayReturnPage } from './pages/customer/VnPayReturnPage';
 import { StaffOrderKitchenPage } from './pages/staff/StaffOrderKitchenPage';
 import { StaffTableManagementPage } from './pages/staff/StaffTableManagementPage';
-
-// Placeholder view cho các route dành cho các Phase tiếp theo (Phase 6 -> Phase 7)
-const PlaceholderView = ({ title, desc }: { title: string; desc: string }) => (
-  <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center bg-[#faf7f2]">
-    <div className="max-w-lg bg-white p-8 rounded-2xl border border-[#e8dbce] shadow-sm space-y-3">
-      <h2 className="font-serif text-2xl font-bold text-[#462c1a]">{title}</h2>
-      <p className="text-xs text-[#7d6756] leading-relaxed">{desc}</p>
-      <div className="pt-2">
-        <Link
-          to="/"
-          className="inline-block px-4 py-2 bg-[#6d492f] text-white rounded-xl text-xs font-bold hover:bg-[#533722] transition"
-        >
-          Về Trang Chủ
-        </Link>
-      </div>
-    </div>
-  </div>
-);
+import { AdminMenuManagementPage } from './pages/admin/AdminMenuManagementPage';
+import { AdminTableQrPage } from './pages/admin/AdminTableQrPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminRevenueStatsPage } from './pages/admin/AdminRevenueStatsPage';
 
 export default function App() {
   return (
@@ -70,7 +57,7 @@ export default function App() {
             />
             <Route
               path="/payment/vnpay-return"
-              element={<PlaceholderView title="Kết Quả Thanh Toán VNPAY" desc="Xác nhận giao dịch thanh toán trực tuyến qua cổng VNPAY Sandbox." />}
+              element={<VnPayReturnPage />}
             />
 
             {/* 3. Staff Protected Routes (Phase 5) */}
@@ -96,7 +83,7 @@ export default function App() {
               path="/admin/menu"
               element={
                 <RoleGuard allowedRoles={['ADMIN']}>
-                  <PlaceholderView title="Quản Trị Thực Đơn & Cloudinary" desc="Thêm, sửa, xóa món ăn và tải hình ảnh lên Cloudinary." />
+                  <AdminMenuManagementPage />
                 </RoleGuard>
               }
             />
@@ -104,7 +91,7 @@ export default function App() {
               path="/admin/tables"
               element={
                 <RoleGuard allowedRoles={['ADMIN']}>
-                  <PlaceholderView title="Quản Trị Bàn Ăn & Mã QR" desc="Quản lý sơ đồ bàn và xuất in mã QR định danh." />
+                  <AdminTableQrPage />
                 </RoleGuard>
               }
             />
@@ -112,7 +99,7 @@ export default function App() {
               path="/admin/users"
               element={
                 <RoleGuard allowedRoles={['ADMIN']}>
-                  <PlaceholderView title="Quản Trị Người Dùng" desc="Danh sách tài khoản và phân quyền CUSTOMER, STAFF, ADMIN." />
+                  <AdminUsersPage />
                 </RoleGuard>
               }
             />
@@ -120,7 +107,7 @@ export default function App() {
               path="/admin/stats"
               element={
                 <RoleGuard allowedRoles={['ADMIN']}>
-                  <PlaceholderView title="Thống Kê Doanh Thu" desc="Báo cáo doanh thu theo ngày/tháng và Top món ăn bán chạy nhất." />
+                  <AdminRevenueStatsPage />
                 </RoleGuard>
               }
             />

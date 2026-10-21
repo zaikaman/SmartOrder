@@ -48,6 +48,13 @@ export interface DiningTable {
   updatedAt?: string;
 }
 
+export interface DiningTableRequest {
+  tableNumber: string;
+  capacity: number;
+  area: string;
+  status?: TableStatus;
+}
+
 // Menu Item types
 export type MenuItemStatus = 'AVAILABLE' | 'OUT_OF_STOCK' | 'INACTIVE';
 
@@ -61,6 +68,15 @@ export interface MenuItem {
   status: MenuItemStatus;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface MenuItemRequest {
+  name: string;
+  price: number;
+  description?: string;
+  category: string;
+  imageUrl?: string;
+  status?: MenuItemStatus;
 }
 
 // Order and Reservation types
@@ -119,12 +135,41 @@ export interface CreateOrderRequest {
   items?: CreateOrderItemRequest[];
 }
 
-export interface RevenueStats {
+export interface DateRevenueDto {
+  period: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface TopSellingItemDto {
+  name: string;
+  quantity: number;
+  revenue: number;
+}
+
+export interface RevenueStatisticsResponse {
   totalRevenue: number;
-  totalCompletedOrders: number;
-  topSellingItems: Array<{
-    name: string;
-    quantity: number;
-    revenue: number;
-  }>;
+  completedOrdersCount: number;
+  totalOrdersCount: number;
+  revenueByDate: DateRevenueDto[];
+  revenueByMonth: DateRevenueDto[];
+  topSellingItems: TopSellingItemDto[];
+}
+
+export interface RevenueStats extends RevenueStatisticsResponse {}
+
+export interface AiRecommendationRequest {
+  partySize?: number;
+  budget?: number;
+  preference?: string;
+  note?: string;
+}
+
+export interface AiRecommendationResponse {
+  comboTitle: string;
+  description: string;
+  culinaryPhilosophy: string;
+  totalEstimatedPrice: number;
+  recommendedForPartySize: number;
+  items: MenuItem[];
 }

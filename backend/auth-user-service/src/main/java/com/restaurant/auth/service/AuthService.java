@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -165,5 +166,27 @@ public class AuthService {
                 .avatarUrl(user.getAvatarUrl())
                 .active(user.isActive())
                 .build();
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::toUserDto)
+                .toList();
+    }
+
+    public UserDto updateUserRole(Long id, UserRole role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng với ID: " + id));
+        user.setRole(role);
+        User saved = userRepository.save(user);
+        return toUserDto(saved);
+    }
+
+    public UserDto updateUserStatus(Long id, boolean active) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng với ID: " + id));
+        user.setActive(active);
+        User saved = userRepository.save(user);
+        return toUserDto(saved);
     }
 }
