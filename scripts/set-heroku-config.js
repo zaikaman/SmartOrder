@@ -62,7 +62,7 @@ setConfig('bepviet-booking-service', {
   DB_PASSWORD: env.DB_PASSWORD,
   DB_DRIVER: env.DB_DRIVER,
   JWT_SECRET: env.JWT_SECRET,
-  CATALOG_SERVICE_URL: 'https://bepviet-catalog-service.herokuapp.com',
+  CATALOG_SERVICE_URL: 'https://bepviet-catalog-service-525768f2f99c.herokuapp.com',
   VNPAY_TMN_CODE: env.VNPAY_TMN_CODE,
   VNPAY_HASH_SECRET: env.VNPAY_HASH_SECRET,
   VNPAY_PAY_URL: env.VNPAY_PAY_URL,

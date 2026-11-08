@@ -88,7 +88,7 @@ export const TableLookupPage: React.FC = () => {
           </div>
 
           <div className="text-[#8c6d60] font-medium border-t md:border-t-0 md:border-l border-[#e8dbce] pt-2 md:pt-0 md:pl-4">
-            Quý khách đang ngồi tại nhà hàng? Vui lòng quét mã QR vật lý dán trên mặt bàn để gọi món trực tiếp vào bếp.
+            Khách ngồi tại bàn hoặc Thầy/Cô khảo sát: Bấm nút <strong>Mã QR</strong> trên từng bàn bên dưới để quét camera hoặc mở nhanh giao diện gọi món tại bàn.
           </div>
         </div>
 
