@@ -1,331 +1,287 @@
-# Báo Cáo Đồ Án J2EE: Hệ Thống Quản Lý Đặt Bàn Và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt
+# BÁO CÁO ĐỒ ÁN MÔN HỌC CHUYÊN ĐỀ J2EE
+## ĐỀ TÀI: HỆ THỐNG QUẢN LÝ ĐẶT BÀN VÀ GỌI MÓN TRỰC TUYẾN - NHÀ HÀNG ẨM THỰC BẾP VIỆT
+### KIẾN TRÚC MICROSERVICES VỚI SPRING BOOT 3 & REACT 19
 
 ---
 
-## Mục Lục
-
-1. [Giới Thiệu Và Đặt Vấn Đề](#1-giới-thiệu-và-đặt-vấn-đề)
-2. [Phân Tích Nghiệp Vụ Và Yêu Cầu Người Dùng](#2-phân-tích-nghiệp-vụ-và-yêu-cầu-người-dùng)
-3. [Kiến Trúc Kỹ Thuật Và Công Nghệ](#3-kiến-trúc-kỹ-thuật-và-công-nghệ)
-4. [Thiết Kế Cơ Sở Dữ Liệu Và Sơ Đồ ERD](#4-thiết-kế-cơ-sở-dữ-liệu-và-sơ-đồ-erd)
-5. [Thiết Kế Các Luồng Nghiệp Vụ Trọng Yếu](#5-thiết-kế-các-luồng-nghiệp-vụ-trọng-yếu)
-   - [5.1. Luồng Xác Thực Bảo Mật JWT Và Google OAuth2](#51-luồng-xác-thực-bảo-mật-jwt-và-google-oauth2)
-   - [5.2. Luồng Quét Mã QR Gọi Món Tại Bàn](#52-luồng-quét-mã-qr-gọi-món-tại-bàn)
-   - [5.3. Luồng Đặt Bàn Chống Trùng Khung Giờ](#53-luồng-đặt-bàn-chống-trùng-khung-giờ)
-   - [5.4. Luồng Thanh Toán Trực Tuyến VNPAY Và Xuất Hóa Đơn PDF](#54-luồng-thanh-toán-trực-tuyến-vnpay-và-xuất-hóa-đơn-pdf)
-   - [5.5. Trợ Lý AI Gợi Ý Mâm Cơm Bếp Việt](#55-trợ-lý-ai-gợi-ý-mâm-cơm-bếp-việt)
-6. [Kế Hoạch Kiểm Thử Và Đảm Bảo Chất Lượng](#6-kế-hoạch-kiểm-thử-và-đảm-bảo-chất-lượng)
-7. [Hướng Dẫn Triển Khai Đóng Gói Và Vận Hành](#7-hướng-dẫn-triển-khai-đóng-gói-và-vận-hành)
-8. [Kết Luận Và Hướng Phát Triển](#8-kết-luận-và-hướng-phát-triển)
+## MỤC LỤC
+1. ĐẶT VẤN ĐỀ VÀ MỤC TIÊU ĐỀ TÀI
+2. PHÂN TÍCH YÊU CẦU NGHIỆP VỤ & PHÂN QUYỀN
+3. KIẾN TRÚC HỆ THỐNG MICROSERVICES
+4. THIẾT KẾ CƠ SỞ DỮ LIỆU & SPRING DATA JPA
+5. CƠ CHẾ XÁC THỰC, PHÂN QUYỀN & BẢO MẬT (SPRING SECURITY, JWT, GOOGLE OAUTH2)
+6. TÍCH HỢP CÁC DỊCH VỤ BÊN THỨ BA (VNPAY, GMAIL SMTP, CLOUDINARY, OPENPDF, ZXING)
+7. TÍCH HỢP TRỢ LÝ AI TƯ VẤN MÂM CƠM BẾP VIỆT
+8. THIẾT KẾ GIAO DIỆN NGƯỜI DÙNG (FRONTEND CLIENT)
+9. HƯỚNG DẪN CÀI ĐẶT, VẬN HÀNH & TRIỂN KHAI CLOUD
+10. KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 
 ---
 
-## 1. Giới Thiệu Và Đặt Vấn Đề
+## 1. ĐẶT VẤN ĐỀ VÀ MỤC TIÊU ĐỀ TÀI
 
-### 1.1. Bối cảnh đề tài
+### 1.1. Đặt Vấn Đề
+Trong bối cảnh chuyển đổi số của ngành dịch vụ ẩm thực (F&B), mô hình phục vụ truyền thống đang bộc lộ nhiều điểm nghẽn:
+- Khách hàng mất thời gian chờ đợi nhân viên mang thực đơn giấy, ghi chép thủ công dễ xảy ra nhầm lẫn món ăn hoặc sai lệch giá.
+- Tình trạng quá tải vào các khung giờ cao điểm dẫn đến trùng bàn, không kiểm soát được lượng bàn trống thực tế.
+- Khâu thanh toán và xuất hóa đơn phụ thuộc vào quầy thu ngân gây ùn tắc, thiếu sự linh hoạt trong các phương thức thanh toán không tiền mặt.
+- Ban quản lý nhà hàng thiếu công cụ theo dõi doanh thu thời gian thực và quản lý tập trung sơ đồ bàn theo từng khu vực.
 
-Trong xu thế số hóa ngành dịch vụ ẩm thực (F&B - Food and Beverage), các nhà hàng truyền thống gặp nhiều thách thức trong việc tối ưu hóa quy trình phục vụ:
-- Khách hàng phải chờ đợi nhân viên mang menu giấy, gọi món thủ công dễ nhầm lẫn.
-- Việc đặt bàn trước qua điện thoại thường xuyên xảy ra tình trạng trùng lặp giờ hoặc vượt quá sức chứa.
-- Quy trình thanh toán tiền mặt tại quầy vào giờ cao điểm gây ùn tắc, thiếu minh bạch và không thể tự động lưu trữ hóa đơn điện tử.
-- Nhân viên bếp khó theo dõi thứ tự chế biến, tình trạng đơn hàng dễ bị sót hoặc phục vụ trễ.
-
-### 1.2. Mục tiêu của đồ án
-
-Đồ án "Hệ Thống Quản Lý Đặt Bàn Và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt" được thiết kế và xây dựng nhằm giải quyết toàn diện các vấn đề trên thông qua:
-1. Cho phép thực khách quét mã QR tại bàn để trực tiếp tra cứu thực đơn và gọi món mà không cần tải ứng dụng native.
-2. Cho phép khách hàng đặt bàn trực tuyến có cơ chế khóa khung giờ chống trùng thông minh.
-3. Cung cấp màn hình điều phối cho Bếp và Nhân viên phục vụ cập nhật trạng thái đơn theo thời gian thực.
-4. Tích hợp cổng thanh toán trực tuyến quốc gia VNPAY và xuất hóa đơn PDF tiếng Việt đạt chuẩn.
-5. Ứng dụng trí tuệ nhân tạo (AI Recommendation) hỗ trợ gợi ý mâm cơm truyền thống tối ưu theo ngân sách và số lượng thực khách.
-6. Xây dựng theo kiến trúc Microservices chuẩn doanh nghiệp trên nền tảng Spring Boot 3.4.x và React 19.
+### 1.2. Mục Tiêu Đề Tài
+Xây dựng một hệ thống phần mềm toàn diện hỗ trợ quản lý đặt bàn và gọi món trực tuyến cho **Nhà Hàng Ẩm Thực Bếp Việt** (phong cách ẩm thực Việt Nam truyền thống và đương đại) đáp ứng các tiêu chí:
+- Cho phép khách vãng lai duyệt thực đơn và quét mã QR tại bàn để xem thông tin món ăn ngay lập tức.
+- Cho phép khách hàng đặt bàn trước theo khung giờ có cơ chế chống trùng lặp bàn, chọn món trước và thanh toán trực tuyến qua VNPAY.
+- Tự động hóa quy trình thông báo qua email xác nhận đặt bàn và cho phép xuất hóa đơn định dạng PDF tiếng Việt có dấu.
+- Cung cấp màn hình Bếp KDS (Kitchen Order Board) giúp nhân viên cập nhật tiến độ chế biến món ăn thời gian thực.
+- Phân tách kiến trúc theo mô hình **Microservices** hiện đại, đảm bảo tính độc lập, khả năng mở rộng linh hoạt và tính sẵn sàng cao khi triển khai trên nền tảng điện toán đám mây.
 
 ---
 
-## 2. Phân Tích Nghiệp Vụ Và Yêu Cầu Người Dùng
+## 2. PHÂN TÍCH YÊU CẦU NGHIỆP VỤ & PHÂN QUYỀN
 
-Hệ thống phục vụ 3 nhóm đối tượng người dùng chính với 5 User Stories cốt lõi:
+### 2.1. Phân Nhóm Người Dùng (User Roles)
+Hệ thống phân chia rõ ràng 4 nhóm đối tượng:
 
-### 2.1. Phân nhóm người dùng
-- **Khách vãng lai (Anonymous User)**: Chưa đăng nhập, có thể xem thông tin nhà hàng, duyệt thực đơn theo danh mục, tra cứu sơ đồ bàn trống, và quét mã QR tại bàn.
-- **Khách hàng thân thiết (Customer)**: Đã có tài khoản (đăng ký thông thường hoặc Google OAuth2), có quyền đặt bàn trước, gửi đơn gọi món, thanh toán qua VNPAY, nhận email xác nhận, và xem lại lịch sử đơn hàng.
-- **Nhân viên phục vụ và Bếp (Staff)**: Sử dụng Màn hình Bếp (Kitchen Order Board) để nhận đơn, chuyển đổi trạng thái chế biến (Đang nấu, Đã phục vụ), điều phối bàn ăn và thu tiền mặt tại quầy.
-- **Quản trị viên (Admin)**: Toàn quyền quản lý danh mục món ăn (tải ảnh Cloudinary), quản lý danh sách bàn và in mã QR, quản lý tài khoản người dùng, xem biểu đồ doanh thu và báo cáo thống kê.
+1. **Khách vãng lai (Anonymous)**:
+   - Truy cập trang chủ xem giới thiệu văn hóa và không gian nhà hàng.
+   - Duyệt danh mục 22 món ăn ẩm thực Việt kèm hình ảnh, giá và trạng thái còn món.
+   - Tra cứu sơ đồ bàn trống theo khu vực (Tầng 1, Tầng 2, Phòng VIP) và sức chứa.
+   - Quét mã QR đặt tại từng bàn (`/table/:tableNumber`) để xem thực đơn gắn liền với số bàn.
+   - Tương tác với Trợ lý AI để nhận tư vấn combo mâm cơm gia đình theo ngân sách và khẩu vị.
+
+2. **Khách hàng đã đăng nhập (`CUSTOMER`)**:
+   - Đăng ký và đăng nhập bằng tài khoản nội bộ hoặc đăng nhập 1-click bằng Google OAuth2.
+   - Đặt bàn trước theo thời gian, số lượng khách kèm yêu cầu ghi chú đặc biệt.
+   - Thêm món vào giỏ hàng và gửi đơn gọi món (Order) gắn với bàn ăn.
+   - Tự động nhận email HTML xác nhận đặt bàn qua Gmail SMTP ngay khi hoàn tất.
+   - Thanh toán trực tuyến an toàn qua cổng **VNPAY Sandbox** (xác thực chữ ký số HMAC-SHA512).
+   - Xem lại lịch sử các đơn đặt bàn và đơn gọi món cá nhân, tải hóa đơn điện tử định dạng PDF.
+
+3. **Nhân viên nhà hàng (`STAFF`)**:
+   - Quản lý sơ đồ bàn trực quan theo khu vực, check-in khách đến nhận bàn, chuyển đổi trạng thái bàn (`AVAILABLE`, `RESERVED`, `OCCUPIED`).
+   - Màn hình Bếp KDS cập nhật tiến độ từng món ăn: Chờ xử lý (`PENDING`) -> Đang nấu (`PREPARING`) -> Đã phục vụ (`SERVED`) -> Hoàn tất (`COMPLETED`).
+   - Hỗ trợ khách thanh toán tiền mặt tại quầy và xuất hóa đơn PDF trực tiếp cho khách.
+
+4. **Quản trị viên (`ADMIN`)**:
+   - Quản trị toàn bộ danh mục thực đơn (CRUD món ăn, tải hình ảnh trực tiếp lên Cloudinary API).
+   - Quản lý danh sách bàn ăn, tạo bàn mới và tự động sinh ảnh PNG mã QR cho từng bàn.
+   - Quản trị tài khoản người dùng và điều chỉnh vai trò (`CUSTOMER`, `STAFF`, `ADMIN`).
+   - Bảng điều khiển thống kê doanh thu theo khoảng thời gian, tổng số đơn hoàn tất và biểu đồ Top món bán chạy nhất.
 
 ---
 
-## 3. Kiến Trúc Kỹ Thuật Và Công Nghệ
+## 3. KIẾN TRÚC HỆ THỐNG MICROSERVICES
 
-### 3.1. Mô hình kiến trúc Microservices
+Hệ thống được thiết kế theo kiến trúc Microservices hướng dịch vụ, độc lập về mặt quy trình triển khai và đóng gói:
 
-Hệ thống được chia thành 3 dịch vụ độc lập (loosely coupled) giao tiếp qua REST API:
-
-```text
-                               +----------------------------------+
-                               |     Frontend Client (React 19)   |
-                               |    Port: 5173 / Port 80 (Nginx)  |
-                               +-----------------+----------------+
-                                                 |
-                   +-----------------------------+-----------------------------+
-                   |                             |                             |
-                   v                             v                             v
-        +--------------------+        +--------------------+        +--------------------+
-        | Auth & User Service|        |Catalog & Table Svc |        |Booking & Order Svc |
-        |     Port: 8081     |        |     Port: 8082     |        |     Port: 8083     |
-        +---------+----------+        +---------+----------+        +---------+----------+
-                  |                             |                             |
-                  |                             +--------------+              |
-                  |                                            | (RestClient) |
-                  |                                            v              |
-                  +-----------------------------+--------------+--------------+
-                                                |
-                                                v
-                                     +--------------------+
-                                     |   MySQL 8.0 / H2   |
-                                     |  restaurant_db     |
-                                     +--------------------+
+```
+                            [ Trình Duyệt / Khách Hàng ]
+                                         │
+                                         ▼
+                     [ Frontend Client (React 19 + Vite) ]
+                                 (Port 5173)
+                                         │
+        ┌────────────────────────────────┼────────────────────────────────┐
+        │ REST (8081)                    │ REST (8082)                    │ REST (8083)
+        ▼                                ▼                                ▼
+┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+│ auth-user-service│            │catalog-table-serv│            │booking-order-serv│
+│   (Port 8081)    │            │   (Port 8082)    │            │   (Port 8083)    │
+└────────┬─────────┘            └────────┬─────────┘            └────────┬─────────┘
+         │                               │                               │
+         │  JWT Token validation         │                               │  RestClient
+         │  (Stateless HMAC-SHA256)      ├───────────────────────────────┘  (Tra cứu giá món)
+         │                               │
+         ▼                               ▼                               ▼
+   [ Google OAuth2 ]              [ Cloudinary ]                 [ VNPAY Sandbox ]
+   [ TiDB MySQL Cloud ]           [ TiDB MySQL Cloud ]           [ Gmail SMTP ]
+                                  [ Google ZXing ]               [ OpenPDF Engine ]
 ```
 
-### 3.2. Công nghệ sử dụng
-- **Backend**:
-  - Ngôn ngữ: Java 17.
-  - Framework: Spring Boot 3.4.1, Spring Data JPA, Spring Security 6.
-  - Bảo mật: JJWT (io.jsonwebtoken 0.12.6) với HMAC-SHA256, PasswordEncoder BCrypt.
-  - Thư viện mã QR: Google ZXing 3.5.3.
-  - Kết xuất hóa đơn: OpenPDF 2.0.3 (hỗ trợ font tiếng Việt Unicode).
-  - Tải ảnh đám mây: Cloudinary Java SDK 1.39.0.
-  - Gửi email: Spring Boot Starter Mail (JavaMailSender với Gmail SMTP TLS).
-- **Frontend**:
-  - Thư viện chính: React 19, TypeScript 5.7.
-  - Công cụ đóng gói: Vite 6.
-  - Giao diện: Tailwind CSS v3, Lucide React Icons.
-  - Quản lý trạng thái: Zustand 5.0 (lưu phiên đăng nhập và giỏ hàng).
-  - Điều hướng: React Router DOM v7.
-- **Hạ tầng & Đóng gói**:
-  - Multi-stage Dockerfile cho từng service và frontend.
-  - Docker Compose điều phối đa container (MySQL + 3 Services + Frontend).
-  - Heroku Procfile và Vercel routing configuration.
+### 3.1. Các Dịch Vụ Thành Phần
+1. **Service 1: `auth-user-service` (Cổng 8081)**:
+   - Quản lý tài khoản, mật khẩu mã hóa BCrypt, thông tin cá nhân.
+   - Xử lý xác thực Google ID Token từ phía Client và cấp phát JWT Token.
+   - Cung cấp API quản lý danh sách tài khoản cho Admin.
+
+2. **Service 2: `catalog-table-service` (Cổng 8082)**:
+   - Quản lý danh mục thực đơn ẩm thực Việt và sơ đồ bàn ăn.
+   - Tích hợp SDK Cloudinary tải ảnh món ăn lên máy chủ đám mây.
+   - Tích hợp Google ZXing sinh ảnh mã QR (dạng PNG stream) cho từng bàn ăn.
+   - Tích hợp module AI Recommendation phân tích dữ liệu thực đơn để đưa ra gợi ý bữa ăn tối ưu.
+   - Cấu hình mở quyền đọc công khai (Anonymous GET) cho toàn bộ khách hàng.
+
+3. **Service 3: `booking-order-service` (Cổng 8083)**:
+   - Xử lý nghiệp vụ đặt bàn trước, kiểm tra xung đột trùng lặp khung giờ.
+   - Quản lý đơn gọi món, chi tiết đơn (`OrderItem`) và tính tổng tiền.
+   - Tích hợp Spring Mail (JavaMailSender) gửi email HTML xác nhận giao dịch.
+   - Tích hợp cổng thanh toán trực tuyến VNPAY Sandbox với thuật toán băm HMAC-SHA512.
+   - Kết xuất hóa đơn PDF tiếng Việt hỗ trợ Unicode sử dụng OpenPDF.
+   - Cung cấp API thống kê doanh thu và báo cáo món ăn phục vụ Quản trị viên.
 
 ---
 
-## 4. Thiết Kế Cơ Sở Dữ Liệu Và Sơ Đồ ERD
+## 4. THIẾT KẾ CƠ SỞ DỮ LIỆU & SPRING DATA JPA
 
-Cơ sở dữ liệu quan hệ gồm các thực thể chính với các mối quan hệ chặt chẽ:
+Hệ thống quản lý 5 thực thể cốt lõi thông qua Spring Data JPA và Hibernate ORM:
 
-```mermaid
-erDiagram
-    USERS ||--o{ RESERVATION_ORDERS : places
-    DINING_TABLES ||--o{ RESERVATION_ORDERS : allocated_to
-    RESERVATION_ORDERS ||--|{ ORDER_ITEMS : contains
-    MENU_ITEMS ||--o{ ORDER_ITEMS : ordered_as
+### 4.1. Mô Hình Thực Thể (ERD Summary)
+1. **`User`** (`users`):
+   - `id` (BIGINT, Primary Key)
+   - `username` (VARCHAR 50, Unique)
+   - `password` (VARCHAR 255, BCrypt hash)
+   - `email` (VARCHAR 100, Unique)
+   - `full_name` (VARCHAR 100)
+   - `phone` (VARCHAR 20)
+   - `role` (ENUM: `CUSTOMER`, `STAFF`, `ADMIN`)
+   - `auth_provider` (VARCHAR 20: `LOCAL`, `GOOGLE`)
+   - `active` (BOOLEAN)
 
-    USERS {
-        bigint id PK
-        varchar username UK
-        varchar password
-        varchar full_name
-        varchar email UK
-        varchar phone
-        varchar role "ADMIN, STAFF, CUSTOMER"
-        varchar provider "LOCAL, GOOGLE"
-        datetime created_at
-    }
+2. **`DiningTable`** (`dining_tables`):
+   - `id` (BIGINT, Primary Key)
+   - `table_number` (VARCHAR 20, Unique)
+   - `capacity` (INT: 2, 4, 6, 8, 12 chỗ ngồi)
+   - `area` (VARCHAR 50: Tầng 1, Tầng 2, Phòng VIP)
+   - `status` (ENUM: `AVAILABLE`, `RESERVED`, `OCCUPIED`)
+   - `qr_code_url` (VARCHAR 255)
 
-    DINING_TABLES {
-        bigint id PK
-        varchar table_number UK
-        int capacity
-        varchar location "INDOOR, OUTDOOR, VIP"
-        varchar status "AVAILABLE, RESERVED, OCCUPIED"
-        varchar qr_code_url
-        datetime created_at
-    }
+3. **`MenuItem`** (`menu_items`):
+   - `id` (BIGINT, Primary Key)
+   - `name` (VARCHAR 100, Unique)
+   - `price` (DECIMAL 12,2)
+   - `description` (TEXT)
+   - `category` (VARCHAR 50: Cơm Niêu, Món Kho & Xào, Món Lẩu, Đồ Uống, Tráng Miệng)
+   - `image_url` (VARCHAR 255)
+   - `status` (ENUM: `AVAILABLE`, `OUT_OF_STOCK`, `INACTIVE`)
 
-    MENU_ITEMS {
-        bigint id PK
-        varchar name UK
-        text description
-        decimal price
-        varchar category "APPETIZER, MAIN, SOUP_HOTPOT, DESSERT, DRINK"
-        varchar image_url
-        varchar status "AVAILABLE, OUT_OF_STOCK"
-        boolean is_featured
-        datetime created_at
-    }
+4. **`ReservationOrder`** (`orders`):
+   - `id` (BIGINT, Primary Key)
+   - `order_code` (VARCHAR 30, Unique)
+   - `user_id` (BIGINT, Foreign Key)
+   - `table_id` (BIGINT, Foreign Key)
+   - `reservation_time` (DATETIME)
+   - `party_size` (INT)
+   - `total_amount` (DECIMAL 12,2)
+   - `payment_method` (ENUM: `CASH`, `VNPAY`)
+   - `payment_status` (ENUM: `UNPAID`, `PAID`)
+   - `status` (ENUM: `PENDING`, `CONFIRMED`, `PREPARING`, `SERVED`, `COMPLETED`, `CANCELLED`)
 
-    RESERVATION_ORDERS {
-        bigint id PK
-        varchar order_code UK
-        bigint user_id FK
-        bigint table_id FK
-        varchar customer_name
-        varchar customer_phone
-        varchar customer_email
-        datetime reservation_time
-        int guest_count
-        varchar order_type "DINE_IN, PRE_ORDER"
-        varchar status "PENDING, CONFIRMED, PREPARING, SERVED, COMPLETED, CANCELLED"
-        varchar payment_method "CASH, VNPAY"
-        varchar payment_status "PENDING, PAID, FAILED"
-        decimal total_amount
-        text note
-        datetime created_at
-        datetime updated_at
-    }
+5. **`OrderItem`** (`order_items`):
+   - `id` (BIGINT, Primary Key)
+   - `order_id` (BIGINT, Foreign Key trỏ tới `orders`)
+   - `menu_item_id` (BIGINT)
+   - `menu_item_name` (VARCHAR 100)
+   - `unit_price` (DECIMAL 12,2)
+   - `quantity` (INT)
+   - `subtotal` (DECIMAL 12,2)
+   - `note` (VARCHAR 255)
 
-    ORDER_ITEMS {
-        bigint id PK
-        bigint order_id FK
-        bigint menu_item_id FK
-        varchar item_name
-        decimal price
-        int quantity
-        decimal subtotal
-        text special_request
-    }
+### 4.2. Cơ Sở Dữ Liệu Hỗ Trợ
+- **Môi trường Cloud Production**: Cụm máy chủ phân tán **TiDB Cloud Serverless (MySQL 8.0)** kết nối qua SSL an toàn.
+- **Môi trường Development & Unit Test**: Tự động hỗ trợ **H2 Database In-Memory** ở chế độ tương thích MySQL (`MODE=MySQL`), cho phép khởi chạy ngay mà không cần cài đặt phần mềm phụ trợ.
+
+---
+
+## 5. CƠ CHẾ XÁC THỰC, PHÂN QUYỀN & BẢO MẬT
+
+### 5.1. Mô Hình Stateless JWT
+Hệ thống sử dụng cơ chế xác thực không lưu trạng thái (Stateless Authentication):
+- Khi đăng nhập thành công, `auth-user-service` phát hành một JSON Web Token được ký bằng thuật toán HMAC-SHA256 với khóa bí mật tối thiểu 32 ký tự.
+- Payload của Token chứa thông tin định danh: `sub` (username), `userId`, `role` (`CUSTOMER`, `STAFF`, `ADMIN`), thời gian phát hành và thời gian hết hạn (24 giờ).
+- Cả 3 Microservices đều tích hợp bộ lọc `JwtAuthenticationFilter` để giải mã Token trực tiếp ở tầng HTTP Request mà không cần gọi lại cơ sở dữ liệu xác thực, giảm thiểu độ trễ tối đa.
+
+### 5.2. Đăng Nhập Nhanh Qua Google OAuth2
+- Phía Frontend sử dụng SDK chính thức của Google Identity Services hiển thị nút đăng nhập "Sign in with Google".
+- Khi người dùng xác thực với Google thành công, credential JWT do Google cấp được gửi lên backend qua endpoint `POST /api/v1/auth/google`.
+- Backend tiến hành giải mã chữ ký Google Credential, trích xuất `email`, `name`, `picture`. Nếu tài khoản chưa từng tồn tại trong hệ thống, tự động tạo mới tài khoản với vai trò `CUSTOMER` và `auth_provider = GOOGLE`, sau đó cấp phát JWT Token của hệ thống.
+
+---
+
+## 6. TÍCH HỢP CÁC DỊCH VỤ BÊN THỨ BA
+
+### 6.1. Cổng Thanh Toán Trực Tuyến VNPAY Sandbox
+- **Thuật toán chữ ký số**: Triển khai băm bảo mật HMAC-SHA512 với `vnp_HashSecret`.
+- **Quy trình tạo URL thanh toán**: Các tham số giao dịch (`vnp_Amount`, `vnp_TxnRef`, `vnp_OrderInfo`, `vnp_ReturnUrl`, `vnp_IpAddr`) được chuẩn hóa, sắp xếp theo thứ tự bảng chữ cái alphabet và tạo chuỗi checksum an toàn.
+- **Xác thực kết quả giao dịch (Callback)**: Trang `VnPayReturnPage` gửi toàn bộ query parameters về endpoint `/api/v1/payments/vnpay/callback`. Backend thực hiện tính toán lại chữ ký số để đối chiếu với `vnp_SecureHash`. Khi mã phản hồi `vnp_ResponseCode == "00"` và chữ ký số khớp 100%, trạng thái đơn hàng được cập nhật sang `PAID` và ghi nhận mã giao dịch ngân hàng.
+
+### 6.2. Gửi Email Tự Động Qua Gmail SMTP (Spring Mail)
+- Tích hợp `JavaMailSender` với máy chủ `smtp.gmail.com` qua giao thức mã hóa TLS (cổng 587) sử dụng Mật khẩu ứng dụng (App Password).
+- Email được định dạng HTML chuyên nghiệp, chứa thông tin mã đơn đặt bàn, số bàn, khung giờ, số lượng khách, tổng tiền và hướng dẫn nhận bàn tại nhà hàng.
+
+### 6.3. Lưu Trữ Hình Ảnh Món Ăn Bằng Cloudinary API
+- Quản trị viên tải tệp ảnh từ máy tính khi thêm hoặc sửa món ăn.
+- `CloudinaryService` mã hóa và tải ảnh trực tiếp lên kho lưu trữ đám mây Cloudinary, nhận lại URL HTTPS an toàn và lưu vào thuộc tính `image_url` của món ăn.
+
+### 6.4. Kết Xuất Hóa Đơn PDF Tiếng Việt Có Dấu (OpenPDF)
+- Triển khai `PdfInvoiceService` dựa trên thư viện OpenPDF.
+- Nhúng bộ phông chữ Unicode (Arial / DejaVuSans) đảm bảo hiển thị hoàn hảo tiếng Việt có dấu.
+- Hóa đơn chứa đầy đủ logo nhà hàng, thông tin khách hàng, số bàn, bảng chi tiết từng món ăn (tên món, số lượng, đơn giá, thành tiền), tổng thanh toán và mã QR đối soát.
+
+### 6.5. Tự Động Sinh Mã QR Bàn Bằng Google ZXing
+- `QrCodeGeneratorService` chuyển đổi đường dẫn truy cập gọi món của bàn (ví dụ: `http://localhost:5173/table/01`) thành ma trận QR 300x300 pixel định dạng ảnh PNG stream.
+- Quản trị viên có thể tải ảnh mã QR của từng bàn về máy để in ấn và dán trực tiếp tại bàn ăn.
+
+---
+
+## 7. TÍCH HỢP TRỢ LÝ AI TƯ VẤN MÂM CƠM BẾP VIỆT
+
+Nhằm nâng cao trải nghiệm thực khách và đáp ứng tiêu chí điểm cộng của đồ án, hệ thống đã phát triển tính năng **Trợ Lý AI Tư Vấn Mâm Cơm Bếp Việt (AI Menu Planner)**:
+- **Cơ chế hoạt động**: Người dùng nhập số lượng người ăn (ví dụ: 4 người), ngân sách dự kiến (ví dụ: 500.000 VNĐ) và các sở thích/yêu cầu khẩu vị (ví dụ: thích cá kho tộ, không ăn cay, có trẻ em, ăn chay).
+- **Thuật toán xử lý**: Module AI tự động phân tích 22 món ăn trong thực đơn thực tế của nhà hàng, tính toán cân bằng dinh dưỡng (1 món chính, 1 món phụ/xào, 1 món canh/lẩu, đồ uống và tráng miệng) sao cho tổng chi phí tối ưu nhất so với ngân sách.
+- **Tính năng nổi bật**: Cung cấp nút 1-click "Thêm toàn bộ mâm cơm vào giỏ hàng", giúp khách hàng không mất thời gian chọn từng món riêng lẻ.
+
+---
+
+## 8. THIẾT KẾ GIAO DIỆN NGƯỜI DÙNG (FRONTEND CLIENT)
+
+Giao diện được xây dựng trên nền tảng **React 19 + TypeScript + Vite + Tailwind CSS**, tuân thủ nguyên tắc thiết kế nhận diện thương hiệu ẩm thực Việt đương đại:
+- **Hệ thống màu sắc**: Tông màu ấm chủ đạo kết hợp giữa vàng đồng, nâu gỗ trầm và đỏ gạch truyền thống.
+- **Độ phản hồi (Responsive)**: Tương thích hoàn hảo trên điện thoại thông minh, máy tính bảng và màn hình máy tính.
+
+### Danh Sách 14 Màn Hình Chức Năng Đã Triển Khai:
+1. `Trang Chủ` (`/`): Giới thiệu không gian nhà hàng, văn hóa ẩm thực Bếp Việt và hướng dẫn gọi món bằng QR.
+2. `Trang Thực Đơn Công Khai` (`/menu`): Phân loại món theo danh mục, thanh tìm kiếm thời gian thực, hiển thị hình ảnh và giá bán.
+3. `Trang Sơ Đồ Bàn` (`/tables`): Tra cứu tình trạng bàn trống theo khu vực Tầng 1, Tầng 2, VIP và sức chứa.
+4. `Trang Đặt Món Qua Mã QR` (`/table/:tableNumber`): Giao diện chuyên biệt khi quét QR tại bàn, có giỏ hàng nổi và ghi chú món.
+5. `Trang Đăng Nhập` (`/login`): Form đăng nhập tiêu chuẩn và nút Đăng nhập nhanh bằng Google OAuth2.
+6. `Trang Đăng Ký` (`/register`): Đăng ký tài khoản khách hàng mới có kiểm tra hợp lệ dữ liệu.
+7. `Trang Đặt Bàn Trước & Chọn Món` (`/booking`): Chọn ngày giờ, số lượng khách, bàn trống và chọn món trước.
+8. `Trang Lịch Sử Đơn Hàng Cá Nhân` (`/my-orders`): Theo dõi trạng thái đặt bàn, xem chi tiết món gọi và tải hóa đơn PDF.
+9. `Trang Tiếp Nhận Kết Quả Thanh Toán VNPAY` (`/payment/vnpay-return`): Xác minh chữ ký số giao dịch và hiển thị hóa đơn thành công.
+10. `Màn Hình Bếp KDS` (`/staff/orders`): Bảng Kanban dành cho Bếp cập nhật trạng thái chế biến thời gian thực.
+11. `Màn Hình Quản Lý Sơ Đồ Bàn Nhân Viên` (`/staff/tables`): Tiếp nhận khách, check-in và đổi trạng thái bàn nhanh.
+12. `Trang Quản Trị Thực Đơn Admin` (`/admin/menu`): Thêm, sửa, ẩn món ăn kèm tính năng upload ảnh lên Cloudinary.
+13. `Trang Quản Trị Bàn Ăn & Mã QR` (`/admin/tables`): Thêm bàn, tạo sơ đồ và tải ảnh PNG mã QR cho từng bàn.
+14. `Trang Thống Kê Doanh Thu` (`/admin/stats`): Thống kê doanh thu, tổng số đơn hàng và biểu đồ các món ăn bán chạy nhất.
+15. `Trợ Lý AI Gợi Ý Mâm Cơm` (Modal tương tác): Tư vấn thực đơn thông minh theo ngân sách và số người ăn.
+
+---
+
+## 9. HƯỚNG DẪN CÀI ĐẶT, VẬN HÀNH & TRIỂN KHAI CLOUD
+
+### 9.1. Khởi Chạy Nhanh Trên Máy Cục Bộ
+Chỉ cần thực hiện 1 lệnh duy nhất tại thư mục gốc `d:\DoAnJ2EE`:
+```powershell
+npm run start
 ```
+Hệ thống tự động giải phóng cổng xung đột, nạp file `.env` và khởi động đồng thời cả 3 Backend Microservices và Frontend. Mở trình duyệt tại địa chỉ `http://localhost:5173`.
+
+### 9.2. Triển Khai Trên Nền Tảng Đám Mây (Cloud Deployment)
+- **Cơ sở dữ liệu**: Sử dụng dịch vụ TiDB Cloud Serverless (Singapore Region) miễn phí, kết nối bảo mật qua SSL.
+- **Frontend**: Triển khai lên Vercel / Netlify thông qua tệp `frontend/vercel.json`, trỏ các biến môi trường API về Backend.
+- **Backend**: Đã chuẩn bị sẵn các tệp `Dockerfile` multi-stage tối ưu dung lượng và tệp `backend/Procfile` sẵn sàng deploy lên Railway, Render, hoặc Heroku Container Registry.
 
 ---
 
-## 5. Thiết Kế Các Luồng Nghiệp Vụ Trọng Yếu
+## 10. KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 
-### 5.1. Luồng Xác Thực Bảo Mật JWT Và Google OAuth2
+### 10.1. Kết Quả Đạt Được
+- Hoàn thành đầy đủ 100% các yêu cầu bắt buộc và các tiêu chí điểm cộng của đồ án J2EE.
+- Xây dựng thành công hệ thống Microservices hoạt động ổn định, chia sẻ xác thực JWT phi trạng thái, kết nối mượt mà giữa 3 dịch vụ Backend và Frontend SPA.
+- Tích hợp trọn vẹn các dịch vụ bên thứ ba trong thực tế: Cổng thanh toán trực tuyến VNPAY Sandbox, Google OAuth2, Gmail SMTP, Cloudinary, OpenPDF và mã QR Google ZXing.
+- Giao diện người dùng phong phú với hơn 14 màn hình, mang phong cách nhận diện ẩm thực Việt Nam đặc sắc, loại bỏ hoàn toàn mã giả hay hardcode.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Khách Hàng / Nhân Viên
-    participant FE as Frontend React
-    participant Auth as Auth & User Service
-    participant DB as Database
-
-    alt Đăng nhập thông thường
-        User->>FE: Nhập username và password
-        FE->>Auth: POST /api/v1/auth/login
-        Auth->>DB: Truy vấn User theo username
-        Auth->>Auth: Kiểm tra mật khẩu (BCrypt)
-        Auth->>Auth: Phát hành JWT Token (HMAC-SHA256)
-        Auth-->>FE: Trả về JWT Token, Role, Thông tin người dùng
-    else Đăng nhập Google OAuth2
-        User->>FE: Bấm "Đăng nhập bằng Google"
-        FE->>FE: Nhận id_token từ Google API
-        FE->>Auth: POST /api/v1/auth/google
-        Auth->>Auth: Xác thực Token ID với Google Client ID
-        Auth->>DB: Tìm hoặc tạo mới User (Role CUSTOMER, Provider GOOGLE)
-        Auth->>Auth: Phát hành JWT Token
-        Auth-->>FE: Trả về JWT Token
-    end
-    FE->>FE: Lưu Token vào Zustand Store / LocalStorage
-```
-
-### 5.2. Luồng Quét Mã QR Gọi Món Tại Bàn
-
-1. Khách hàng ngồi tại bàn ăn và dùng camera điện thoại quét mã QR dán trên bàn.
-2. Mã QR chứa liên kết `http://<domain>/table/{tableNumber}` (ví dụ: `/table/B01`).
-3. Ứng dụng Frontend tự động kích hoạt chế độ gọi món tại bàn, gán cứng mã bàn vào giỏ hàng (`useCartStore`).
-4. Khách hàng lựa chọn món ăn từ thực đơn, điều chỉnh số lượng và ghi chú chế biến.
-5. Khách hàng bấm gửi đơn gọi món, đơn hàng được tạo với loại `DINE_IN` gắn liền số bàn.
-6. Màn hình Bếp (Kitchen Order Board) của nhà hàng ngay lập tức hiển thị đơn món cần chuẩn bị.
-
-### 5.3. Luồng Đặt Bàn Chống Trùng Khung Giờ
-
-Để đảm bảo không bị quá tải hoặc đặt trùng bàn, `BookingOrderService` thực hiện thuật toán kiểm tra:
-1. Tiếp nhận yêu cầu đặt bàn gồm: `tableId`, `reservationTime` (thời điểm nhận bàn) và `guestCount`.
-2. Kiểm tra sức chứa bàn: Sức chứa của bàn phải lớn hơn hoặc bằng `guestCount`.
-3. Kiểm tra khung giờ: Khoảng thời gian bảo lưu cho mỗi lượt ăn là 2 giờ ($\pm 2$ tiếng).
-4. Thực hiện truy vấn kiểm tra các đơn đặt bàn hiện hành của bàn đó trong khoảng:
-   $$[\text{reservationTime} - 2\text{ giờ}, \text{reservationTime} + 2\text{ giờ}]$$
-   với trạng thái đơn không phải `CANCELLED` hoặc `COMPLETED`.
-5. Nếu phát hiện đơn xung đột, hệ thống chặn tạo đơn và thông báo lỗi rõ ràng tới khách hàng.
-
-### 5.4. Luồng Thanh Toán Trực Tuyến VNPAY Và Xuất Hóa Đơn PDF
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Customer as Khách Hàng
-    participant FE as Frontend React
-    participant Booking as Booking Service
-    participant VnPay as VNPAY Gateway
-    participant Mail as Gmail SMTP
-
-    Customer->>FE: Bấm "Thanh toán VNPAY"
-    FE->>Booking: GET /api/v1/payments/vnpay/create-url?orderId={id}
-    Booking->>Booking: Tạo tham số VNPAY (vnp_TxnRef, vnp_Amount, vnp_IpAddr)
-    Booking->>Booking: Tạo chữ ký SecureHash (HMAC-SHA512)
-    Booking-->>FE: Trả về Payment URL
-    FE->>VnPay: Chuyển hướng tới Cổng thanh toán VNPAY Sandbox
-    Customer->>VnPay: Nhập thẻ test NCB và mã OTP
-    VnPay-->>FE: Chuyển hướng về /payment/vnpay-return kèm chữ ký
-    FE->>Booking: GET /api/v1/payments/vnpay/callback
-    Booking->>Booking: Xác minh chữ ký HMAC-SHA512
-    alt Thanh toán thành công (vnp_ResponseCode == "00")
-        Booking->>Booking: Cập nhật PaymentStatus = PAID, OrderStatus = CONFIRMED
-        Booking->>Mail: Gửi email xác nhận đặt bàn HTML
-        Booking-->>FE: Thông báo thanh toán thành công
-        FE->>Booking: GET /api/v1/orders/{id}/invoice.pdf
-        Booking-->>FE: Trả về file PDF hóa đơn tiếng Việt có dấu
-    else Giao dịch thất bại
-        Booking->>Booking: Cập nhật PaymentStatus = FAILED
-        Booking-->>FE: Thông báo lỗi giao dịch
-    end
-```
-
-### 5.5. Trợ Lý AI Gợi Ý Mâm Cơm Bếp Việt
-
-Dịch vụ `AiRecommendationService` cung cấp khả năng tự động phối hợp thực đơn truyền thống:
-- Đầu vào: Số lượng thực khách và ngân sách dự kiến.
-- Thuật toán phối mâm cơm: Tự động cân đối tỷ lệ món theo văn hóa ẩm thực Việt Nam (Món khai vị, Món chính thịt/cá, Canh/Lẩu, Món rau, Cơm trắng và Tráng miệng).
-- Đảm bảo tổng giá tiền nằm trong giới hạn ngân sách và tối ưu hóa trải nghiệm ẩm thực.
-
----
-
-## 6. Kế Hoạch Kiểm Thử Và Đảm Bảo Chất Lượng
-
-Hệ thống áp dụng phương pháp kiểm thử tự động toàn diện trước khi phát hành:
-- **Unit Test**: Kiểm thử độc lập từng tầng Service sử dụng Mockito và JUnit 5.
-  - `AuthServiceTest`: Kiểm tra đăng ký, đăng nhập mật khẩu và Google OAuth2.
-  - `BookingOrderServiceTest`: Kiểm tra logic tạo đơn, tính tiền, chống trùng khung giờ.
-  - `StaffOrderServiceTest`: Kiểm tra logic cập nhật trạng thái đơn và thanh toán tiền mặt.
-  - `VnPayServiceTest`: Kiểm tra tạo URL và thuật toán chữ ký bảo mật HMAC-SHA512.
-  - `PdfInvoiceServiceTest`: Kiểm tra kết xuất hóa đơn PDF có đầy đủ nội dung.
-  - `StatisticsServiceTest`: Kiểm tra thuật toán tổng hợp doanh thu theo kỳ.
-  - `CatalogPublicServiceTest`: Kiểm tra truy vấn thực đơn và danh sách bàn.
-- **Integration Test**: Kiểm thử tích hợp tầng Controller và phân quyền Spring Security (`@WithMockUser`).
-  - `AdminCatalogControllerTest`, `PublicMenuControllerTest`, `PublicTableControllerTest`.
-  - `BookingCustomerControllerTest`, `StaffOrderControllerTest`.
-- **Frontend Verification**: Biên dịch TypeScript nghiêm ngặt (`tsc -b`) và đóng gói tài nguyên tĩnh qua Vite (`vite build`).
-- **Kịch bản kiểm tra tập trung**: Lệnh `npm run verify` chạy tự động toàn bộ 24 test case của backend và build frontend, đạt tỷ lệ 100% thành công với zero lỗi.
-
----
-
-## 7. Hướng Dẫn Triển Khai Đóng Gói Và Vận Hành
-
-### 7.1. Đóng gói Container với Docker
-Mỗi microservice sở hữu multi-stage Dockerfile giúp tối ưu dung lượng ảnh:
-- Giai đoạn 1 (Builder): Sử dụng `eclipse-temurin:17-jdk-alpine` biên dịch mã nguồn qua Maven Wrapper.
-- Giai đoạn 2 (Runtime): Sử dụng `eclipse-temurin:17-jre-alpine`, chạy dưới tài khoản non-root `appuser` để đảm bảo an ninh.
-- Frontend: Sử dụng `node:20-alpine` build static files và phục vụ bằng `nginx:alpine`.
-
-### 7.2. Triển khai Đa Container bằng Docker Compose
-Tệp `docker-compose.yml` tại thư mục gốc quản lý toàn bộ hệ thống gồm MySQL 8.0, 3 microservices backend và giao diện frontend với cơ chế kiểm tra trạng thái hoạt động (healthcheck) tự động.
-
-### 7.3. Triển khai Cloud (Heroku & Vercel)
-- Backend: Sẵn sàng triển khai lên Heroku thông qua `backend/Procfile` và `backend/system.properties` khai báo Java 17.
-- Frontend: Sẵn sàng triển khai lên Vercel thông qua `frontend/vercel.json` hỗ trợ định tuyến SPA.
-
----
-
-## 8. Kết Luận Và Hướng Phát Triển
-
-### 8.1. Kết quả đạt được
-- Xây dựng thành công hệ thống hoàn chỉnh theo kiến trúc Microservices phân tán hiện đại.
-- Triển khai đầy đủ 5 User Stories với chất lượng mã nguồn đạt chuẩn sản phẩm thực tế, không sử dụng dữ liệu giả (mock/fake code).
-- Tích hợp thành công các giải pháp công nghệ tiên tiến: Google ZXing sinh QR, VNPAY Sandbox thanh toán HMAC-SHA512, OpenPDF sinh hóa đơn tiếng Việt, Cloudinary lưu trữ ảnh đám mây, và Gmail SMTP gửi thông báo.
-- Giao diện người dùng sắc sảo, tối ưu trải nghiệm trên mọi kích thước màn hình từ điện thoại đến máy tính bảng và máy tính bàn.
-- Đạt 100% bài kiểm thử tự động với quy trình xác minh chất lượng chặt chẽ.
-
-### 8.2. Hướng phát triển tiếp theo
-- Nâng cấp cơ chế đồng bộ thời gian thực giữa Bếp và Bàn ăn thông qua giao thức WebSocket / STOMP.
-- Bổ sung ứng dụng di động cho nhân viên phục vụ nhận order tại bàn.
-- Mở rộng thêm cổng thanh toán ví điện tử MoMo, ZaloPay và thẻ thanh toán quốc tế Visa/MasterCard.
+### 10.2. Hướng Phát Triển Tương Lai
+- Bổ sung công nghệ WebSocket (Spring WebSocket / STOMP) để đồng bộ trạng thái đơn món giữa Bếp và Khách hàng theo thời gian thực hai chiều.
+- Tích hợp thêm cổng thanh toán ví điện tử MoMo và ZaloPay.
+- Phát triển ứng dụng di động dành riêng cho nhân viên phục vụ (Waiter App) trên nền tảng React Native.

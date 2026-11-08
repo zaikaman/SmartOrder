@@ -1,205 +1,119 @@
-# Hệ Thống Quản Lý Đặt Bàn Và Gọi Món Trực Tuyến - Nhà Hàng Ẩm Thực Bếp Việt
-
-Hệ thống phần mềm quản lý đặt bàn và gọi món trực tuyến dành cho nhà hàng ẩm thực truyền thống Việt Nam, được xây dựng theo kiến trúc Microservices hướng dịch vụ trên nền tảng Java Enterprise (Spring Boot 3.4.x, Spring Security 6) kết hợp giao diện người dùng hiện đại React 19, TypeScript và Tailwind CSS.
-
----
-
-## 1. Tổng Quan Kiến Trúc Hệ Thống
-
-Hệ thống được tổ chức dưới dạng Monorepo gồm 3 Microservices độc lập và 1 Single Page Application (SPA):
-
-- **Service 1: Auth & User Service (Cổng 8081)**
-  - Quản lý người dùng, phân quyền RBAC (ADMIN, STAFF, CUSTOMER).
-  - Đăng ký, đăng nhập bằng tài khoản mật khẩu mã hóa BCrypt.
-  - Đăng nhập bằng Google OAuth2 xác thực token ID an toàn.
-  - Phát hành và xác thực JWT (JSON Web Token) HMAC-SHA256 không lưu trạng thái (stateless).
-
-- **Service 2: Catalog & Table Service (Cổng 8082)**
-  - Quản lý danh mục thực đơn món ăn (Khai vị, Món chính, Canh & lẩu, Tráng miệng, Đồ uống).
-  - Tích hợp Cloudinary API để tải lên và quản lý ảnh món ăn trực tuyến.
-  - Quản lý sơ đồ bàn ăn (Khu vực Trong nhà, Ngoài trời, Phòng VIP).
-  - Sinh mã QR Code tự động theo từng bàn bằng thư viện Google ZXing để khách hàng quét mã truy cập menu tại bàn.
-  - Trợ lý AI thông minh (AiRecommendationService) gợi ý mâm cơm truyền thống Bếp Việt theo số lượng người và ngân sách.
-
-- **Service 3: Booking & Order Service (Cổng 8083)**
-  - Xử lý đặt bàn trước theo khung giờ, có cơ chế kiểm tra chống trùng giờ và kiểm tra sức chứa bàn.
-  - Quản lý giỏ hàng và đơn gọi món theo thời gian thực.
-  - Điều phối đơn gọi món cho Nhân viên phục vụ và Màn hình Bếp (Kitchen Order Board: PENDING -> PREPARING -> SERVED -> COMPLETED).
-  - Tích hợp cổng thanh toán trực tuyến VNPAY Sandbox với mã hóa chữ ký HMAC-SHA512.
-  - Hỗ trợ thanh toán tiền mặt tại quầy cho nhân viên thu ngân.
-  - Tự động kết xuất hóa đơn thanh toán định dạng PDF tiếng Việt có dấu bằng OpenPDF.
-  - Tự động gửi email HTML xác nhận đơn đặt bàn qua dịch vụ Gmail SMTP.
-  - Thống kê doanh thu theo ngày, tháng và xếp hạng top món bán chạy.
-
-- **Frontend Client (Cổng 5173 / Cổng 80 qua Nginx)**
-  - React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons, Zustand Store, React Router v7.
-  - Giao diện phân tách rõ ràng theo 3 phân hệ: Khách hàng (Public & Customer), Nhân viên / Bếp (Staff), và Quản trị viên (Admin).
+# HE THONG QUAN LY DAT BAN VA GOI MON TRUC TUYEN - NHA HANG BEP VIET
+### DO AN MON HOC CHUYEN DE J2EE (MICROSERVICES SPRING BOOT 3 & REACT 19)
 
 ---
 
-## 2. Yêu Cầu Môi Trường
+## 1. TONG QUAN DE TAI
 
-- Java Development Kit (JDK): Phiên bản 17 trở lên (OpenJDK hoặc Eclipse Temurin).
-- Node.js: Phiên bản 20.x trở lên và npm phiên bản 10.x trở lên.
-- Docker & Docker Compose (tùy chọn, nếu chạy qua container).
-- Git.
+He thong quan ly dat ban va goi mon truc tuyen cho **Nha Hang Am Thuc Bep Viet** duoc thiet ke va xay dung theo mo hinh kien truc **Microservices** hien dai, phan tach ro rang giua Backend (Java 17 / Spring Boot 3.4) va Frontend (React 19 / TypeScript / Vite / Tailwind CSS).
 
----
-
-## 3. Hướng Dẫn Cài Đặt Và Chạy Cục Bộ
-
-### Bước 1: Chuẩn bị biến môi trường
-
-Sao chép file cấu hình mẫu `.env.example` thành `.env` tại thư mục gốc của dự án:
-
-```bash
-cp .env.example .env
-```
-
-Nội dung file `.env` gồm các tham số:
-
-```env
-# Database Configuration
-DB_URL=jdbc:mysql://localhost:3306/restaurant_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
-DB_USERNAME=root
-DB_PASSWORD=root
-
-# Security
-JWT_SECRET=DoAnJ2EE_SuperSecretKey_For_Jwt_Authentication_2026_Minimum32Bytes
-
-# Cloudinary (Quản lý ảnh thực đơn)
-CLOUDINARY_CLOUD_NAME=demo
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-
-# VNPAY Sandbox Payment
-VNPAY_TMN_CODE=DEMOV210
-VNPAY_HASH_SECRET=RAOEXHYVSDDIIENYWSLDIIZTANXUXZFJ
-VNPAY_PAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-VNPAY_RETURN_URL=http://localhost:5173/payment/vnpay-return
-
-# Gmail SMTP (Gửi email xác nhận đặt bàn)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=
-MAIL_PASSWORD=
-```
-
-Lưu ý: Các microservices đã được cấu hình cơ chế sẵn sàng chạy fallback với H2 in-memory database nếu MySQL chưa được bật, giúp kiểm thử ngay lập tức mà không gặp lỗi kết nối.
-
-### Bước 2: Cài đặt dependencies
-
-Chạy lệnh sau tại thư mục gốc để cài đặt dependencies cho cả Monorepo và Frontend:
-
-```bash
-npm run install:all
-```
-
-### Bước 3: Khởi chạy hệ thống
-
-Có thể lựa chọn một trong các cách khởi chạy sau:
-
-#### Cách 1: Khởi chạy tất cả dịch vụ đồng thời bằng 1 lệnh npm
-
-```bash
-npm start
-```
-
-Lệnh trên sẽ tự động dọn dẹp các tiến trình cũ trên các cổng 8081, 8082, 8083, 5173 và khởi động đồng thời cả 3 microservices cùng giao diện Frontend.
-
-- Frontend: http://localhost:5173
-- Auth Service: http://localhost:8081
-- Catalog Service: http://localhost:8082
-- Booking Service: http://localhost:8083
-
-#### Cách 2: Khởi chạy bằng Docker Compose
-
-Nếu máy tính đã cài đặt Docker:
-
-```bash
-docker compose up --build
-```
-
-Hệ thống sẽ tự động khởi tạo database MySQL 8.0, build container cho cả 3 microservices backend và container Frontend chạy dưới Nginx reverse proxy tại địa chỉ `http://localhost:5173`.
+He thong phuc vu day du 4 nhom doi tuong nguoi dung:
+1. **Khach vang lai (Anonymous)**: Duyet thuc don 22 mon an am thuc Viet Nam theo danh muc, tra cuu so do ban trong theo khu vuc (Tang 1, Tang 2, VIP), quet ma QR tai ban de xem mon, tro chuyen va nho Tro ly AI tu van mam com gia dinh.
+2. **Khach hang da dang nhap (CUSTOMER)**: Dang ky/dang nhap thuong hoac dang nhap 1-click bang Google OAuth2, dat ban truoc (chong trung khung gio), them mon vao gio hang va gui order, thanh toan truc tuyen qua cong VNPAY Sandbox, xem lich su don va tai hoa don PDF tieng Viet.
+3. **Nhan vien nha hang (STAFF)**: Quan ly so do ban truc quan, tiep nhan va check-in khach, man hinh Bep KDS (Kitchen Order Board) dieu phoi tien do mon (Dang nau -> Da phuc vu -> Hoan tat).
+4. **Quan tri vien (ADMIN)**: Toan quyen CRUD thuc don mon an (tai anh Cloudinary), quan ly so do ban va xuat anh PNG ma QR ban, quan ly tai khoan nguoi dung, xem bang dieu khien thong ke doanh thu va Top mon ban chay.
 
 ---
 
-## 4. Danh Sách Tài Khoản Mặc Định
+## 2. KIEN TRUC HE THONG & CONG DICH VU (PORTS MAPPING)
 
-Hệ thống tự động nạp sẵn các tài khoản mẫu tại DataInitializer:
+He thong duoc to chuc thanh 3 Backend Microservices doc lap va 1 Frontend Client:
 
-| Vai trò | Tên đăng nhập | Mật khẩu | Quyền hạn truy cập |
+| Thanh phan | Thu muc | Cong mac dinh | Chuc nang chinh |
 |---|---|---|---|
-| Quản trị viên (Admin) | `admin` | `admin123` | Toàn quyền quản lý Menu, Bàn ăn, Người dùng, Thống kê doanh thu |
-| Nhân viên (Staff) | `staff` | `staff123` | Màn hình Bếp, Cập nhật trạng thái món, Sơ đồ bàn ăn, Thu tiền mặt tại quầy |
-| Khách hàng (Customer) | `customer` | `customer123` | Đặt bàn, Chọn món gọi món, Thanh toán VNPAY, Xem lịch sử đơn hàng |
-
-Ngoài ra, hệ thống hỗ trợ đăng nhập trực tiếp bằng Google OAuth2 trên giao diện đăng nhập.
-
----
-
-## 5. Hướng Dẫn Kiểm Thử Thanh Toán VNPAY Sandbox
-
-Hệ thống đã tích hợp sẵn thông tin Merchant Sandbox của VNPAY để kiểm thử nghiệp vụ thanh toán trực tuyến:
-
-- Cổng thanh toán: VNPAY Sandbox Portal
-- Ngân hàng test: **NCB**
-- Số thẻ test: `9704198526191432198`
-- Tên chủ thẻ: `NGUYEN VAN A`
-- Ngày phát hành: `07/15`
-- Mã OTP xác thực: `123456`
-
-Quy trình kiểm thử thanh toán:
-1. Đăng nhập tài khoản `customer` hoặc tạo đơn đặt bàn mới.
-2. Vào trang Chi tiết đơn hàng hoặc Lịch sử đơn hàng, bấm **Thanh toán VNPAY**.
-3. Hệ thống chuyển hướng sang Cổng thanh toán VNPAY Sandbox.
-4. Chọn thẻ nội địa NCB, nhập thông tin thẻ test ở trên.
-5. Nhập OTP `123456` và bấm Xác nhận.
-6. VNPAY chuyển hướng về trang `http://localhost:5173/payment/vnpay-return`.
-7. Đơn hàng được cập nhật trạng thái `PAID`, hóa đơn PDF sẵn sàng được tải về.
+| **Auth & User Service** | `backend/auth-user-service` | `8081` | Dang ky, dang nhap, Google OAuth2, cap phat & xac thuc JWT Token, quan ly phan quyen |
+| **Catalog & Table Service** | `backend/catalog-table-service` | `8082` | CRUD thuc don, tai anh len Cloudinary, quan ly ban an, sinh ma QR (Google ZXing), Tro ly AI goi y mon an |
+| **Booking & Order Service** | `backend/booking-order-service` | `8083` | Dat ban, goi mon, cap nhat trang thai Bep, thanh toan VNPAY Sandbox (HMAC-SHA512), gui email HTML qua Gmail SMTP, xuat hoa don PDF (OpenPDF), thong ke doanh thu |
+| **Frontend Client** | `frontend` | `5173` | Giao dien nguoi dung React 19 + TypeScript + Vite + Tailwind CSS voi hon 14 man hinh |
+| **Co so du lieu Cloud** | TiDB Cloud (Serverless) | `4000` | CSDL MySQL 8.0 Cloud mien phi (hoac H2 in-memory che do MySQL khi chay local) |
 
 ---
 
-## 6. Hướng Dẫn Triển Khai Lên Nền Tảng Đám Mây (Heroku & Vercel)
+## 3. HUONG DAN CAI DAT & KHOI CHAY NHANH
 
-### Triển khai Backend lên Heroku
+### Yeu cau moi truong:
+- **Node.js**: v18+ (khuyen dung v20 hoac v24)
+- **Java JDK**: 17 LTS
+- **Maven**: Da tich hop san Maven Wrapper (`mvnw.cmd` / `./mvnw`), khong can cai them Maven ben ngoai.
 
-1. Cài đặt Heroku CLI và đăng nhập:
-   ```bash
-   heroku login
-   ```
-2. Tạo ứng dụng trên Heroku:
-   ```bash
-   heroku create restaurant-bepviet-backend
-   ```
-3. Thêm buildpack Java:
-   ```bash
-   heroku buildpacks:add heroku/java
-   ```
-4. Cấu hình các biến môi trường trên Heroku (Config Vars) tương tự `.env`.
-5. Triển khai mã nguồn: Heroku sẽ tự động nhận diện `backend/pom.xml`, `backend/system.properties` (Java 17) và `backend/Procfile`.
+### Khoi chay toan bo he thong trong 1 cua so Terminal:
+Tai thu muc goc cua du an `d:\DoAnJ2EE`:
 
-### Triển khai Frontend lên Vercel
+```powershell
+npm run start
+```
 
-1. Dự án frontend đã được cấu hình sẵn file `frontend/vercel.json` để xử lý rewrite URL cho React Router SPA.
-2. Cài đặt Vercel CLI hoặc kết nối repository với Vercel Dashboard:
-   ```bash
-   cd frontend
-   vercel --prod
-   ```
-3. Thiết lập biến môi trường `VITE_API_BASE_URL` trỏ tới địa chỉ backend trên Heroku.
+Lenh tren se tu dong:
+1. Giai phong cac cong `8081`, `8082`, `8083`, `5173` neu co tien trinh chiem dung (`clean-ports.js`).
+2. Nap toan bo bien moi truong tu tep `.env`.
+3. Khoi dong dong thoi ca 3 Spring Boot Microservices va may chu Frontend Vite.
+
+Sau khi khoi dong xong, mo trinh duyet truy cap: **`http://localhost:5173`**
+
+*(Nhan `Ctrl + C` de dung toan bo cac dich vu).*
 
 ---
 
-## 7. Lệnh Kiểm Tra Chất Lượng Và Đóng Gói Dự Án
+## 4. TAI KHOAN MAU CO SAN (SEEDED ACCOUNTS)
 
-- **Kiểm tra toàn bộ test suite và build (Verification):**
-  ```bash
-  npm run verify
-  ```
-  Lệnh trên sẽ thực thi tất cả 24 unit test và integration test của 3 microservices backend thông qua Maven Wrapper, sau đó biên dịch TypeScript và build Frontend Vite để đảm bảo hệ thống hoàn toàn sạch lỗi.
+He thong da khoi tao san 3 tai khoan tuong ung voi 3 vai tro de cham bai va trai nghiem:
 
-- **Đóng gói toàn bộ dự án:**
-  ```bash
-  npm run build
-  ```
+| Vai tro | Ten dang nhap (`username`) | Mat khau (`password`) | Chuc nang trai nghiem |
+|---|---|---|---|
+| **Anonymous** | *(Khong can dang nhap)* | - | Xem thuc don, quet ma QR tai ban, tra cuu ban trong, AI goi y mam com |
+| **Customer** | `customer` | `Customer@123` | Dat ban truoc, goi mon, thanh toan VNPAY, nhan email xac nhan, tai PDF hoa don |
+| **Staff** | `staff` | `Staff@123` | Quan ly so do ban nhan vien (`/staff/tables`), man hinh Bep KDS (`/staff/orders`) |
+| **Admin** | `admin` | `Admin@123` | Quan tri menu tai anh Cloudinary (`/admin/menu`), quan ly ban & QR (`/admin/tables`), thong ke doanh thu (`/admin/stats`), quan tri user (`/admin/users`) |
+
+---
+
+## 5. HUONG DAN KIEM THU THANH TOAN VNPAY SANDBOX
+
+Khi thuc hien thanh toan don hang qua cong **VNPAY Sandbox**, he thong chuyen huong sang cong thanh toan test cua VNPAY. Su dung thong tin the thu nghiem sau:
+
+- **Ngan hang**: NCB
+- **So the**: `9704198526191432198`
+- **Ten chu the**: `NGUYEN VAN A`
+- **Ngay phat hanh**: `07/15`
+- **Ma xac thuc OTP**: `123456`
+
+Sau khi thanh toan thanh cong, VNPAY se tra ve trang ket qua tren he thong, don hang tu dong chuyen sang trang thai da thanh toan (`PAID`) va cho phep tai hoa don PDF ngay lap tuc.
+
+---
+
+## 6. KIEM TRA CHAT LUONG TOAN DU AN (AUTOMATED VERIFICATION)
+
+Chay lenh sau tai thu muc goc de kiem tra toan bo Unit Test, Integration Test cua 3 Microservices va build kiem tra Frontend:
+
+```powershell
+npm run verify
+```
+
+---
+
+## 7. HUONG DAN DEPLOY LEN CLOUD
+
+### 7.1. Database Cloud: TiDB Cloud (Serverless)
+- Dang ky tai khoan mien phi tai `https://tidbcloud.com`
+- Tao Cluster Serverless khu vuc Singapore (ap-southeast-1).
+- Lay thong tin Host, Port 4000, User va Password dien vao tep `.env`.
+
+### 7.2. Frontend: Deploy len Vercel
+1. Day ma nguon len GitHub.
+2. Dang nhap Vercel, tao New Project va chon thu muc `frontend`.
+3. Cau hinh Framework Preset: **Vite**.
+4. Them cac bien moi truong:
+   - `VITE_AUTH_API_URL`: URL cua Service 1 tren Cloud.
+   - `VITE_CATALOG_API_URL`: URL cua Service 2 tren Cloud.
+   - `VITE_ORDER_API_URL`: URL cua Service 3 tren Cloud.
+   - `VITE_GOOGLE_CLIENT_ID`: Client ID Google OAuth2.
+5. Bam **Deploy**.
+
+### 7.3. Backend Microservices: Deploy qua Docker / Railway / Render / Heroku
+Moi service deu da co san tệp `Dockerfile` multi-stage toi uu:
+- `backend/auth-user-service/Dockerfile`
+- `backend/catalog-table-service/Dockerfile`
+- `backend/booking-order-service/Dockerfile`
+- `backend/Procfile`
+
+Tung service co the deploy doc lap len Railway hoac Render bang cach lien ket repository va chon Dockerfile tuong ung, sau do gan cac bien moi truong tu tệp `.env`.

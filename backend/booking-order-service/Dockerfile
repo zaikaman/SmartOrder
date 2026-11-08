@@ -1,25 +1,20 @@
-# Multi-stage Dockerfile for Booking & Order Service
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# Multi-stage Dockerfile for Booking & Order Service (Port 8083)
+FROM maven:3.9-eclipse-temurin-17 AS builder
 WORKDIR /build
 
-COPY pom.xml mvnw ./
-COPY .mvn .mvn
-COPY auth-user-service/pom.xml auth-user-service/pom.xml
-COPY catalog-table-service/pom.xml catalog-table-service/pom.xml
-COPY booking-order-service/pom.xml booking-order-service/pom.xml
+COPY pom.xml .
+COPY auth-user-service/pom.xml auth-user-service/
+COPY catalog-table-service/pom.xml catalog-table-service/
+COPY booking-order-service/pom.xml booking-order-service/
+
 COPY booking-order-service/src booking-order-service/src
+RUN mvn clean package -pl booking-order-service -am -DskipTests
 
-RUN chmod +x mvnw && ./mvnw clean package -pl booking-order-service -am -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser:appgroup
-
 COPY --from=builder /build/booking-order-service/target/*.jar app.jar
 
 ENV SERVER_PORT=8083
 EXPOSE 8083
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
