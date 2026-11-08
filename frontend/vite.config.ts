@@ -4,11 +4,24 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  envDir: path.resolve(__dirname, '..'),
   plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-utils': ['axios', 'zustand'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
   },
   server: {
     port: 5173,

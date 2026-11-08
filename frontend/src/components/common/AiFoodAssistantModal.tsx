@@ -258,7 +258,7 @@ export const AiFoodAssistantModal: React.FC<AiFoodAssistantModalProps> = ({ isOp
                 )}
               </div>
 
-              {/* Danh sach mon an trong mam com */}
+              {/* Danh sách món ăn trong mâm cơm */}
               <div className="space-y-2">
                 <div className="font-bold text-[#462c1a] text-xs">
                   Danh Sách Món Ăn Trong Mâm Cơm ({recommendation.items.length} món):
@@ -293,7 +293,7 @@ export const AiFoodAssistantModal: React.FC<AiFoodAssistantModalProps> = ({ isOp
                 </div>
               </div>
 
-              {/* Thao tac Them gio hang / Chon lai */}
+              {/* Thao tác Thêm giỏ hàng / Chọn lại */}
               <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#f0e6da]">
                 <button
                   type="button"

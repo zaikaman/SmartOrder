@@ -190,14 +190,14 @@ description: "Danh sách tác vụ chi tiết triển khai toàn diện hệ th�
 
 **Mục tiêu**: Hoàn thiện các tệp Dockerfile cho từng service, tệp Procfile cho Heroku, kịch bản chạy kiểm thử tự động npm run verify trên toàn bộ workspace, và biên soạn Báo cáo đồ án đầy đủ (docs/REPORT.md).
 
-- [ ] T089 [P] Tạo Dockerfile cho Service 1 tại backend/auth-user-service/Dockerfile
-- [ ] T090 [P] Tạo Dockerfile cho Service 2 tại backend/catalog-table-service/Dockerfile
-- [ ] T091 [P] Tạo Dockerfile cho Service 3 tại backend/booking-order-service/Dockerfile
-- [ ] T092 [P] Tạo Procfile cho Heroku deployment tại backend/Procfile
-- [ ] T093 Cập nhật kịch bản npm run verify tại package.json gốc để chạy toàn bộ bộ kiểm thử Backend trên cả 3 microservices và build Frontend
-- [ ] T094 Chạy kiểm tra thực tế toàn bộ test suite và build qua npm run verify để đảm bảo zero warning và zero lỗi
-- [ ] T095 [P] Viết tệp README.md đầy đủ tại d:/DoAnJ2EE/README.md hướng dẫn chi tiết chạy cục bộ, tài khoản mẫu, test VNPAY Sandbox và deploy Heroku/Vercel
-- [ ] T096 [P] Biên soạn Báo cáo đồ án J2EE đầy đủ (docs/REPORT.md) bao gồm đặt vấn đề, kiến trúc Microservices, sơ đồ ERD, luồng xác thực Google OAuth2, thanh toán VNPAY, hướng dẫn sử dụng và kết quả đạt được.
+- [X] T089 [P] Tạo Dockerfile cho Service 1 tại backend/auth-user-service/Dockerfile
+- [X] T090 [P] Tạo Dockerfile cho Service 2 tại backend/catalog-table-service/Dockerfile
+- [X] T091 [P] Tạo Dockerfile cho Service 3 tại backend/booking-order-service/Dockerfile
+- [X] T092 [P] Tạo Procfile cho Heroku deployment tại backend/Procfile
+- [X] T093 Cập nhật kịch bản npm run verify tại package.json gốc để chạy toàn bộ bộ kiểm thử Backend trên cả 3 microservices và build Frontend
+- [X] T094 Chạy kiểm tra thực tế toàn bộ test suite và build qua npm run verify để đảm bảo zero warning và zero lỗi
+- [X] T095 [P] Viết tệp README.md đầy đủ tại d:/DoAnJ2EE/README.md hướng dẫn chi tiết chạy cục bộ, tài khoản mẫu, test VNPAY Sandbox và deploy Heroku/Vercel
+- [X] T096 [P] Biên soạn Báo cáo đồ án J2EE đầy đủ (docs/REPORT.md) bao gồm đặt vấn đề, kiến trúc Microservices, sơ đồ ERD, luồng xác thực Google OAuth2, thanh toán VNPAY, hướng dẫn sử dụng và kết quả đạt được.
 
 ---
 

@@ -1,7 +1,7 @@
 const { execSync } = require('child_process');
 
 const ports = [8081, 8082, 8083, 5173];
-console.log('[CLEAN] Kiem tra va giai phong cac cong 8081, 8082, 8083, 5173 truoc khi khoi dong...');
+console.log('[CLEAN] Kiểm tra và giải phóng các cổng 8081, 8082, 8083, 5173 trước khi khởi động...');
 
 if (process.platform === 'win32') {
   ports.forEach((port) => {
@@ -24,11 +24,11 @@ if (process.platform === 'win32') {
       pids.forEach((pid) => {
         try {
           execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
-          console.log(`[CLEAN] Da giai phong cong ${port} (PID: ${pid})`);
+          console.log(`[CLEAN] Đã giải phóng cổng ${port} (PID: ${pid})`);
         } catch (_) {}
       });
     } catch (_) {
-      // Khong co tien trinh chiem cong
+      // Không có tiến trình chiếm cổng
     }
   });
 } else {
@@ -38,4 +38,4 @@ if (process.platform === 'win32') {
     } catch (_) {}
   });
 }
-console.log('[CLEAN] Cac cong san sang de khoi dong!');
+console.log('[CLEAN] Các cổng sẵn sàng để khởi động!');

@@ -1,0 +1,3 @@
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar auth-user-service/target/auth-user-service-1.0.0.jar
+catalog: java -Dserver.port=$PORT $JAVA_OPTS -jar catalog-table-service/target/catalog-table-service-1.0.0.jar
+booking: java -Dserver.port=$PORT $JAVA_OPTS -jar booking-order-service/target/booking-order-service-1.0.0.jar
