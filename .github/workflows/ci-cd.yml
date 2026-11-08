@@ -1,0 +1,94 @@
+name: "CI/CD Pipeline - Quality Gate & Multi-Service Deployment"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ==============================================================================
+  # GIAI ĐOẠN 1: CONTINUOUS INTEGRATION (CI) - AUTOMATED QUALITY GATE
+  # ==============================================================================
+  verify:
+    name: "Automated Verification (Quality Gate)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "1. Checkout full repository history"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "2. Set up Java 17 LTS (Eclipse Temurin)"
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: "3. Set up Node.js 20 LTS"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: "4. Cache Maven dependencies"
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('backend/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: "5. Grant execute permission for Maven Wrapper"
+        run: chmod +x backend/mvnw
+
+      - name: "6. Install Monorepo and Frontend dependencies"
+        run: npm run install:all
+
+      - name: "7. Execute Automated Quality Gate (npm run verify)"
+        run: npm run verify
+
+  # ==============================================================================
+  # GIAI ĐOẠN 2: CONTINUOUS DEPLOYMENT (CD) - AUTOMATED CLOUD DEPLOYMENT
+  # ==============================================================================
+  deploy-heroku:
+    name: "Deploy Microservices to Heroku Cloud"
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "1. Checkout repository with full history"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "2. Configure Git User for Deployment"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: "3. Deploy Service 1 (Auth & User Service)"
+        run: |
+          echo "Deploying backend subtree to bepviet-auth-service..."
+          git subtree push --prefix backend https://_:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/bepviet-auth-service.git main
+
+      - name: "4. Deploy Service 2 (Catalog & Table Service)"
+        run: |
+          echo "Deploying backend subtree to bepviet-catalog-service..."
+          git subtree push --prefix backend https://_:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/bepviet-catalog-service.git main
+
+      - name: "5. Deploy Service 3 (Booking & Order Service)"
+        run: |
+          echo "Deploying backend subtree to bepviet-booking-service..."
+          git subtree push --prefix backend https://_:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/bepviet-booking-service.git main
+
+      - name: "6. Deployment Summary"
+        run: |
+          echo "=========================================================="
+          echo "ALL 3 BACKEND MICROSERVICES SUCCESSFULLY DEPLOYED TO CLOUD"
+          echo "1. Auth Service:    https://bepviet-auth-service-9d917df9c554.herokuapp.com"
+          echo "2. Catalog Service: https://bepviet-catalog-service-525768f2f99c.herokuapp.com"
+          echo "3. Booking Service: https://bepviet-booking-service-423e0bd45289.herokuapp.com"
+          echo "=========================================================="
