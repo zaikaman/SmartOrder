@@ -5,8 +5,8 @@
   "description": "Monorepo for Restaurant QR Code Table Booking and Ordering System",
   "scripts": {
     "clean:ports": "node scripts/clean-ports.js",
-    "prestart": "npm run clean:ports",
-    "prestart:backend": "npm run clean:ports",
+    "prestart": "node scripts/setup-maven.js && npm run clean:ports",
+    "prestart:backend": "node scripts/setup-maven.js && npm run clean:ports",
     "start": "node --env-file-if-exists=.env ./node_modules/concurrently/dist/bin/index.js -k -p \"[{name}]\" -n \"AUTH:8081,CATALOG:8082,BOOKING:8083,FRONTEND:5173\" -c \"blue,green,magenta,yellow\" \"npm run start:auth\" \"npm run start:catalog\" \"npm run start:booking\" \"npm run start:frontend\"",
     "start:backend": "node --env-file-if-exists=.env ./node_modules/concurrently/dist/bin/index.js -k -p \"[{name}]\" -n \"AUTH:8081,CATALOG:8082,BOOKING:8083\" -c \"blue,green,magenta\" \"npm run start:auth\" \"npm run start:catalog\" \"npm run start:booking\"",
     "start:auth": "node scripts/run-backend-mvn.js spring-boot:run -pl auth-user-service",
