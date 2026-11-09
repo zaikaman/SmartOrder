@@ -63,14 +63,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         username,
-                        userId, // Dung credentials de chua userId giup controller trich xuat de dang
+                        userId, // Dùng credentials để chứa userId giúp controller trích xuất dễ dàng
                         Collections.singletonList(authority)
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception ignored) {
-            // Bo qua loi, Security Context se tu chan endpoint can bao ve
+            // Bỏ qua lỗi, Security Context sẽ tự chặn endpoint cần bảo vệ
         }
 
         filterChain.doFilter(request, response);

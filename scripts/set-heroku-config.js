@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// 1. Doc .env
+// 1. Đọc .env
 const envPath = path.resolve(__dirname, '..', '.env');
 const envContent = fs.readFileSync(envPath, 'utf8');
 const env = {};
@@ -17,19 +17,19 @@ envContent.split('\n').forEach(line => {
   }
 });
 
-console.log('[CONFIG] Da doc bien moi truong tu .env thanh cong!');
+console.log('[CONFIG] Đã đọc biến môi trường từ .env thành công!');
 
 const setConfig = (app, vars) => {
-  console.log(`\n[HEROKU] Dang nap bien moi truong cho app: ${app}...`);
+  console.log(`\n[HEROKU] Đang nạp biến môi trường cho app: ${app}...`);
   const args = Object.entries(vars)
     .map(([k, v]) => `"${k}=${v}"`)
     .join(' ');
   const cmd = `heroku config:set ${args} --app ${app}`;
   try {
     execSync(cmd, { stdio: 'inherit', shell: 'cmd.exe' });
-    console.log(`[HEROKU] Thanh cong cho ${app}!`);
+    console.log(`[HEROKU] Thành công cho ${app}!`);
   } catch (err) {
-    console.error(`[HEROKU] Loi khi nap config cho ${app}:`, err.message);
+    console.error(`[HEROKU] Lỗi khi nạp config cho ${app}:`, err.message);
   }
 };
 
@@ -73,4 +73,4 @@ setConfig('bepviet-booking-service', {
   MAIL_PASSWORD: env.MAIL_PASSWORD,
 });
 
-console.log('\n[HEROKU] Da nap hoan tat toan bo Config Vars cho 3 ung dung!');
+console.log('\n[HEROKU] Đã nạp hoàn tất toàn bộ Config Vars cho 3 ứng dụng!');

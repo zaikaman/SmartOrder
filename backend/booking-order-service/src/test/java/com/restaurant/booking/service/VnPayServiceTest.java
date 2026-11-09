@@ -106,6 +106,7 @@ class VnPayServiceTest {
         Map<String, String> params = new HashMap<>();
         params.put("vnp_Amount", "25000000");
         params.put("vnp_BankCode", "NCB");
+        // Theo quy định kỹ thuật của cổng VNPAY v2.1.0, vnp_OrderInfo chỉ chấp nhận chuỗi ASCII không dấu
         params.put("vnp_OrderInfo", "Thanh toan don dat ban BV2026101401");
         params.put("vnp_ResponseCode", "00");
         params.put("vnp_TmnCode", "DEMOV210");

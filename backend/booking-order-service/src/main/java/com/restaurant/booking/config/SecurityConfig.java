@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Cau hinh Spring Security 6 cho Booking & Order Service.
+ * Cấu hình Spring Security 6 cho Booking & Order Service.
  */
 @Configuration
 @EnableWebSecurity

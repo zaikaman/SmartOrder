@@ -89,7 +89,7 @@ export const TableCard: React.FC<TableCardProps> = ({ table }) => {
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-[#e8dbce]/70 flex items-center gap-2">
-          {/* Xem ma QR Code button cho tat ca nguoi dung */}
+          {/* Nút xem mã QR cho tất cả người dùng */}
           <button
             onClick={() => setShowQrModal(true)}
             className="flex items-center gap-1.5 text-xs font-semibold py-2.5 px-3 rounded-lg bg-[#f3ece3] hover:bg-[#ebdccb] text-[#6d492f] border border-[#d7bda0]/80 transition-colors shadow-sm shrink-0"

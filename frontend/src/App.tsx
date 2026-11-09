@@ -22,7 +22,7 @@ export default function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-[#faf7f2] text-[#462c1a]">
-        {/* Main Header Brand Bep Viet */}
+        {/* Header chính Thương hiệu Bếp Việt */}
         <MainHeader />
 
         {/* Router View Content */}
@@ -114,7 +114,7 @@ export default function App() {
           </Routes>
         </main>
 
-        {/* Main Footer Brand Bep Viet */}
+        {/* Footer chính Thương hiệu Bếp Việt */}
         <MainFooter />
       </div>
     </Router>

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 /**
- * Cau hinh RestClient goi noi bo sang Catalog & Table Service (Port 8082).
+ * Cấu hình RestClient gọi nội bộ sang Catalog & Table Service (Cổng 8082).
  */
 @Configuration
 public class RestClientConfig {

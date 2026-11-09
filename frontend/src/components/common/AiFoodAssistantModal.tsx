@@ -61,7 +61,7 @@ export const AiFoodAssistantModal: React.FC<AiFoodAssistantModalProps> = ({ isOp
       const res = await catalogApi.post('/menu/ai-recommend', payload);
       setRecommendation(res.data);
     } catch (err) {
-      console.error('Loi khi goi Tro ly AI mam com Bep Viet:', err);
+      console.error('Lỗi khi gọi Trợ lý AI mâm cơm Bếp Việt:', err);
     } finally {
       setLoading(false);
     }
@@ -205,7 +205,7 @@ export const AiFoodAssistantModal: React.FC<AiFoodAssistantModalProps> = ({ isOp
                 </div>
               </div>
 
-              {/* Ghi chu bo sung */}
+              {/* Ghi chú bổ sung */}
               <div>
                 <label className="block font-bold text-[#462c1a] mb-1">Ghi Chú Bổ Sung (Tùy Chọn)</label>
                 <input
@@ -231,7 +231,7 @@ export const AiFoodAssistantModal: React.FC<AiFoodAssistantModalProps> = ({ isOp
             </form>
           ) : (
             <div className="space-y-4">
-              {/* Thong tin tom tat mâm com */}
+              {/* Thông tin tóm tắt mâm cơm */}
               <div className="bg-[#faf5ef] border border-[#e8dbce] rounded-2xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <div>

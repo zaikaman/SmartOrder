@@ -84,6 +84,7 @@ public class VnPayService {
         vnpParams.put("vnp_Amount", String.valueOf(amountInVndCents));
         vnpParams.put("vnp_CurrCode", "VND");
         vnpParams.put("vnp_TxnRef", txnRef);
+        // Theo quy định kỹ thuật của cổng VNPAY v2.1.0, vnp_OrderInfo chỉ chấp nhận chuỗi ASCII không dấu
         vnpParams.put("vnp_OrderInfo", "Thanh toan don dat ban " + order.getOrderCode());
         vnpParams.put("vnp_OrderType", "other");
         vnpParams.put("vnp_Locale", "vn");
