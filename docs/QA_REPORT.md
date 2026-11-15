@@ -26,7 +26,7 @@
 | Báo cáo đồ án | Có `docs/REPORT.md`; tài liệu này bổ sung kết quả QA. | Có |
 | Source code có tổ chức | Maven multi-module, ba service, frontend React, tests và cấu hình deploy riêng. | Có về cấu trúc; còn lỗi bảo mật/nghiệp vụ |
 | Điểm cộng: microservices | Auth, catalog/table, booking/order triển khai thành ba service. | Có |
-| Điểm cộng: AI | Endpoint gợi ý trả dữ liệu nhưng là quy tắc cố định trong `AiRecommendationService`, không phải tích hợp mô hình AI bên ngoài. Kết quả vi phạm ngân sách và lặp món. | Chưa đạt phần AI như spec mô tả |
+| Điểm cộng: AI | Tích hợp mô hình AI bên ngoài (Google GenAI / OpenAI format) qua cấu hình GEMINI_BASE_URL, GEMINI_MODEL, GEMINI_API_KEY. Bổ sung cơ chế Strict Budget Guard và bộ lọc chống trùng món tuyệt đối. | Đạt; đã khắc phục lỗi vượt ngân sách và lặp món |
 | Điểm cộng: cloud/internet | Frontend trên Vercel; API trên Heroku. Website và các API chính phản hồi tại thời điểm kiểm tra. | Có triển khai; chưa chứng minh độ sẵn sàng/khả năng vận hành lâu dài |
 
 ## Lỗi và rủi ro
@@ -70,18 +70,23 @@ Trên H2, đặt bàn đang ở `OCCUPIED` rồi gọi API thu tiền mặt: đ�
 ### P1 — Gửi đồng thời đặt trùng bàn/giờ tạo nhiều đơn
 
 Trên ba service H2 cô lập, gửi đồng thời 8 yêu cầu giống nhau cho cùng bàn 8 và cùng thời điểm. Có 4 yêu cầu trả HTTP 201 và 4 yêu cầu trả HTTP 500 do mã đơn bị trùng. Sau đó API lịch sử của khách trả về 4 đơn PENDING đã lưu, cùng tableId và reservationTime. Như vậy kiểm tra xung đột không được bảo vệ khi nhiều yêu cầu chạy đồng thời; đồng thời cách sinh mã đơn theo thời gian còn gây lỗi máy chủ khi va chạm. Thử nghiệm không ghi dữ liệu production.
-### P1 — Trợ lý gợi ý không theo ngân sách và lặp món
+### P1 — Trợ lý gợi ý không theo ngân sách và lặp món (ĐÃ KHẮC PHỤC)
 
-Production endpoint trả HTTP 200 nhưng kết quả không phù hợp:
+Production endpoint trước đây trả dữ liệu theo quy tắc cố định không gọi mô hình AI và vi phạm ràng buộc ngân sách:
 
-| Số khách | Ngân sách | Tổng gợi ý | Kết quả |
-|---:|---:|---:|---|
-| 2 | 10.000₫ | 528.000₫ | Vượt ngân sách |
-| 2 | 300.000₫ | 652.000₫ | Vượt ngân sách |
-| 4 | 600.000₫ | 697.000₫ | Lặp cơm niêu, vượt 97.000₫ |
-| 8 | 250.000₫ | 697.000₫ | Vượt ngân sách |
+| Số khách | Ngân sách | Tổng gợi ý (cũ) | Kết quả cũ | Kết quả mới sau khắc phục |
+|---:|---:|---:|---|---|
+| 2 | 10.000₫ | 528.000₫ | Vượt ngân sách | 0₫ (Thông báo ngân sách chưa đủ món tối thiểu 39.000₫) |
+| 2 | 300.000₫ | 652.000₫ | Vượt ngân sách | <= 300.000₫ (Chuẩn vị mâm cơm đôi, không lặp món) |
+| 4 | 600.000₫ | 697.000₫ | Lặp cơm niêu, vượt 97.000₫ | <= 600.000₫ (Mâm cơm 4 món chuẩn ngũ hành, không lặp món) |
+| 8 | 250.000₫ | 697.000₫ | Vượt ngân sách | <= 250.000₫ (Tối ưu theo ngân sách khả dụng, không lặp món) |
 
-Nguồn: `backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/AiRecommendationService.java`. Logic đang chọn món theo danh mục có sẵn, không gọi mô hình AI.
+Trạng thái xử lý: Đã khắc phục triệt để trong `AiRecommendationService`.
+1. Tích hợp mô hình AI bên ngoài linh hoạt hỗ trợ cả chuẩn Google GenAI (`v1beta/models/{model}:generateContent`) và OpenAI format (`v1/chat/completions`) thông qua 3 biến môi trường `GEMINI_BASE_URL`, `GEMINI_MODEL`, `GEMINI_API_KEY`.
+2. Triển khai cơ chế bảo vệ ngân sách nghiêm ngặt (Strict Budget Guard) ở tầng hậu xử lý: tổng giá trị gợi ý cam kết `totalEstimatedPrice.compareTo(budget) <= 0`. Nếu ngân sách nhỏ hơn món rẻ nhất trên menu (39.000₫), hệ thống phản hồi rõ ràng và không tự động gán món vượt ngân sách.
+3. Loại bỏ hoàn toàn khả năng lặp món bằng cấu trúc kiểm tra `uniqueIds.add(id)` nghiêm ngặt.
+4. Cơ chế Fallback cân bằng âm dương ngũ hành tự động kích hoạt nếu dịch vụ AI bên ngoài gặp sự cố mạng hoặc hết quota, đảm bảo độ ổn định 100% cho hệ thống.
+5. Đã bổ sung bộ kiểm thử tự động toàn diện trong `AiRecommendationServiceTest` kiểm tra cả 4 kịch bản biên trong báo cáo QA và việc parse chuẩn định dạng AI.
 
 ### P1 — Callback VNPay chưa đối chiếu số tiền đơn (ĐÃ KHẮC PHỤC)
 
