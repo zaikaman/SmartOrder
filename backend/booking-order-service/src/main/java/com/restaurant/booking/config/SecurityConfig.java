@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép VNPAY callback không cần token
-                        .requestMatchers("/api/v1/payments/vnpay/return").permitAll()
+                        .requestMatchers("/api/v1/payments/vnpay/return", "/api/v1/payments/vnpay/callback").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         // Phục vụ nhân viên quản lý đơn và bếp
                         .requestMatchers("/api/v1/staff/**").hasAnyRole("STAFF", "ADMIN")

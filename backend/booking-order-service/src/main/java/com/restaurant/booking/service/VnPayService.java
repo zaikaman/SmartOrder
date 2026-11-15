@@ -200,9 +200,16 @@ public class VnPayService {
         String payDate = params.get("vnp_PayDate");
         String rawAmount = params.get("vnp_Amount");
 
-        BigDecimal amount = BigDecimal.ZERO;
+        BigDecimal amount;
         if (rawAmount != null && !rawAmount.isBlank()) {
-            amount = new BigDecimal(rawAmount).divide(BigDecimal.valueOf(100));
+            try {
+                amount = new BigDecimal(rawAmount).divide(BigDecimal.valueOf(100));
+            } catch (Exception ex) {
+                log.warn("Không thể chuyển đổi vnp_Amount={}: {}", rawAmount, ex.getMessage());
+                amount = BigDecimal.valueOf(-1);
+            }
+        } else {
+            amount = BigDecimal.valueOf(-1);
         }
 
         // Tìm đơn hàng tương ứng theo TxnRef hoặc cắt tiền tố orderCode
@@ -222,6 +229,30 @@ public class VnPayService {
                     .txnRef(txnRef)
                     .responseCode(responseCode)
                     .message("Không tìm thấy đơn hàng tương ứng với mã giao dịch VNPAY.")
+                    .build();
+        }
+
+        // Kiểm tra và đối chiếu số tiền thanh toán thực tế với tổng tiền đơn hàng
+        // Bất kỳ sự sai lệch số tiền nào (dù lớn hơn hay nhỏ hơn) đều không hợp lệ
+        boolean isAmountMatched = order.getTotalAmount() != null && amount.compareTo(order.getTotalAmount()) == 0;
+        if (!isAmountMatched) {
+            log.error("Số tiền thanh toán callback ({}) không khớp với tổng tiền đơn hàng ({}) cho đơn {}",
+                    amount, order.getTotalAmount(), order.getOrderCode());
+            // Nếu đơn chưa thanh toán thành công trước đó, đánh dấu FAILED
+            if (order.getPaymentStatus() != PaymentStatus.PAID) {
+                order.setPaymentStatus(PaymentStatus.FAILED);
+                orderRepository.save(order);
+            }
+            return PaymentCallbackResultDto.builder()
+                    .success(false)
+                    .orderCode(order.getOrderCode())
+                    .txnRef(txnRef)
+                    .amount(amount)
+                    .responseCode(responseCode)
+                    .transactionNo(transactionNo)
+                    .bankCode(bankCode)
+                    .payDate(payDate)
+                    .message("Số tiền thanh toán không khớp với tổng giá trị đơn hàng.")
                     .build();
         }
 
@@ -245,25 +276,6 @@ public class VnPayService {
         String explanation = getResponseMessage(responseCode);
 
         if (success) {
-            // Kiểm tra và đối chiếu số tiền thanh toán thực tế với tổng tiền đơn hàng
-            if (order.getTotalAmount() == null || amount.compareTo(order.getTotalAmount()) < 0) {
-                log.error("Số tiền thanh toán callback ({}) nhỏ hơn tổng tiền đơn hàng ({}) cho đơn {}",
-                        amount, order.getTotalAmount(), order.getOrderCode());
-                order.setPaymentStatus(PaymentStatus.FAILED);
-                orderRepository.save(order);
-                return PaymentCallbackResultDto.builder()
-                        .success(false)
-                        .orderCode(order.getOrderCode())
-                        .txnRef(txnRef)
-                        .amount(amount)
-                        .responseCode(responseCode)
-                        .transactionNo(transactionNo)
-                        .bankCode(bankCode)
-                        .payDate(payDate)
-                        .message("Số tiền thanh toán không khớp với tổng giá trị đơn hàng.")
-                        .build();
-            }
-
             order.setPaymentStatus(PaymentStatus.PAID);
             order.setStatus(OrderStatus.COMPLETED);
             orderRepository.save(order);

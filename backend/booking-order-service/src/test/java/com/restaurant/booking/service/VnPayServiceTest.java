@@ -218,4 +218,111 @@ class VnPayServiceTest {
         assertThat(mockOrder.getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
         verify(catalogTableClient, never()).updateTableStatus(anyLong(), eq("AVAILABLE"));
     }
+
+    @Test
+    @DisplayName("Callback VNPAY số tiền lớn hơn tổng đơn báo lỗi và không cập nhật PAID")
+    void testProcessPaymentReturnAmountLargerFails() {
+        String txnRef = "BV2026101401_99998";
+        mockOrder.setVnpTxnRef(txnRef);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("vnp_Amount", "30000000"); // 300.000 VND thay vì 250.000 VND
+        params.put("vnp_ResponseCode", "00");
+        params.put("vnp_TransactionNo", "14859235");
+        params.put("vnp_TxnRef", txnRef);
+
+        List<String> keys = new ArrayList<>(params.keySet());
+        Collections.sort(keys);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < keys.size(); i++) {
+            String k = keys.get(i);
+            String v = params.get(k);
+            sb.append(URLEncoder.encode(k, StandardCharsets.US_ASCII))
+              .append('=')
+              .append(URLEncoder.encode(v, StandardCharsets.US_ASCII));
+            if (i < keys.size() - 1) sb.append('&');
+        }
+        params.put("vnp_SecureHash", vnPayService.hmacSHA512(secretKey, sb.toString()));
+
+        when(orderRepository.findByVnpTxnRef(txnRef)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.save(any(ReservationOrder.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        PaymentCallbackResultDto result = vnPayService.processPaymentReturn(params);
+
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getMessage()).contains("không khớp");
+        assertThat(mockOrder.getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
+        verify(catalogTableClient, never()).updateTableStatus(anyLong(), eq("AVAILABLE"));
+    }
+
+    @Test
+    @DisplayName("Callback VNPAY chuỗi vnp_Amount không hợp lệ báo lỗi và không ném exception")
+    void testProcessPaymentReturnInvalidAmountFormat() {
+        String txnRef = "BV2026101401_99997";
+        mockOrder.setVnpTxnRef(txnRef);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("vnp_Amount", "invalid_numeric");
+        params.put("vnp_ResponseCode", "00");
+        params.put("vnp_TxnRef", txnRef);
+
+        List<String> keys = new ArrayList<>(params.keySet());
+        Collections.sort(keys);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < keys.size(); i++) {
+            String k = keys.get(i);
+            String v = params.get(k);
+            sb.append(URLEncoder.encode(k, StandardCharsets.US_ASCII))
+              .append('=')
+              .append(URLEncoder.encode(v, StandardCharsets.US_ASCII));
+            if (i < keys.size() - 1) sb.append('&');
+        }
+        params.put("vnp_SecureHash", vnPayService.hmacSHA512(secretKey, sb.toString()));
+
+        when(orderRepository.findByVnpTxnRef(txnRef)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.save(any(ReservationOrder.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        PaymentCallbackResultDto result = vnPayService.processPaymentReturn(params);
+
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getMessage()).contains("không khớp");
+        assertThat(mockOrder.getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
+    }
+
+    @Test
+    @DisplayName("Callback VNPAY với đơn hàng đã PAID nhưng sai số tiền không ghi đè trạng thái đơn")
+    void testProcessPaymentReturnAlreadyPaidWithMismatchedAmount() {
+        String txnRef = "BV2026101401_99996";
+        mockOrder.setVnpTxnRef(txnRef);
+        mockOrder.setPaymentStatus(PaymentStatus.PAID);
+        mockOrder.setStatus(OrderStatus.COMPLETED);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("vnp_Amount", "100"); // 1 VND thay vì 250.000 VND
+        params.put("vnp_ResponseCode", "00");
+        params.put("vnp_TxnRef", txnRef);
+
+        List<String> keys = new ArrayList<>(params.keySet());
+        Collections.sort(keys);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < keys.size(); i++) {
+            String k = keys.get(i);
+            String v = params.get(k);
+            sb.append(URLEncoder.encode(k, StandardCharsets.US_ASCII))
+              .append('=')
+              .append(URLEncoder.encode(v, StandardCharsets.US_ASCII));
+            if (i < keys.size() - 1) sb.append('&');
+        }
+        params.put("vnp_SecureHash", vnPayService.hmacSHA512(secretKey, sb.toString()));
+
+        when(orderRepository.findByVnpTxnRef(txnRef)).thenReturn(Optional.of(mockOrder));
+
+        PaymentCallbackResultDto result = vnPayService.processPaymentReturn(params);
+
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getMessage()).contains("không khớp");
+        // Đơn đã PAID không bị chuyển thành FAILED
+        assertThat(mockOrder.getPaymentStatus()).isEqualTo(PaymentStatus.PAID);
+        verify(orderRepository, never()).save(any());
+    }
 }

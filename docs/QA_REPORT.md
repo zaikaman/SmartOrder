@@ -18,7 +18,7 @@
 |---|---|---|
 | Đăng nhập Gmail/Google hoặc Facebook | Trang đăng nhập có Google Identity Services; luồng Google thực tế chưa xác minh bằng credential thật. Backend nhận credential nhưng mã nguồn không xác minh chữ ký Google. | Có giao diện, chưa an toàn/đạt end-to-end |
 | Tối thiểu 3 nhóm quyền | Có CUSTOMER, STAFF, ADMIN. Production chặn khách khỏi API nhân viên; nhân viên bị chặn khỏi thống kê ADMIN; vai trò hợp lệ truy cập được API tương ứng. | Có, nhưng lộ tài khoản ADMIN mẫu |
-| VNPay/Momo | Hoàn tất giao dịch Sandbox 45.000₫ bằng thẻ NCB test, gateway và callback H2 cập nhật đơn `PAID/COMPLETED`. Callback production chữ ký sai trả `success=false`; callback H2 sai số tiền vẫn đánh dấu PAID. | Sandbox end-to-end đạt; callback sai số tiền là lỗi P1 |
+| VNPay/Momo | Hoàn tất giao dịch Sandbox 45.000₫ bằng thẻ NCB test, gateway và callback H2 cập nhật đơn `PAID/COMPLETED`. Đã bổ sung cơ chế đối chiếu nghiêm ngặt số tiền callback với tổng giá trị đơn hàng, từ chối mọi sai lệch số tiền. | Sandbox end-to-end đạt; đã khắc phục lỗi đối chiếu số tiền callback |
 | Spring Data JPA | Ba backend service có Spring Data JPA/Hibernate; H2 và truy vấn/nghiệp vụ được chạy cục bộ. | Có |
 | Spring Email | Có JavaMailSender và template HTML; luồng H2 dùng Gmail SMTP từ `.env` tạo đơn và trả `emailSent=true`. Chưa xác nhận email đã vào Inbox/Spam. | Gửi thành công tới SMTP; nhận thư chưa được xác nhận |
 | Tách frontend/backend | React/Vite frontend và ba Spring Boot service riêng. | Có |
@@ -83,9 +83,11 @@ Production endpoint trả HTTP 200 nhưng kết quả không phù hợp:
 
 Nguồn: `backend/catalog-table-service/src/main/java/com/restaurant/catalog/service/AiRecommendationService.java`. Logic đang chọn món theo danh mục có sẵn, không gọi mô hình AI.
 
-### P1 — Callback VNPay chưa đối chiếu số tiền đơn
+### P1 — Callback VNPay chưa đối chiếu số tiền đơn (ĐÃ KHẮC PHỤC)
 
-Đã tái hiện trên ba service H2 cô lập: tạo đơn 45.000₫, tạo TxnRef trong H2, ký HMAC-SHA512 callback bằng khóa sandbox kiểm thử với `vnp_ResponseCode=00` nhưng `vnp_Amount=100` (1₫). Callback trả `success=true`; truy vấn lại đơn cho thấy `paymentStatus=PAID`, `status=COMPLETED`. `VnPayService.processPaymentReturn` không đối chiếu số tiền callback với tổng đơn, nên đơn thiếu tiền vẫn được chốt thanh toán. Không gọi VNPay thật và không ghi production.
+Đã tái hiện trên ba service H2 cô lập: tạo đơn 45.000₫, tạo TxnRef trong H2, ký HMAC-SHA512 callback bằng khóa sandbox kiểm thử với `vnp_ResponseCode=00` nhưng `vnp_Amount=100` (1₫). Trước khi sửa, callback trả `success=true` và đơn bị chốt `PAID/COMPLETED`.
+
+Trạng thái xử lý: Đã khắc phục triệt để trong `VnPayService.processPaymentReturn`. Hệ thống đối chiếu chính xác `amount.compareTo(order.getTotalAmount()) == 0`. Bất kỳ trường hợp sai lệch số tiền nào (nhỏ hơn, lớn hơn, hoặc định dạng không hợp lệ) đều bị từ chối với thông báo "Số tiền thanh toán không khớp với tổng giá trị đơn hàng", đơn được đánh dấu `PaymentStatus.FAILED`, không giải phóng bàn và không ghi đè trạng thái của đơn đã thanh toán hợp lệ trước đó. Đồng thời đã bổ sung bộ kiểm thử tự động toàn diện cho các trường hợp số tiền nhỏ hơn, lớn hơn, chuỗi số tiền không hợp lệ và kiểm tra tính an toàn đơn đã thanh toán.
 
 ### P2 — CORS cho phép mọi origin cùng credentials trên cả ba service
 

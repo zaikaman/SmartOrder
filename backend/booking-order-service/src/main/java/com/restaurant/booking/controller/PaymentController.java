@@ -85,9 +85,9 @@ public class PaymentController {
     }
 
     /**
-     * Endpoint tiếp nhận kết quả thanh toán từ VNPAY (cho phép truy cập công khai).
+     * Endpoint tiếp nhận kết quả thanh toán từ VNPAY (cho phép truy cập công khai qua GET và POST).
      */
-    @GetMapping("/api/v1/payments/vnpay/return")
+    @RequestMapping(value = {"/api/v1/payments/vnpay/return", "/api/v1/payments/vnpay/callback"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<PaymentCallbackResultDto> handlePaymentReturn(@RequestParam Map<String, String> allParams) {
         log.info("Nhận callback phản hồi từ cổng thanh toán VNPAY: TxnRef={}", allParams.get("vnp_TxnRef"));
         PaymentCallbackResultDto result = vnPayService.processPaymentReturn(allParams);
