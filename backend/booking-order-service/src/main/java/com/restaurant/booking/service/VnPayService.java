@@ -268,9 +268,16 @@ public class VnPayService {
             order.setStatus(OrderStatus.COMPLETED);
             orderRepository.save(order);
 
-            // Tự động giải phóng bàn khi đơn hàng đã hoàn tất thanh toán
+            // Tự động giải phóng bàn khi đơn hàng đã hoàn tất thanh toán nếu không còn khách khác dùng bàn
             try {
-                catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+                boolean hasOtherDining = orderRepository.existsByTableIdAndStatusInAndIdNot(
+                        order.getTableId(),
+                        List.of(OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED),
+                        order.getId()
+                );
+                if (!hasOtherDining) {
+                    catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+                }
             } catch (Exception ex) {
                 log.warn("Không thể cập nhật trạng thái bàn sang AVAILABLE sau khi thanh toán VNPAY: {}", ex.getMessage());
             }

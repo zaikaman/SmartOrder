@@ -26,6 +26,8 @@ public interface ReservationOrderRepository extends JpaRepository<ReservationOrd
 
     List<ReservationOrder> findByTableIdAndStatusIn(Long tableId, List<OrderStatus> statuses);
 
+    boolean existsByTableIdAndStatusInAndIdNot(Long tableId, List<OrderStatus> statuses, Long id);
+
     /**
      * Kiểm tra chống trùng lịch đặt bàn trên cùng 1 bàn trong khoảng thời gian (+/- 2 giờ).
      */

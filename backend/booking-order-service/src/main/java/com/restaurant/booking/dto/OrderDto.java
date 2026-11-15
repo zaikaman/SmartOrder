@@ -35,6 +35,8 @@ public class OrderDto {
     private String vnpTxnRef;
     private boolean emailSent;
     private String note;
+    @Builder.Default
+    private boolean tableStatusUpdated = true;
     private List<OrderItemDto> items;
     private Instant createdAt;
 }

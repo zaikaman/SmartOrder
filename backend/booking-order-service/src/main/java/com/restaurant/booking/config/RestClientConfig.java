@@ -16,8 +16,9 @@ public class RestClientConfig {
 
     @Bean
     public RestClient catalogRestClient() {
+        String cleanUrl = catalogServiceUrl != null ? catalogServiceUrl.replaceAll("/+$", "") : "http://localhost:8082";
         return RestClient.builder()
-                .baseUrl(catalogServiceUrl)
+                .baseUrl(cleanUrl)
                 .build();
     }
 }

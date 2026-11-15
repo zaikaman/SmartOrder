@@ -149,4 +149,34 @@ class StaffOrderServiceTest {
         assertEquals(1, orders.size());
         assertEquals(OrderStatus.PREPARING, orders.get(0).getStatus());
     }
+
+    @Test
+    @DisplayName("Nhân viên cập nhật đơn sang SERVED và duy trì trạng thái bàn OCCUPIED")
+    void testUpdateOrderStatusToServed() {
+        mockOrder.setStatus(OrderStatus.PREPARING);
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.save(any(ReservationOrder.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderDto result = bookingOrderService.updateOrderStatus(10L, OrderStatus.SERVED);
+
+        assertNotNull(result);
+        assertEquals(OrderStatus.SERVED, result.getStatus());
+        verify(catalogTableClient).updateTableStatus(5L, "OCCUPIED");
+    }
+
+    @Test
+    @DisplayName("Không giải phóng bàn sang AVAILABLE khi vẫn còn đơn khác đang phục vụ tại cùng bàn")
+    void testUpdateOrderStatusToCompletedWithOtherDiningOrders() {
+        mockOrder.setStatus(OrderStatus.SERVED);
+        mockOrder.setPaymentStatus(PaymentStatus.PAID);
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.save(any(ReservationOrder.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderRepository.existsByTableIdAndStatusInAndIdNot(eq(5L), anyList(), eq(10L))).thenReturn(true);
+
+        OrderDto result = bookingOrderService.updateOrderStatus(10L, OrderStatus.COMPLETED);
+
+        assertNotNull(result);
+        assertEquals(OrderStatus.COMPLETED, result.getStatus());
+        verify(catalogTableClient, never()).updateTableStatus(5L, "AVAILABLE");
+    }
 }

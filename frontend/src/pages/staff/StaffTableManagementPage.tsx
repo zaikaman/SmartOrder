@@ -117,15 +117,34 @@ export const StaffTableManagementPage: React.FC = () => {
     return { total, available, occupied, reserved };
   }, [tables]);
 
-  // Lấy đơn hoạt động gần nhất của bàn nếu có
+  // Lấy đơn hoạt động thực tế gần nhất của bàn nếu có
   const getActiveOrderByTable = (tableId: number, tableNumber: string) => {
     if (!Array.isArray(orders)) return undefined;
-    return orders.find(
+    const tableOrders = orders.filter(
       (o) =>
         (o.tableId === tableId || o.tableNumber === tableNumber) &&
         o.status !== 'COMPLETED' &&
         o.status !== 'CANCELLED'
     );
+
+    if (tableOrders.length === 0) return undefined;
+
+    // Ưu tiên 1: Đơn đang phục vụ tại chỗ (CONFIRMED, PREPARING, SERVED)
+    const diningOrder = tableOrders.find(
+      (o) => o.status === 'CONFIRMED' || o.status === 'PREPARING' || o.status === 'SERVED'
+    );
+    if (diningOrder) return diningOrder;
+
+    // Ưu tiên 2: Đơn PENDING đặt bàn trong hôm nay (bỏ qua đơn PENDING quá hạn > 6 tiếng)
+    const now = new Date().getTime();
+    const activePending = tableOrders.find((o) => {
+      if (o.status !== 'PENDING') return false;
+      const resTime = new Date(o.reservationTime).getTime();
+      const diffHours = (now - resTime) / (1000 * 60 * 60);
+      return diffHours < 6;
+    });
+
+    return activePending;
   };
 
 
@@ -365,17 +384,30 @@ export const StaffTableManagementPage: React.FC = () => {
                     {activeOrder && (
                       <div className="mt-2.5 bg-white p-2.5 rounded-xl border border-[#e8dbce] text-[11px] space-y-1">
                         <div className="flex justify-between items-center text-[#462c1a] font-bold">
-                          <span>{activeOrder.customerName}</span>
-                          <span className="text-[#b84a28]">#{activeOrder.orderCode}</span>
+                          <span className="truncate max-w-[120px]">{activeOrder.customerName}</span>
+                          <span className="text-[#b84a28] font-mono">#{activeOrder.orderCode}</span>
                         </div>
-                        <div className="text-[#8c6d60] flex items-center gap-1 text-[10px]">
-                          <Clock className="w-3 h-3" />
-                          <span>
-                            {new Date(activeOrder.reservationTime).toLocaleTimeString('vi-VN', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
+                        <div className="text-[#8c6d60] flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-[#b84a28]" />
+                            <span>
+                              {new Date(activeOrder.reservationTime).toLocaleDateString('vi-VN', {
+                                day: '2-digit',
+                                month: '2-digit',
+                              }) === new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+                                ? new Date(activeOrder.reservationTime).toLocaleTimeString('vi-VN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })
+                                : `${new Date(activeOrder.reservationTime).toLocaleTimeString('vi-VN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })} (${new Date(activeOrder.reservationTime).toLocaleDateString('vi-VN', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                  })})`}
+                            </span>
+                          </div>
                           <span>• {activeOrder.partySize} khách</span>
                         </div>
                       </div>

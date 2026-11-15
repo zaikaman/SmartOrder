@@ -13,7 +13,7 @@ import {
   FileText,
   CreditCard
 } from 'lucide-react';
-import { bookingApi } from '../../api/client';
+import { catalogApi, bookingApi } from '../../api/client';
 import { ReservationOrder, OrderStatus } from '../../types';
 import { StaffSidebar } from '../../components/layout/StaffSidebar';
 import { InvoicePreviewModal } from '../../components/common/InvoicePreviewModal';
@@ -80,13 +80,40 @@ export const StaffOrderKitchenPage: React.FC = () => {
 
   // Cập nhật trạng thái đơn hàng
   const handleUpdateStatus = async (orderId: number, newStatus: OrderStatus) => {
+    const targetOrder = orders.find((o) => o.id === orderId);
     setActionLoadingId(orderId);
     setSuccessMessage(null);
     try {
-      await bookingApi.patch(`/staff/orders/${orderId}/status`, {
+      const res = await bookingApi.patch<ReservationOrder>(`/staff/orders/${orderId}/status`, {
         status: newStatus,
       });
-      setSuccessMessage(`Đã cập nhật trạng thái đơn sang ${newStatus}`);
+
+      // Đồng bộ trạng thái bàn sang Catalog Service nếu cần
+      if (targetOrder?.tableId) {
+        try {
+          if (newStatus === 'COMPLETED' || newStatus === 'CANCELLED') {
+            await catalogApi.patch(`/staff/tables/${targetOrder.tableId}/status`, {
+              status: 'AVAILABLE',
+            });
+          } else if (newStatus === 'CONFIRMED' || newStatus === 'PREPARING' || newStatus === 'SERVED') {
+            await catalogApi.patch(`/staff/tables/${targetOrder.tableId}/status`, {
+              status: 'OCCUPIED',
+            });
+          }
+        } catch (tableErr) {
+          console.warn('Đồng bộ trạng thái bàn từ frontend:', tableErr);
+        }
+      }
+
+      if (newStatus === 'COMPLETED') {
+        if (res.data?.tableStatusUpdated === false) {
+          setSuccessMessage('Đã hoàn tất đơn hàng. Lưu ý: Bàn chưa được giải phóng tự động, vui lòng kiểm tra trên Sơ đồ bàn.');
+        } else {
+          setSuccessMessage('Đã hoàn tất đơn hàng và giải phóng bàn thành công!');
+        }
+      } else {
+        setSuccessMessage(`Đã cập nhật trạng thái đơn sang ${newStatus}`);
+      }
       await fetchOrders(false);
     } catch (err: any) {
       console.error('Lỗi khi cập nhật trạng thái đơn:', err);
@@ -102,11 +129,28 @@ export const StaffOrderKitchenPage: React.FC = () => {
     if (!window.confirm('Xác nhận thu tiền mặt tại quầy và hoàn tất đơn này?')) {
       return;
     }
+    const targetOrder = orders.find((o) => o.id === orderId);
     setActionLoadingId(orderId);
     setSuccessMessage(null);
     try {
-      await bookingApi.post(`/staff/orders/${orderId}/pay-cash`);
-      setSuccessMessage('Xác nhận thanh toán tiền mặt thành công! Đã giải phóng bàn.');
+      const res = await bookingApi.post<ReservationOrder>(`/staff/orders/${orderId}/pay-cash`);
+
+      // Đồng bộ trực tiếp sang Catalog Service để đảm bảo bàn chuyển sang AVAILABLE
+      if (targetOrder?.tableId) {
+        try {
+          await catalogApi.patch(`/staff/tables/${targetOrder.tableId}/status`, {
+            status: 'AVAILABLE',
+          });
+        } catch (tableErr) {
+          console.warn('Đồng bộ trạng thái bàn từ frontend:', tableErr);
+        }
+      }
+
+      if (res.data?.tableStatusUpdated === false) {
+        setSuccessMessage('Xác nhận thanh toán tiền mặt thành công! Lưu ý: Bàn chưa thể giải phóng tự động, vui lòng kiểm tra Sơ đồ bàn.');
+      } else {
+        setSuccessMessage('Xác nhận thanh toán tiền mặt thành công! Đã giải phóng bàn.');
+      }
       await fetchOrders(false);
     } catch (err: any) {
       console.error('Lỗi khi thu tiền mặt:', err);

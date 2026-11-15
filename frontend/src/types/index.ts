@@ -112,6 +112,7 @@ export interface ReservationOrder {
   vnpTxnRef?: string;
   emailSent: boolean;
   note?: string;
+  tableStatusUpdated?: boolean;
   items: OrderItem[];
   createdAt?: string;
   updatedAt?: string;

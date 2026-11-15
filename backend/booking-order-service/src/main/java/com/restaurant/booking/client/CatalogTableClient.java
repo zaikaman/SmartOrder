@@ -1,5 +1,6 @@
 package com.restaurant.booking.client;
 
+import com.restaurant.booking.security.InternalTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 public class CatalogTableClient {
 
     private final RestClient catalogRestClient;
+    private final InternalTokenProvider internalTokenProvider;
 
     @Data
     @Builder
@@ -85,28 +87,50 @@ public class CatalogTableClient {
         throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
     }
 
-    public void updateTableStatus(Long tableId, String status) {
+    public boolean updateTableStatus(Long tableId, String status) {
+        if (tableId == null || status == null || status.isBlank()) {
+            log.warn("tableId hoặc status không hợp lệ để cập nhật trạng thái bàn: id={}, status={}", tableId, status);
+            return false;
+        }
+
+        String normalizedStatus = status.trim().toUpperCase();
+        String bearerToken = internalTokenProvider != null ? internalTokenProvider.getOrGenerateBearerToken() : null;
+
+        // 1. Thử gọi endpoint nội bộ /api/v1/internal/tables/{id}/status
         try {
-            catalogRestClient.patch()
+            var request = catalogRestClient.patch()
                     .uri("/api/v1/internal/tables/{id}/status", tableId)
-                    .body(java.util.Map.of("status", status))
-                    .retrieve()
-                    .toBodilessEntity();
-            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (internal)", tableId, status);
-            return;
+                    .body(java.util.Map.of("status", normalizedStatus));
+
+            if (bearerToken != null) {
+                request.header("Authorization", bearerToken);
+            }
+            request.header("X-Internal-Service", "booking-order-service");
+
+            request.retrieve().toBodilessEntity();
+            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (internal)", tableId, normalizedStatus);
+            return true;
         } catch (Exception ex) {
             log.warn("Không thể cập nhật trạng thái bàn ID {} qua internal endpoint: {}. Thử qua staff endpoint...", tableId, ex.getMessage());
         }
 
+        // 2. Dự phòng gọi endpoint nhân viên /api/v1/staff/tables/{id}/status kèm Authorization header hợp lệ
         try {
-            catalogRestClient.patch()
+            var request = catalogRestClient.patch()
                     .uri("/api/v1/staff/tables/{id}/status", tableId)
-                    .body(java.util.Map.of("status", status))
-                    .retrieve()
-                    .toBodilessEntity();
-            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (staff)", tableId, status);
+                    .body(java.util.Map.of("status", normalizedStatus));
+
+            if (bearerToken != null) {
+                request.header("Authorization", bearerToken);
+            }
+            request.header("X-Internal-Service", "booking-order-service");
+
+            request.retrieve().toBodilessEntity();
+            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (staff)", tableId, normalizedStatus);
+            return true;
         } catch (Exception ex) {
-            log.warn("Không thể cập nhật trạng thái bàn ID {} qua Catalog Service: {}", tableId, ex.getMessage());
+            log.error("Không thể cập nhật trạng thái bàn ID {} qua Catalog Service: {}", tableId, ex.getMessage());
+            return false;
         }
     }
 }

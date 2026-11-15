@@ -23,7 +23,7 @@ public class StaffTableController {
     /**
      * Cập nhật trạng thái bàn ăn: AVAILABLE, RESERVED, OCCUPIED.
      */
-    @PatchMapping("/{id}/status")
+    @RequestMapping(value = "/{id}/status", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<DiningTable> updateTableStatus(
             @PathVariable Long id,
             @RequestBody @Valid UpdateTableStatusRequest request) {

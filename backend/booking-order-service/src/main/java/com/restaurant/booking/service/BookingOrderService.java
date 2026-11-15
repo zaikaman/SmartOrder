@@ -252,15 +252,27 @@ public class BookingOrderService {
         order.setStatus(newStatus);
         log.info("Nhân viên cập nhật đơn {} từ {} sang {}", order.getOrderCode(), oldStatus, newStatus);
 
+        boolean tableStatusUpdated = true;
         // Tự động cập nhật trạng thái bàn sang Catalog Service
         if (newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.CANCELLED) {
-            catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
-        } else if (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.PREPARING) {
-            catalogTableClient.updateTableStatus(order.getTableId(), "OCCUPIED");
+            boolean hasOtherDining = orderRepository.existsByTableIdAndStatusInAndIdNot(
+                    order.getTableId(),
+                    List.of(OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED),
+                    order.getId()
+            );
+            if (!hasOtherDining) {
+                tableStatusUpdated = catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+            } else {
+                log.info("Bàn ID {} vẫn còn đơn khác đang phục vụ, giữ nguyên trạng thái OCCUPIED", order.getTableId());
+            }
+        } else if (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.PREPARING || newStatus == OrderStatus.SERVED) {
+            tableStatusUpdated = catalogTableClient.updateTableStatus(order.getTableId(), "OCCUPIED");
         }
 
         ReservationOrder updated = orderRepository.save(order);
-        return toDto(updated);
+        OrderDto dto = toDto(updated);
+        dto.setTableStatusUpdated(tableStatusUpdated);
+        return dto;
     }
 
     private boolean isValidStatusTransition(OrderStatus from, OrderStatus to) {
@@ -292,11 +304,24 @@ public class BookingOrderService {
         order.setStatus(OrderStatus.COMPLETED);
         log.info("Nhân viên xác nhận thanh toán tiền mặt cho đơn {}", order.getOrderCode());
 
-        // Giải phóng bàn khi đã thanh toán xong và hoàn tất
-        catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+        // Giải phóng bàn khi đã thanh toán xong và hoàn tất nếu không còn khách khác dùng bàn
+        boolean hasOtherDining = orderRepository.existsByTableIdAndStatusInAndIdNot(
+                order.getTableId(),
+                List.of(OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED),
+                order.getId()
+        );
+
+        boolean tableStatusUpdated = true;
+        if (!hasOtherDining) {
+            tableStatusUpdated = catalogTableClient.updateTableStatus(order.getTableId(), "AVAILABLE");
+        } else {
+            log.info("Bàn ID {} vẫn còn đơn khác đang phục vụ, không chuyển sang AVAILABLE", order.getTableId());
+        }
 
         ReservationOrder updated = orderRepository.save(order);
-        return toDto(updated);
+        OrderDto dto = toDto(updated);
+        dto.setTableStatusUpdated(tableStatusUpdated);
+        return dto;
     }
 
 
