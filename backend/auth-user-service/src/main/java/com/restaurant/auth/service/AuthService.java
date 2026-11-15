@@ -7,6 +7,7 @@ import com.restaurant.auth.repository.UserRepository;
 import com.restaurant.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final GoogleTokenVerifierService googleTokenVerifierService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -76,43 +78,28 @@ public class AuthService {
 
     @Transactional
     public AuthResponse loginWithGoogle(GoogleLoginRequest request) {
-        String email = request.getEmail();
-        String fullName = request.getName();
-        String picture = request.getPicture();
-
-        // Nếu request chưa có email/name trực tiếp, tiến hành parse từ JWT credential payload
-        if (email == null || email.isBlank()) {
-            try {
-                String[] parts = request.getCredential().split("\\.");
-                if (parts.length >= 2) {
-                    byte[] decoded = java.util.Base64.getUrlDecoder().decode(parts[1]);
-                    String payloadJson = new String(decoded, java.nio.charset.StandardCharsets.UTF_8);
-                    com.fasterxml.jackson.databind.JsonNode rootNode = new com.fasterxml.jackson.databind.ObjectMapper().readTree(payloadJson);
-                    if (rootNode.has("email")) {
-                        email = rootNode.get("email").asText();
-                    }
-                    if (rootNode.has("name")) {
-                        fullName = rootNode.get("name").asText();
-                    }
-                    if (rootNode.has("picture")) {
-                        picture = rootNode.get("picture").asText();
-                    }
-                }
-            } catch (Exception ex) {
-                log.warn("Không thể parse payload từ Google credential: {}", ex.getMessage());
-            }
+        if (request == null || request.getCredential() == null || request.getCredential().isBlank()) {
+            throw new BadCredentialsException("Google ID token không được để trống");
         }
 
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Không tìm thấy thông tin email từ tài khoản Google");
-        }
+        // Xác thực chữ ký số mật mã và tính hợp lệ của token trực tiếp với Google OpenID Connect
+        GoogleUserInfo googleUserInfo = googleTokenVerifierService.verify(request.getCredential());
 
-        final String userEmail = email.trim().toLowerCase();
-        final String displayName = (fullName != null && !fullName.isBlank()) ? fullName.trim() : userEmail.split("@")[0];
-        final String avatar = picture;
+        final String userEmail = googleUserInfo.getEmail().trim().toLowerCase();
+        final String displayName = (googleUserInfo.getName() != null && !googleUserInfo.getName().isBlank())
+                ? googleUserInfo.getName().trim()
+                : userEmail.split("@")[0];
+        final String avatar = googleUserInfo.getPicture();
 
         User user = userRepository.findByEmail(userEmail)
                 .map(existingUser -> {
+                    // Phòng vệ chuyên sâu: Tài khoản ADMIN/STAFF nội bộ (LOCAL) không được phép chiếm quyền qua Google OAuth công khai
+                    if (existingUser.getRole() != UserRole.CUSTOMER && !"GOOGLE".equalsIgnoreCase(existingUser.getAuthProvider())) {
+                        log.warn("Cảnh báo bảo mật: Phát hiện nỗ lực đăng nhập Google OAuth vào tài khoản nội bộ {} (role={})",
+                                existingUser.getUsername(), existingUser.getRole());
+                        throw new BadCredentialsException("Tài khoản quản trị hoặc nhân viên phải đăng nhập bằng tên đăng nhập và mật khẩu nội bộ");
+                    }
+
                     // Cập nhật avatar nếu có
                     if (avatar != null && !avatar.isBlank()) {
                         existingUser.setAvatarUrl(avatar);
@@ -120,7 +107,7 @@ public class AuthService {
                     return userRepository.save(existingUser);
                 })
                 .orElseGet(() -> {
-                    // Tạo mới người dùng từ Google OAuth2
+                    // Tạo mới người dùng từ Google OAuth2 (luôn mang vai trò CUSTOMER)
                     String generatedUsername = "gg_" + userEmail.split("@")[0] + "_" + UUID.randomUUID().toString().substring(0, 5);
                     User newUser = User.builder()
                             .username(generatedUsername)
