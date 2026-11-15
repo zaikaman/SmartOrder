@@ -55,33 +55,56 @@ public class CatalogTableClient {
 
     public TableInfo getTable(Long tableId) {
         try {
+            TableInfo table = catalogRestClient.get()
+                    .uri("/api/v1/tables/{id}", tableId)
+                    .retrieve()
+                    .body(TableInfo.class);
+            if (table != null && table.getId() != null) {
+                return table;
+            }
+        } catch (Exception ex) {
+            log.warn("Không thể lấy chi tiết bàn ID {} qua /api/v1/tables/{id}: {}. Thử tìm từ danh sách bàn...", tableId, ex.getMessage());
+        }
+
+        try {
             TableInfo[] tables = catalogRestClient.get()
                     .uri("/api/v1/tables")
                     .retrieve()
                     .body(TableInfo[].class);
             if (tables != null) {
                 for (TableInfo t : tables) {
-                    if (t.getId().equals(tableId)) {
+                    if (t.getId() != null && t.getId().equals(tableId)) {
                         return t;
                     }
                 }
             }
-            throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
         } catch (Exception ex) {
-            log.error("Lỗi khi lấy thông tin bàn ăn ID {}: {}", tableId, ex.getMessage());
-            // Fallback khi catalog table service chưa bật trong môi trường mock/test
-            throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
+            log.error("Lỗi khi lấy danh sách bàn ăn: {}", ex.getMessage());
         }
+
+        throw new IllegalArgumentException("Không tìm thấy bàn ăn ID: " + tableId);
     }
 
     public void updateTableStatus(Long tableId, String status) {
+        try {
+            catalogRestClient.patch()
+                    .uri("/api/v1/internal/tables/{id}/status", tableId)
+                    .body(java.util.Map.of("status", status))
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (internal)", tableId, status);
+            return;
+        } catch (Exception ex) {
+            log.warn("Không thể cập nhật trạng thái bàn ID {} qua internal endpoint: {}. Thử qua staff endpoint...", tableId, ex.getMessage());
+        }
+
         try {
             catalogRestClient.patch()
                     .uri("/api/v1/staff/tables/{id}/status", tableId)
                     .body(java.util.Map.of("status", status))
                     .retrieve()
                     .toBodilessEntity();
-            log.info("Cập nhật thành công trạng thái bàn ID {} sang {}", tableId, status);
+            log.info("Cập nhật thành công trạng thái bàn ID {} sang {} (staff)", tableId, status);
         } catch (Exception ex) {
             log.warn("Không thể cập nhật trạng thái bàn ID {} qua Catalog Service: {}", tableId, ex.getMessage());
         }

@@ -245,6 +245,25 @@ public class VnPayService {
         String explanation = getResponseMessage(responseCode);
 
         if (success) {
+            // Kiểm tra và đối chiếu số tiền thanh toán thực tế với tổng tiền đơn hàng
+            if (order.getTotalAmount() == null || amount.compareTo(order.getTotalAmount()) < 0) {
+                log.error("Số tiền thanh toán callback ({}) nhỏ hơn tổng tiền đơn hàng ({}) cho đơn {}",
+                        amount, order.getTotalAmount(), order.getOrderCode());
+                order.setPaymentStatus(PaymentStatus.FAILED);
+                orderRepository.save(order);
+                return PaymentCallbackResultDto.builder()
+                        .success(false)
+                        .orderCode(order.getOrderCode())
+                        .txnRef(txnRef)
+                        .amount(amount)
+                        .responseCode(responseCode)
+                        .transactionNo(transactionNo)
+                        .bankCode(bankCode)
+                        .payDate(payDate)
+                        .message("Số tiền thanh toán không khớp với tổng giá trị đơn hàng.")
+                        .build();
+            }
+
             order.setPaymentStatus(PaymentStatus.PAID);
             order.setStatus(OrderStatus.COMPLETED);
             orderRepository.save(order);

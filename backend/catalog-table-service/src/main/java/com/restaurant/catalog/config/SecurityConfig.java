@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/menu/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/menu/ai-recommend").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/tables/**").permitAll()
+                        .requestMatchers("/api/v1/internal/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         // Endpoint nhân viên và nội bộ cập nhật trạng thái bàn
                         .requestMatchers("/api/v1/staff/**").hasAnyRole("STAFF", "ADMIN")

@@ -69,7 +69,18 @@ class StatisticsServiceTest {
                 .createdAt(now)
                 .build();
 
-        when(orderRepository.findAll()).thenReturn(List.of(order1, order2, order3));
+        // Đơn COMPLETED nhưng chưa thanh toán UNPAID không được tính vào doanh thu
+        ReservationOrder order4 = ReservationOrder.builder()
+                .id(4L)
+                .orderCode("ORD-004")
+                .totalAmount(new BigDecimal("50000"))
+                .status(OrderStatus.COMPLETED)
+                .paymentStatus(PaymentStatus.UNPAID)
+                .paymentMethod(PaymentMethod.VNPAY)
+                .createdAt(now)
+                .build();
+
+        when(orderRepository.findAll()).thenReturn(List.of(order1, order2, order3, order4));
 
         List<Object[]> rawTopSelling = new ArrayList<>();
         rawTopSelling.add(new Object[]{"Phở Bò Tái Lăn", 15L, new BigDecimal("1350000")});
@@ -82,7 +93,7 @@ class StatisticsServiceTest {
         assertNotNull(response);
         assertEquals(new BigDecimal("600000"), response.getTotalRevenue());
         assertEquals(2L, response.getCompletedOrdersCount());
-        assertEquals(3L, response.getTotalOrdersCount());
+        assertEquals(4L, response.getTotalOrdersCount());
 
         assertFalse(response.getRevenueByDate().isEmpty());
         assertEquals(new BigDecimal("600000"), response.getRevenueByDate().get(0).getRevenue());

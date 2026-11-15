@@ -39,7 +39,7 @@ public class StatisticsService {
         List<ReservationOrder> allOrders = orderRepository.findAll();
 
         List<ReservationOrder> completedOrders = allOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.COMPLETED)
+                .filter(o -> o.getStatus() == OrderStatus.COMPLETED && o.getPaymentStatus() == com.restaurant.booking.entity.PaymentStatus.PAID)
                 .toList();
 
         BigDecimal totalRevenue = completedOrders.stream()

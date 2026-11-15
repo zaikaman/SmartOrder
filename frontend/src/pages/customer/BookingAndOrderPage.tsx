@@ -67,11 +67,12 @@ export const BookingAndOrderPage: React.FC = () => {
           }
         }
 
-        // Default to first available table
-        const firstAvail = tableList.find((t) => t.status === 'AVAILABLE');
-        if (firstAvail) {
-          setSelectedTableId(firstAvail.id);
-          setTable(firstAvail.id, firstAvail.tableNumber);
+        // Ưu tiên chọn bàn trống có sức chứa phù hợp với số lượng khách (partySize)
+        const suitableTable = tableList.find((t) => t.status === 'AVAILABLE' && t.capacity >= 4)
+          || tableList.find((t) => t.status === 'AVAILABLE');
+        if (suitableTable) {
+          setSelectedTableId(suitableTable.id);
+          setTable(suitableTable.id, suitableTable.tableNumber);
         } else if (tableList.length > 0) {
           setSelectedTableId(tableList[0].id);
         }
@@ -99,12 +100,21 @@ export const BookingAndOrderPage: React.FC = () => {
       return;
     }
 
+    if (selectedTable && selectedTable.capacity < partySize) {
+      setError(`Bàn ${selectedTable.tableNumber} chỉ có sức chứa tối đa ${selectedTable.capacity} người, không đủ cho đoàn ${partySize} khách. Vui lòng chọn bàn khác hoặc giảm số lượng khách.`);
+      return;
+    }
+
+    // Chuyển date và time thành ISO string
+    const reservationDateTime = new Date(`${date}T${time}:00`);
+    if (reservationDateTime.getTime() < Date.now() - 5 * 60 * 1000) {
+      setError('Thời gian dùng bữa phải từ thời điểm hiện tại trở đi.');
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
-
-      // Chuyen date va time thanh ISO string
-      const reservationDateTime = new Date(`${date}T${time}:00`);
 
       const orderPayload: CreateOrderRequest = {
         tableId: selectedTableId,
@@ -248,27 +258,35 @@ export const BookingAndOrderPage: React.FC = () => {
                 {tables.map((table) => {
                   const isSelected = selectedTableId === table.id;
                   const isAvailable = table.status === 'AVAILABLE';
+                  const isCapacityExceeded = table.capacity < partySize;
+                  const isSelectable = isAvailable && !isCapacityExceeded;
 
                   return (
                     <button
                       type="button"
                       key={table.id}
-                      disabled={!isAvailable}
+                      disabled={!isSelectable}
                       onClick={() => {
                         setSelectedTableId(table.id);
                         setTable(table.id, table.tableNumber);
                       }}
                       className={`p-4 rounded-2xl border text-left transition ${
-                        !isAvailable
+                        !isSelectable
                           ? 'border-[#e8dbce]/50 bg-stone-100/70 text-stone-400 opacity-60 cursor-not-allowed'
                           : isSelected
                           ? 'border-[#8B1E0F] bg-[#FFF8F0] ring-2 ring-[#8B1E0F]/20'
                           : 'border-[#e8dbce] bg-[#faf7f2]/50 hover:bg-[#faf7f2]'
                       }`}
-                      title={!isAvailable ? `Bàn đang ${table.status === 'OCCUPIED' ? 'có khách ngồi' : 'đã được đặt trước'}` : `Bàn trống: ${table.tableNumber}`}
+                      title={
+                        !isAvailable
+                          ? `Bàn đang ${table.status === 'OCCUPIED' ? 'có khách ngồi' : 'đã được đặt trước'}`
+                          : isCapacityExceeded
+                          ? `Sức chứa ${table.capacity} người, không đủ cho ${partySize} khách`
+                          : `Bàn trống: ${table.tableNumber}`
+                      }
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className={`font-bold text-sm ${isAvailable ? 'text-[#462c1a]' : 'text-stone-500'}`}>
+                        <span className={`font-bold text-sm ${isSelectable ? 'text-[#462c1a]' : 'text-stone-500'}`}>
                           Bàn {table.tableNumber}
                         </span>
                         {isSelected && <CheckCircle2 className="w-4 h-4 text-[#8B1E0F]" />}
@@ -276,13 +294,19 @@ export const BookingAndOrderPage: React.FC = () => {
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-[#7d6756]">{table.area}</p>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          table.status === 'AVAILABLE'
-                            ? 'bg-[#2d5a27]/10 text-[#2d5a27]'
-                            : table.status === 'OCCUPIED'
-                            ? 'bg-[#b84a28]/10 text-[#b84a28]'
-                            : 'bg-[#c85a17]/10 text-[#c85a17]'
+                          !isAvailable
+                            ? table.status === 'OCCUPIED'
+                              ? 'bg-[#b84a28]/10 text-[#b84a28]'
+                              : 'bg-[#c85a17]/10 text-[#c85a17]'
+                            : isCapacityExceeded
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-[#2d5a27]/10 text-[#2d5a27]'
                         }`}>
-                          {table.status === 'AVAILABLE' ? 'Trống' : table.status === 'OCCUPIED' ? 'Có khách' : 'Đã đặt'}
+                          {!isAvailable
+                            ? table.status === 'OCCUPIED' ? 'Có khách' : 'Đã đặt'
+                            : isCapacityExceeded
+                            ? 'Quá tải'
+                            : 'Trống'}
                         </span>
                       </div>
                       <p className="text-xs font-medium text-[#9c8675] mt-2">Sức chứa: {table.capacity} người</p>
